@@ -2,11 +2,13 @@
 % riscv-spec.tex
 %-----------------------------------------------------------------------
 
-\documentclass[twoside,11pt]{book}
+\documentclass[twoside]{jsbook}
+\usepackage[utf8]{inputenc}
+\usepackage[dvipdfmx]{graphicx}
 
 % Fix copy/pasting of ligatures in Acrobat
-\input{glyphtounicode.tex}
-\pdfgentounicode=1 %
+% \input{glyphtounicode.tex}
+% \pdfgentounicode=1 %
 
 \input{preamble}
 
@@ -26,7 +28,7 @@
   {\tt andrew@sifive.com, krste@berkeley.edu} \\
   \today
 }
-\date{} 
+\date{}
 \maketitle
 
 Contributors to all versions of the spec in
@@ -54,7 +56,7 @@ International License.
 
 This document is a derivative of ``The RISC-V Instruction Set
 Manual, Volume I: User-Level ISA Version 2.1'' released under the following license:
-\copyright \,2010--2017 Andrew Waterman, Yunsup Lee, David Patterson, Krste Asanovi\'{c}. 
+\copyright \,2010--2017 Andrew Waterman, Yunsup Lee, David Patterson, Krste Asanovi\'{c}.
 Creative Commons Attribution 4.0 International License.
 
 Please cite as: ``The RISC-V Instruction Set

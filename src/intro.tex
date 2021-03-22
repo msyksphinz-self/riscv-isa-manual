@@ -1,10 +1,16 @@
 \chapter{Introduction}
 
+\begin{comment}
 RISC-V (pronounced ``risk-five'') is a new instruction-set
 architecture (ISA) that was originally designed to support computer
 architecture research and education, but which we now hope will also
 become a standard free and open architecture for industry
 implementations.  Our goals in defining RISC-V include:
+\end{comment}
+RISC-V（``リスクファイブ''と発音）は、コンピュータアーキテクチャの研究と
+教育をサポートするために設計された新しい命令セットアーキテクチャ（ISA）ですが、
+現在私たちが望んでいるのは、業界標準の自由でオープンなアーキテクチャです。
+RISC-Vを定義する私たちの目標は次のとおりです。：
 \vspace{-0.1in}
 \begin{itemize}
 \parskip 0pt
@@ -34,6 +40,30 @@ implementations.  Our goals in defining RISC-V include:
   and energy efficiency.
 \item A fully virtualizable ISA to ease hypervisor development.
 \item An ISA that simplifies experiments with new privileged architecture designs.
+\end{itemize}
+\vspace{-0.1in}
+
+\vspace{-0.1in}
+\begin{itemize}
+\parskip 0pt
+\itemsep 1pt
+\item 学界や産業界が自由に利用できる完全に{\em オープンな}ISAです。
+\item 実際のISAシミュレーションまたはバイナリ変換だけでなく、直接ネイティブハードウェア実装に適しています。
+\item ISAは特定のマイクロアーキテクチャスタイル（例えばマイクロコード化、インオーダー、デカップル、アウトオブオーダー）や
+  実装技術（フルカスタム、ASIC、FPGAなど）を``オーバーアーキテクチャー``することなく、
+  効率的にこれらのいずれかの実装を可能にします。
+\item ISAは、汎用のソフトウェア開発をサポートするために、
+  カスタマイズされたアクセラレータまたは教育目的のためのベースとして使用可能な{\em 小さな}基本整数ISAと
+  オプションの標準拡張子に分かれています。
+\item 改訂された2008 IEEE-754浮動小数点標準のサポート [14]。
+\item 広範なユーザーレベルのISA拡張機能と{\em 特定用途向けの}バリアントをサポートするISA。
+\item アプリケーション、オペレーティングシステムカーネル、およびハードウェア実装の32ビットおよび64ビットアドレス空間の両バリエーション。
+\item 異種マルチプロセッサを含む、高度に並列なマルチコアまたは多くのコアの実装を支援するISA。
+\item オプションの可変長命令は、使用可能な命令エンコーディング空間を拡張と、
+  オプションの高密度命令エンコーディングを提供し、パフォーマンス、
+  静的コードサイズ、およびエネルギー効率を向上させます。
+\item ハイパーバイザー開発を容易にする完全仮想化ISA
+\item 新しいスーパーバイザーレベルとハイパーバイザーレベルのISAデザインを使用して実験を簡単にするISA。
 \end{itemize}
 \vspace{-0.1in}
 
@@ -514,21 +544,21 @@ $\neq$ {\tt 111}) \\
 \cline{3-4}
 \\
 \cline{2-4}
-\hspace{0.1in} 
+\hspace{0.1in}
 & \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
 & \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
 & \multicolumn{1}{c|}{\tt xxxxxxxxxx011111} & 48-bit \\
 \cline{2-4}
 \\
 \cline{2-4}
-\hspace{0.1in} 
+\hspace{0.1in}
 & \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
 & \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
 & \multicolumn{1}{c|}{\tt xxxxxxxxx0111111} & 64-bit \\
 \cline{2-4}
 \\
 \cline{2-4}
-\hspace{0.1in} 
+\hspace{0.1in}
 & \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
 & \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
 & \multicolumn{1}{c|}{\tt xnnnxxxxx1111111} & (80+16*{\tt nnn})-bit,
@@ -536,7 +566,7 @@ $\neq$ {\tt 111}) \\
 \cline{2-4}
 \\
 \cline{2-4}
-\hspace{0.1in} 
+\hspace{0.1in}
 & \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
 & \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
 & \multicolumn{1}{c|}{\tt x111xxxxx1111111} & Reserved for $\geq$192-bits \\
@@ -755,7 +785,7 @@ some other means may cause a fatal trap.
 
 The architecture fully describes what implementations must do and any
 constraints on what they may do.  In cases where the architecture
-intentionally does not constrain implementations, the term \unspecified\ 
+intentionally does not constrain implementations, the term \unspecified\
 is explicitly used.
 
 The term \unspecified\ refers to a behavior or value that is

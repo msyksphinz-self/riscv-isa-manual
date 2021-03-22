@@ -8,19 +8,19 @@
 # build directory, copy the makefile there, and change the srcdir
 # variable accordingly.
 #
-# Note that the makefile assumes that the default dvips/ps2pdfwr 
-# commands "do the right thing" for fonts in pdfs. This is true on 
+# Note that the makefile assumes that the default dvips/ps2pdfwr
+# commands "do the right thing" for fonts in pdfs. This is true on
 # Athena/Linux and Fedora Core but is not true for older redhat installs ...
 #
 # At a minimum you should just change the main variable to be
-# the basename of your toplevel tex file. If you use a bibliography 
+# the basename of your toplevel tex file. If you use a bibliography
 # then you should set the bibfile variable to be the name of your
 # .bib file (assumed to be in the source directory).
 #
 
 srcdir  = ../src
 
-docs_with_bib = riscv-spec riscv-privileged 
+docs_with_bib = riscv-spec riscv-privileged
 docs_without_bib =
 
 srcs = $(wildcard $(srcdir)/*.tex)
@@ -31,8 +31,10 @@ bibs = $(srcdir)/riscv-spec.bib
 # You shouldn't need to change anything below this
 #=======================================================================
 
-PDFLATEX := TEXINPUTS=$(srcdir): pdflatex -interaction=nonstopmode -halt-on-error
+# PDFLATEX := TEXINPUTS=$(srcdir): pdflatex -interaction=nonstopmode -halt-on-error
+PDFLATEX := TEXINPUTS=$(srcdir): platex
 BIBTEX := BIBINPUTS=$(srcdir): bibtex
+DVIPDFMX := dvipdfmx
 
 default : pdf
 
@@ -54,10 +56,13 @@ $(pdfs_with_bib): %.pdf: $(srcdir)/%.tex $(srcs) $(figs) $(bibs)
 	$(BIBTEX) $*
 	$(PDFLATEX) $*
 	$(PDFLATEX) $*
+	$(DVIPDFMX) riscv-spec.dvi
+	$(DVIPDFMX) riscv-privileged.dvi
 
 $(pdfs_without_bib): %.pdf: $(srcdir)/%.tex $(srcs) $(figs)
 	$(PDFLATEX) $*
 	$(PDFLATEX) $*
+	$(DVIPDFMX) $(subst .pdf,.dvi,$(pdfs_with_bib)) $@
 
 junk += $(pdfs) *.aux *.log *.bbl *.blg *.toc *.out
 
