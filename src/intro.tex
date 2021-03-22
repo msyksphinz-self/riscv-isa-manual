@@ -73,6 +73,12 @@ RISC-Vを定義する私たちの目標は次のとおりです。：
   only interested in the specification itself.
 \end{commentary}
 \begin{commentary}
+  私たちのデザイン決定に関する論評(解説)は、
+  この段落のように書式化されており、
+  読者が仕様書そのもののみに興味がある場合スキップすることができます。
+\end{commentary}
+
+\begin{commentary}
 The name RISC-V was chosen to represent the fifth major RISC ISA
 design from UC Berkeley (RISC-I~\cite{riscI-isca1981},
 RISC-II~\cite{Katevenis:1983}, SOAR~\cite{Ungar:1984}, and
@@ -82,6 +88,28 @@ use of the Roman numeral ``V'' to signify ``variations'' and
 including various data-parallel accelerators, is an explicit goal of
 the ISA design.
 \end{commentary}
+
+\begin{commentary}
+  RISC-Vという名前は、UC Berkeley（RISC-I~\cite{riscI-isca1981},
+    RISC-II~\cite{Katevenis:1983}、SOAR~\cite{Ungar:1984}、
+    SPUR~\cite{spur-jsscc1989}の最初の4つ）から5番目の主要なRISC
+  ISA設計を代表するものです。
+  さまざまなデータ並列アクセラレータを含む一連のアーキテクチャ研究の支援がISA設計の明白な目標で、
+  ``バリエーション``と ``ベクトル``を表すローマ数字``V``の使用についてもしゃれ
+  (だじゃれ)を言います。
+\end{commentary}
+
+RISC-V ISAはソフトウェアからのインタフェースのみを可視化し、
+特定のハードウェアだけでなく様々な実装に対応できるよう、
+実装の詳細について可能な限り触れないように定義されています(しかしコメント文については、
+実装依存の決定についても含まれています)。
+RISC-Vマニュアルは2巻で構成されています。
+本巻はベースとなる{\em 非特権}命令のデザインについてカバーしており、
+オプションとなる非特権ISA拡張も含まれています。
+非特権命令は通常すべての特権モードと特権アーキテクチャで使用可能なものですが、
+命令の動作は特権モードと特権アーキテクチャに非常に強く依存します。
+第2巻は、最初の(``クラシックな``)特権アーキテクチャのデザインについて説明します。
+このマニュアルはIEC 80000-13:2008で定義される単位系を使用しており、1バイトは8ビットとします。
 
 The RISC-V ISA is defined avoiding implementation details as much as
 possible (although commentary is included on implementation-driven
