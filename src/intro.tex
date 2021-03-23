@@ -11,6 +11,8 @@ RISC-V（``リスクファイブ''と発音）は、コンピュータアーキ�
 教育をサポートするために設計された新しい命令セットアーキテクチャ（ISA）ですが、
 現在私たちが望んでいるのは、業界標準の自由でオープンなアーキテクチャです。
 RISC-Vを定義する私たちの目標は次のとおりです。：
+
+\begin{comment}
 \vspace{-0.1in}
 \begin{itemize}
 \parskip 0pt
@@ -42,6 +44,7 @@ RISC-Vを定義する私たちの目標は次のとおりです。：
 \item An ISA that simplifies experiments with new privileged architecture designs.
 \end{itemize}
 \vspace{-0.1in}
+\end{comment}
 
 \vspace{-0.1in}
 \begin{itemize}
@@ -67,17 +70,20 @@ RISC-Vを定義する私たちの目標は次のとおりです。：
 \end{itemize}
 \vspace{-0.1in}
 
+\begin{comment}
 \begin{commentary}
   Commentary on our design decisions is formatted as in this
   paragraph.  This non-normative text can be skipped if the reader is
   only interested in the specification itself.
 \end{commentary}
+
 \begin{commentary}
   私たちのデザイン決定に関する論評(解説)は、
   この段落のように書式化されており、
   読者が仕様書そのもののみに興味がある場合スキップすることができます。
 \end{commentary}
 
+\begin{comment}
 \begin{commentary}
 The name RISC-V was chosen to represent the fifth major RISC ISA
 design from UC Berkeley (RISC-I~\cite{riscI-isca1981},
@@ -88,6 +94,7 @@ use of the Roman numeral ``V'' to signify ``variations'' and
 including various data-parallel accelerators, is an explicit goal of
 the ISA design.
 \end{commentary}
+\end{comment}
 
 \begin{commentary}
   RISC-Vという名前は、UC Berkeley（RISC-I~\cite{riscI-isca1981},
@@ -111,6 +118,7 @@ RISC-Vマニュアルは2巻で構成されています。
 第2巻は、最初の(``クラシックな``)特権アーキテクチャのデザインについて説明します。
 このマニュアルはIEC 80000-13:2008で定義される単位系を使用しており、1バイトは8ビットとします。
 
+\begin{comment}
 The RISC-V ISA is defined avoiding implementation details as much as
 possible (although commentary is included on implementation-driven
 decisions) and should be read as the software-visible interface to a
@@ -124,7 +132,9 @@ vary depending on privilege mode and privilege architecture.  The
 second volume provides the design of the first (``classic'')
 privileged architecture. The manuals use IEC 80000-13:2008
 conventions, with a byte of 8 bits.
+\end{comment}
 
+\begin{comment}
 \begin{commentary}
 In the unprivileged ISA design, we tried to remove any dependence on
 particular microarchitectural features, such as cache line size, or on
@@ -132,8 +142,14 @@ privileged architecture details, such as page translation.  This is
 both for simplicity and to allow maximum flexibility for alternative
 microarchitectures or alternative privileged architectures.
 \end{commentary}
+\end{comment}
 
+非特権ISAのデザインでは、キャッシュラインサイズなどの特定のマイクロアーキテクチャの機能や、
+ページ変換などの特権アーキテクチャの詳細に依存しないようにしました。 
+これは、単純化するためであり、また、代替のマイクロアーキテクチャや
+代替の特権アーキテクチャに対して最大限の柔軟性を持たせるためでもあります。
 
+\begin{comment}
 \section{RISC-V Hardware Platform Terminology}
 
 A RISC-V hardware platform can contain one or more RISC-V-compatible
@@ -170,6 +186,35 @@ shared-memory manycore server nodes.  Even small systems-on-a-chip
 might be structured as a hierarchy of multicomputers and/or
 multiprocessors to modularize development effort or to provide secure
 isolation between subsystems.
+\end{comment}
+
+\section{RISC-V ハードウェアプラットフォームの用語}
+
+RISC-Vハードウェアプラットフォームには、1つまたは複数のRISC-V互換のプロセッシングコアと、
+その他の非RISC-V互換のコア、固定機能のアクセラレータ、さまざまな物理メモリ構造、
+I/Oデバイス、およびコンポーネント間の通信を可能にするインターコネクト構造が含まれます。
+
+独立した命令フェッチユニットを含むコンポーネントを{\em コア}と呼びます。
+RISC-V互換のコアは、マルチスレッドにより、複数のRISC-V互換のハードウェアスレッド、または{\em hart}をサポートします。
+
+RISC-Vコアは、特殊な命令セットの拡張や、{\em コプロセッサ}の追加を行うことができます。
+私たちは{\em コプロセッサ}という用語を、RISC-Vコアに接続されるユニットとして使用し、
+ほとんどがRISC-V命令ストリームによって順番に実行されますが、
+追加のアーキテクチャ状態や命令セット拡張を含み、
+場合によってはプライマリRISC-V命令ストリームに対して限定的な自律性を持つユニットを指すために使用します。
+
+ここでは、プログラマブルではない固定機能ユニットや、
+自律的に動作するが特定のタスクに特化したコアを{\em アクセラレータ}と呼んでいます。 
+RISC-Vシステムでは、プログラム可能なアクセラレータの多くは、RISC-Vベースのコアに特殊な
+命令セット拡張やカスタマイズされたコプロセッサを搭載したものになると考えられます。
+RISC-Vアクセラレータの中で重要なクラスは、
+I/Oアクセラレータで、I/O処理タスクをメインのアプリケーションコアからオフロードします。
+
+RISC-Vハードウェアプラットフォームのシステムレベルの構成は、
+シングルコアのマイクロコントローラから、共有メモリを持つメニーコアの
+サーバーノードの何千何万ノードのクラスタにまで及びます。 
+また、小型のシステム・オン・チップであっても、マルチコンピュータやマルチプロセッサの
+階層構造にすることで、開発作業をモジュール化したり、サブシステム間を安全に分離することができます。
 
 \section{RISC-V Software Execution Environments and Harts}
 
