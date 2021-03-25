@@ -562,12 +562,12 @@ RISC-V ISAという言い方は便利ですが、RISC-Vは実際には関連す�
 各基本整数命令セットは、整数レジスタの幅とそれに対応するアドレス空間のサイズ、
 および整数レジスタの数によって特徴付けられます。 
 ベース整数にはRV32IとRV64Iの2種類があり、
-Chapters~\ref{rv32}および\ref{rv64}で説明されており、
+第~\ref{rv32}章および第\ref{rv64}章で説明されており、
 それぞれ32ビットと64ビットのアドレス空間を提供しています。
 ここでは，整数レジスタの幅(32ビットまたは64ビット)をXLENと呼ぶことにします。
-Chapter~\ref{rv32e}では、RV32I基本命令セットのサブセットであるRV32Eについて説明しています。
+第~\ref{rv32e}章では、RV32I基本命令セットのサブセットであるRV32Eについて説明しています。
 RV32Eは、小型マイクロコントローラをサポートするために追加された命令セットで、整数レジスタの数が半分になっています。
-Chapter~\ref{rv128}では、フラットな128ビットのアドレス空間(XLEN=128)をサポートする基本整数命令セットの
+第~\ref{rv128}章では、フラットな128ビットのアドレス空間(XLEN=128)をサポートする基本整数命令セットの
 将来のRV128Iバリアントをスケッチしています。
 基本的な整数命令セットは、符号付き整数値に2の補数表現を使用します。
 
@@ -751,7 +751,7 @@ RISC-Vプラットフォームに複数のhartsがある場合、
 RISC-Vの機械語命令を実行するためには、1回以上のメモリアクセスが必要となりますが、
 そのアクセスは「暗黙的」と「明示的」に分けられます。
 各命令の実行時には、実行するコード化された命令を取得するために、
-メモリリード（命令フェッチ）が行われます。
+メモリリード(命令フェッチ)が行われます。
 多くのRISC-V命令は、命令フェッチ以外のメモリアクセスを行いません。
 特定のロード命令やストア命令は、命令によって決定されたアドレスに対して、
 メモリのリードまたはライトを行います。
@@ -772,7 +772,7 @@ RISC-Vの機械語命令を実行するためには、1回以上のメモリア�
 後の命令フェッチのためにフェッチ可能な(実行可能な)バイトをできるだけ多くキャッシュし、
 命令フェッチのためにメインメモリを二度と読み取らないようにすることができます。 特定の暗黙のリードが、同じメモリロケーションへのライトの後にのみ順序付けられるようにするには、
 ソフトウェアは、この目的のために定義された特定のフェンスまたは
-キャッシュコントロール命令(Chapter~\ref{chap:zifencei}で定義されたFENCE.I命令など)
+キャッシュコントロール命令(第~\ref{chap:zifencei}章で定義されたFENCE.I命令など)
 を実行する必要があります。
 
 hartが行うメモリアクセス(暗黙的または明示的)は、
@@ -780,9 +780,9 @@ hartが行うメモリアクセス(暗黙的または明示的)は、
 異なる順序で行われているように見えることがあります。
 しかし、このようなメモリアクセスの順序変更は、適用可能なメモリ一貫性モデルによって常に制約されます。
 RISC-Vのデフォルトのメモリ一貫性モデルは、
-RISC-V Weak Memory Ordering (RVWMO)で、Chapter~\ref{ch:memorymodel}とAppendicesで定義されています。
+RISC-V Weak Memory Ordering (RVWMO)で、第~\ref{ch:memorymodel}章とAppendicesで定義されています。
 オプションとして、より強力なモデルであるTotal Store Orderingを
-採用することもできます(Chapter~\ref{sec:ztso}で定義)。 
+採用することもできます(第~\ref{sec:ztso}章で定義)。 
 また、実行環境では、メモリアクセスの順序変更をさらに制限する
 制約を加えることもできます。
 RVWMOモデルは、RISC-Vの実装に許される最も弱いモデルであるため、
@@ -829,7 +829,7 @@ lowest two bits equal to {\tt 00}, {\tt 01}, or {\tt 10}.
 これらの命令は、32ビット境界で自然に整列する必要があります。
 しかし、標準のRISC-Vエンコーディング方式は、可変長命令を持つISA拡張をサポートするように設計されており、
 各命令は任意の数の16ビット命令{\em 区切り}になり、16ビット境界で自然に整列されます。
-Chapter~\ref{compressed}で説明した標準の圧縮ISA拡張命令は、
+第~\ref{compressed}章で説明した標準の圧縮ISA拡張命令は、
 圧縮された16ビット命令を提供することでコードサイズを縮小し、
 すべての命令(16ビットと32ビット)を16ビット境界で整列させて
 コード密度を向上させるための整列制約を緩和します。
@@ -845,12 +845,12 @@ IALIGNは、16または32以外の値を取ることはできません。
 基本命令セットのみをサポートする実装では、ILENは32ビットです。
 より長い命令をサポートする実装では、ILENの値が大きくなります。
 
-Figure~\ref{instlengthcode}に、標準的なRISC-V命令長エンコード規則を示します。
+図~\ref{instlengthcode}に、標準的なRISC-V命令長エンコード規則を示します。
 ベースISAのすべての32ビット命令は、最下位の2ビットが{\tt 11}に固定されています。
 オプションの圧縮された16ビット命令セット拡張は、
 下位の2ビットが{\tt 00},{\tt 01}、または{\tt 10}のいずれかとなります。
 
-
+\begin{comment}
 \subsection*{Expanded Instruction-Length Encoding}
 
 A portion of the 32-bit instruction-encoding space has been tentatively
@@ -918,7 +918,75 @@ Byte Address: & \multicolumn{1}{r}{base+4} & \multicolumn{1}{r}{base+2} & \multi
 \caption{RISC-V instruction length encoding.  Only the 16-bit and 32-bit encodings are considered frozen at this time.}
 \label{instlengthcode}
 \end{figure}
+\end{comment}
 
+\subsection{命令長拡張エンコーディング}
+
+32ビットの命令エンコード領域の一部は、32ビットよりも長い命令のために暫定的に割り当てられています。
+現時点では、このスペースの全体が予約されており、
+32ビットを超える命令をエンコードするための以下の提案は凍結されていないと考えられます。
+
+32ビット以上でエンコードされた標準的な命令セット拡張は、
+下位ビットが追加で1に設定されており、48ビットと64ビットの長さの規則は図~\ref{instlengthcode}に示されています。 
+80ビットから176ビットまでの命令長は、
+ビット[14:12]に16ビットワードの数を示す3ビットのフィールドを使用して符号化されますが、
+これは最初の5$¥times$16ビットワードに加えて、16ビットワードの数を示すものです。
+ビット[14:12]に{\tt 111}を設定したエンコーディングは、
+将来のより長い命令のエンコーディングのために予約されています。
+
+\begin{figure}[hbt]
+{
+\begin{center}
+\begin{tabular}{ccccl}
+\cline{4-4}
+& & & \multicolumn{1}{|c|}{\tt xxxxxxxxxxxxxxaa} & 16-bit ({\tt aa}
+$\neq$ {\tt 11})\\
+\cline{4-4}
+\\
+\cline{3-4}
+& & \multicolumn{1}{|c|}{\tt xxxxxxxxxxxxxxxx}
+& \multicolumn{1}{c|}{\tt xxxxxxxxxxxbbb11} & 32-bit ({\tt bbb}
+$\neq$ {\tt 111}) \\
+\cline{3-4}
+\\
+\cline{2-4}
+\hspace{0.1in}
+& \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
+& \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
+& \multicolumn{1}{c|}{\tt xxxxxxxxxx011111} & 48-bit \\
+\cline{2-4}
+\\
+\cline{2-4}
+\hspace{0.1in}
+& \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
+& \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
+& \multicolumn{1}{c|}{\tt xxxxxxxxx0111111} & 64-bit \\
+\cline{2-4}
+\\
+\cline{2-4}
+\hspace{0.1in}
+& \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
+& \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
+& \multicolumn{1}{c|}{\tt xnnnxxxxx1111111} & (80+16*{\tt nnn})-bit,
+       {\tt nnn}$\neq${\tt 111} \\
+\cline{2-4}
+\\
+\cline{2-4}
+\hspace{0.1in}
+& \multicolumn{1}{c|}{$\cdot\cdot\cdot${\tt xxxx} }
+& \multicolumn{1}{c|}{\tt xxxxxxxxxxxxxxxx}
+& \multicolumn{1}{c|}{\tt x111xxxxx1111111} & Reserved for $\geq$192-bits \\
+\cline{2-4}
+\\
+Byte Address: & \multicolumn{1}{r}{base+4} & \multicolumn{1}{r}{base+2} & \multicolumn{1}{r}{base} & \\
+ \end{tabular}
+\end{center}
+}
+\caption{RISC-V命令長エンコーディング。現在では16ビットと32ビット命令長のエンコーディングのみが決定されている。}
+\label{instlengthcode}
+\end{figure}
+
+\begin{comment}
 \begin{commentary}
 Given the code size and energy savings of a compressed format, we
 wanted to build in support for a compressed format to the ISA encoding
@@ -948,13 +1016,45 @@ for standard $\geq$32-bit instruction-set extensions.  Further, if the
 implementation also does not need instructions $>$32-bits in length,
 it can recover a further four major opcodes for non-conforming extensions.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+圧縮フォーマットのコードサイズとエネルギーの節約を考えると、
+後付けではなく、ISAエンコーディングスキームに圧縮フォーマットのサポートを組み込みたかったのですが、
+よりシンプルな実装を可能にするために、圧縮フォーマットを必須にはしませんでした。
+また、実験やより大きな命令セットの拡張をサポートするために、
+より長い命令をオプションで許可したいと考えました。
+今回のエンコード方式では、RISC-V ISAのコア部分をよりタイトにエンコードする必要がありましたが、
+これにはいくつかの利点があります。
+
+標準的なIMAFD ISAの実装では、
+命令キャッシュには上位の30ビットを保持するだけで良いです(6.25\%の削減)。 命令キャッシュのリフィルでは、不正な命令例外の動作を維持するために、
+いずれかの下位ビットがクリアされている命令は、
+キャッシュに格納する前に不正な30ビット命令に再コードされるべきです。
+
+さらに重要なことは、ベースISAを32ビット命令語のサブセットに凝縮することで、
+非標準やカスタムの拡張に利用できるスペースを確保していることです。
+特に、ベースとなるRV32I ISAでは、32ビット命令語のエンコーディングスペースの1/8以下しか使用していません。
+第~\ref{extensions}章で説明したように、標準的な圧縮命令拡張のサポートを必要としない実装では、
+標準的な$\geq$32ビット命令セット拡張のサポートを維持しながら、
+さらに3つの標準ではない30ビット命令スペースを32ビット固定幅フォーマットにマッピングすることができます。
+さらに、32ビットよりも長い命令を必要としない実装であれば、
+さらに4つの主要なオペコードを標準ではない拡張に対応させることができます。
+\end{commentary}
+
+\begin{comment}
 Encodings with bits [15:0] all zeros are defined as illegal
 instructions.  These instructions are considered to be of minimal
 length: 16 bits if any 16-bit instruction-set extension is present,
 otherwise 32 bits.  The encoding with bits [ILEN-1:0] all ones is also
 illegal; this instruction is considered to be ILEN bits long.
+\end{comment}
 
+ビット[15:0]がすべてゼロのエンコーディングは、不正な命令として定義されます。 
+これらの命令は、16ビットの命令セット拡張がある場合は16ビット、それ以外の場合は32ビットという最小の長さとみなされます。
+また、[ILEN-1:0]ビットがすべて1のエンコーディングも不正な命令で、この命令はILENビット長とみなされます。
+
+\begin{comment}
 \begin{commentary}
 We consider it a feature that any length of instruction containing all
 zero bits is not legal, as this quickly traps erroneous jumps into
@@ -978,7 +1078,31 @@ report an illegal instruction exception rather than an access-fault
 exception when such an instruction borders a protection boundary,
 complicating variable-instruction-length fetch and decode.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+すべての長さの命令において、すべてのビットがゼロの命令は、
+ゼロのメモリ領域への誤ったジャンプをすぐに捕捉するため、
+不正な命令となっていることを特徴としています。
+同様に、プログラムされていない不揮発性メモリデバイス、
+切断されたメモリバス、または壊れたメモリデバイスで観察されるもう一つの一般的な
+パターンを捕らえるために、すべての1を含む命令エンコーディングも不正な命令として予約します。
+
+ソフトウェアは、すべてのRISC-Vの実装において、
+0を含む自然にアラインされた32ビットのワードが不正な命令として機能することに依存し、
+不正な命令が明示的に望まれるソフトウェアによって使用されます。
+すべての1に対応する既知のイリーガル値を定義することは、可変長エンコーディングのため、より困難です。
+ソフトウェアは、最終的なターゲット・マシンのILENを知らない可能性があるため
+(例えば、ソフトウェアが多くの異なるマシンで使用される標準的なバイナリ・ライブラリにコンパイルされている場合)、
+すべての1のILENビットのイリーガル値を一般的に使用することはできません。 
+すべてのマシンが32ビットの命令サイズをサポートする必要があるため、
+すべての1からなる32ビットのワードを不正命令と定義することも検討されましたが、
+この場合、ILEN$>$32を持つマシンの命令フェッチ・ユニットは、
+そのような命令が保護境界を越えたときに、アクセス・フォールト例外ではなく不正命令例外を報告する必要があり、
+可変命令長のフェッチおよびデコードが複雑になります。
+\end{commentary}
+
+\begin{comment}
 RISC-V base ISAs have either little-endian or big-endian memory systems,
 with the privileged architecture further defining bi-endian operation.
 Instructions are stored in memory as a sequence of 16-bit little-endian
@@ -986,7 +1110,16 @@ parcels, regardless of memory system endianness.
 Parcels forming one instruction are stored at increasing
 halfword addresses, with the lowest-addressed parcel holding the
 lowest-numbered bits in the instruction specification.
+\end{comment}
 
+RISC-Vの基本ISAは、リトルエンディアンまたはビッグエンディアンのメモリシステムを持ち、
+特権アーキテクチャではさらにバイエンディアン動作が定義されています。
+命令は、メモリシステムのエンディアンに関係なく、
+16ビットのリトルエンディアン区画のシーケンスとしてメモリに格納されます。
+1つの命令を構成する区画は、ハーフワードアドレスの増加に伴って格納され、
+最も低いアドレスの区画には、命令仕様の最下位ビットが格納されています。
+
+\begin{comment}
 \begin{commentary}
 We originally chose little-endian byte ordering for the RISC-V memory system
 because little-endian systems are currently dominant commercially (all
@@ -1022,6 +1155,41 @@ to instruction memory.
 Once we had decided to fix on a little-endian instruction encoding, this
 naturally led to placing the length-encoding bits in the LSB positions of the
 instruction format to avoid breaking up opcode fields.
+\end{commentary}
+\end{comment}
+
+\begin{commentary}
+RISC-Vのメモリシステムにリトルエンディアン方式のバイトオーダを採用したのは、
+現在、商業的にリトルエンディアン方式が主流となっているからです
+(x86系のすべてのシステム、ARM系のiOS、Android、Windowsなど)。 
+また、ハードウェア設計者にとっても、リトルエンディアンのメモリシステムの方が自然であると考えたからです。 
+しかし、IPネットワークなどの特定のアプリケーション分野では、ビッグエンディアンのデータ構造で動作しますし、
+レガシーのコードベースもビッグエンディアンのプロセッサを想定して作られていますので、
+RISC-Vにビッグエンディアンとバイエンディアンのバリエーションを定義しました。
+
+メモリシステムのエンディアンとは無関係に、命令区画がメモリに格納される順序を固定し、
+長さをエンコードするビットがハーフワードアドレス順に常に最初に現れるようにしなければなりません。
+これにより、命令フェッチユニットは、最初の16ビットの命令区画の最初の数ビットを調べるだけで、
+可変長の命令の長さをすばやく判断することができます。
+
+さらに、命令区画自体をリトルエンディアンにすることで、
+命令のエンコーディングとメモリシステムのエンディアンを完全に切り離しています。
+この設計は、ソフトウェアツールとバイエンディアンハードウェアの両方にメリットがあります。
+例えば、RISC-Vのアセンブラやディスアセンブラは、
+実行中にエンディアンモードが動的に変化する可能性があるにもかかわらず、
+常に意図したアクティブなエンディアンを知る必要があります。
+これに対して、命令に固定のエンディアンネスを与えることで、
+注意深く書かれたソフトウェアは、位置に依存しないコードのように、
+バイナリ形式であってもエンディアンネスに依存しないことができる場合があります。
+
+しかし、リトルエンディアンのみを選択したことは、
+機械語命令をエンコードまたはデコードするRISC-Vソフトウェアに影響を与えます。
+例えば、ビッグエンディアンのJITコンパイラは、
+命令メモリに格納する際にバイト順を入れ替える必要があります。
+
+一度命令のエンコーディングをリトルエンディアンに固定することが決めると、
+当然、長さエンコーディングビットを命令フォーマットのLSB位置に配置して、
+オペコードフィールドを分割しないようにしています。
 \end{commentary}
 
 \section{Exceptions, Traps, and Interrupts}
