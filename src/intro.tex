@@ -1192,6 +1192,7 @@ RISC-Vにビッグエンディアンとバイエンディアンのバリエー�
 オペコードフィールドを分割しないようにしています。
 \end{commentary}
 
+\begin{comment}
 \section{Exceptions, Traps, and Interrupts}
 \label{sec:trap-defn}
 
@@ -1210,12 +1211,35 @@ exception is signaled on an instruction (except for floating-point
 exceptions, which, in the standard floating-point extensions, do not
 cause traps).  The manner in which interrupts are generated, routed
 to, and enabled by a hart depends on the EEI.
+\end{comment}
 
+\section{例外、トラップ、割り込み}
+\label{sec:trap-defn}
+
+{\em 例外(exception)}とは、現在のRISC-V hartの命令に関連してランタイムに発生する異常な状態を指します。
+外部からの非同期イベントで、RISC-V hartに予期せぬ制御権の移譲が発生することを指しています。
+また、例外や割り込みによるトラップハンドラへの制御の移行については、
+{\em トラップ(trap)}という用語を使用しています。
+
+以下の章の命令説明では、実行中に例外が発生する条件を説明しています。 
+ほとんどのRISC-V EEIの一般的な動作は、
+命令で例外がシグナリングされると、何らかのハンドラへのトラップが発生します
+(標準の浮動小数点拡張機能ではトラップが発生しない浮動小数点例外を除く)。 
+割り込みがどのように生成され、どのようにルーティングされ、どのように有効化されるのかは、EEIによって異なります。
+
+\begin{comment}
 \begin{commentary}
 Our use of ``exception'' and ``trap'' is compatible with that in the IEEE-754
 floating-point standard.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+私たちが用いる``例外(exception)''と``トラップ(trap)''は、
+IEEE-754浮動小数点規格のものと互換性があります。
+\end{commentary}
+
+\begin{comment}
 How traps are handled and made visible to software running on the hart
 depends on the enclosing execution environment.  From the perspective
 of software running inside an execution environment, traps encountered
@@ -1250,7 +1274,41 @@ by a hart at runtime can have four different effects:
     a watchdog timer to expire.  Each EEI should define how execution
     is terminated and reported to an external environment.
 \end{description}
+\end{comment}
 
+トラップがどのように処理され、hart上で動作するソフトウェアに表示されるかは、
+周囲の実行環境によって異なります。
+実行環境の中で動作するソフトウェアの視点から見ると、
+実行時にhartが遭遇するトラップは4つの異なる効果をもたらします。
+
+\begin{description}
+  \item [Contained Trap:] このトラップは、実行環境内で動作するソフトウェアから見え、処理されます。
+  例えば、スーパーバイザーモードとユーザーモードの両方のhartを提供しているEEIでは、
+  ユーザーモードのhartによるECALLは、一般的に、同じhart上で実行されている
+  スーパーバイザーモードのハンドラに制御を移すことになります。
+  同様に、同じ環境下では、hartが割り込みを受けると、
+  そのhart上でスーパバイザモードの割り込みハンドラが実行されます。
+  \item[Requested Trap:] このトラップでは、実行環境に明示的な呼び出しを行い、
+  実行環境内のソフトウェアに代わってアクションを要求する同期例外のことです。
+  例として、システムコールがあります。
+  この場合、要求されたアクションが実行環境で実行された後、hartで実行が再開される場合もあれば、
+  再開されない場合もあります。
+  例えば、システムコールは、hartを削除したり、
+  実行環境全体の秩序ある終了を引き起こす可能性があります。
+  \item[Invisible Trap:] このトラップは実行環境によって透過的に処理され、
+  トラップの処理後に実行が正常に再開されます。
+  例えば、欠落した命令のエミュレーション、デマンド・ページング方式の
+  仮想メモリ・システムにおける非常駐ページ・フォールトの処理、
+  マルチプログラム・マシンにおける別のジョブのためのデバイス割込みの処理などがあります。
+  これらのケースでは、実行環境内で動作しているソフトウェアは
+  トラップを意識しません(ここではタイミングの影響を無視しています)。
+  \item[Fatal Trap:] このトラップは致命的な失敗を表し、実行環境が実行を終了させます。
+  例としては、仮想メモリのページ保護チェックの失敗や、
+  ウォッチドッグ・タイマーの期限切れなどがあります。
+  各EEIは、どのように実行を終了し、外部環境に報告するかを定義する必要があります。
+\end{description}
+
+\begin{comment}
 Table~\ref{table:trapcharacteristics} shows the characteristics of each
 kind of trap.
 
@@ -1269,7 +1327,26 @@ kind of trap.
     requested. 2) Imprecise fatal traps might be observable by software.}
 \label{table:trapcharacteristics}
 \end{table}
+\end{comment}
 
+表~\ref{table:trapcharacteristics}に各トラップの特徴を示します。
+
+\begin{table}[hbt]
+  \centering
+  \begin{tabular}{|l|c|c|c|c|}
+      \hline
+      & Contained & Requested & Invisible & Fatal\\
+      \hline
+      実行終了             & No & No$^{1}$ & No  & Yes \\
+      ソフトウェアから観測できる  & No & No       & Yes & Yes$^{2}$ \\
+      実行環境により処理される & No & Yes      & Yes & Yes \\
+      \hline
+  \end{tabular}
+  \caption{トラップの特徴. 注: 1) 実行の終了がリクエストされる. 2) 不正確なfatal trapがソフトウェアから観測可能.}
+\label{table:trapcharacteristics}
+\end{table}
+
+\begin{comment}
 The EEI defines for each trap whether it is handled precisely, though
 the recommendation is to maintain preciseness where possible.
 Contained and requested traps can be observed to be imprecise by
@@ -1287,7 +1364,25 @@ defined solely to cause requested traps are documented here.
 Invisible traps are, by their nature, out of scope for this document.
 Instruction encodings that are not defined here and not defined by
 some other means may cause a fatal trap.
+\end{comment}
 
+EEIでは、各トラップが正確に処理されるかどうかを定義していますが、
+可能な限り正確さを維持することを推奨しています。
+Contained TrapとRequested Trapは、実行環境内のソフトウェアによって不正確であることが確認できます。
+Invisible Trapは、定義上、実行環境内で実行されているソフトウェアによって
+正確であるか不正確であるかを観察することはできません。 Fatal Trapは、既知のエラー命令が即時終了を引き起こさない場合、
+実行環境内で動作するソフトウェアによって不正確であることが確認できます。
+
+このドキュメントでは、非特権的な命令について説明しているため、
+トラップについてはほとんど触れられていません。 
+含まれるトラップを処理するアーキテクチャ手段は、よりリッチなEEIをサポートする他の機能とともに、
+特権アーキテクチャ・マニュアルで定義されています。 
+ここでは、Requested Trapを引き起こすためだけに定義された非特権命令について説明します。
+Invisible Trapは、その性質上、このドキュメントの対象外となります。
+ここで定義されておらず、他の手段でも定義されていない命令エンコーディングは、
+致命的なトラップを引き起こす可能性があります。
+
+\begin{comment}
 \section{UNSPECIFIED Behaviors and Values}
 
 The architecture fully describes what implementations must do and any
@@ -1306,3 +1401,20 @@ Like the base architecture, extensions should fully describe allowable
 behavior and values and use the term \unspecified\ for cases that are
 intentionally unconstrained.  These cases may be constrained or defined
 by other extensions, platform standards, or implementations.
+\end{comment}
+
+\section{``定義されていない''動作と値}
+
+アーキテクチャは、実装が何をしなければならないか、何をしてもよいかという制約を完全に記述しています。
+ーキテクチャが意図的に実装を制約しない場合には、 ``定義されていない(unspecified)'' という用語が明示的に使用されます。
+
+意図的に制約されていない動作や値を意味します。
+これらの動作や値の定義は、拡張機能、プラットフォーム標準、
+または実装に開放されています。
+拡張機能、プラットフォーム標準、または実装文書は、基本アーキテクチャが ``定義されていない'' 
+と定義したケースをさらに制約するための規範的な内容を提供することができます。
+
+基本アーキテクチャと同様に、拡張機能は許容される動作と値を完全に記述する必要があり、
+意図的に制約を受けないケースには ``定義されていない(unspecified)'' という用語を使用します。 
+これらのケースは、他の拡張機能、プラットフォームの標準、
+または実装によって制約されたり定義されたりします。
