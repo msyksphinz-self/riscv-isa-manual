@@ -1,8 +1,16 @@
+\begin{comment}
 \chapter{RV32I Base Integer Instruction Set, Version 2.1}
 \label{rv32}
 
 This chapter describes the RV32I base integer instruction set.
+\end{comment}
 
+\chapter{RV32I ベース整数命令セット, Version 2.1}
+\label{rv32}
+
+本章ではRV32Iベース整数命令セットについて説明する。
+
+\begin{comment}
 \begin{commentary}
 RV32I was designed to be sufficient to form a compiler target and to
 support modern operating system environments.  The ISA was also
@@ -23,16 +31,48 @@ little incentive to subset a real hardware implementation beyond
 omitting support for misaligned memory accesses and treating all
 SYSTEM instructions as a single trap.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+RV32Iは、コンパイラのターゲットを形成するのに十分な性能と、最新のOS環境をサポートするように設計されています。
+また、ISAは、最小限の実装で必要なハードウェアを減らすように設計されています。
+RV32Iには40のユニークな命令が含まれていますが、シンプルな実装であれば、ECALL/EBREAK命令を常にトラップする1つのSYSTEMハードウェア命令でカバーしたり、
+FENCE命令をNOPとして実装することで、
+基本命令数を合計38に減らすことができるかもしれません。
+RV32Iは、他のほとんどのISA拡張をエミュレートすることができます(アトミック性のために追加のハードウェアサポートを必要とするA拡張を除く)。
+
+実際には、マシンモード特権アーキテクチャを含むハードウェア実装では、
+6つのCSR命令も必要となります。
+
+基本となる整数ISAのサブセットは、教育的には有用かもしれませんが、
+実際のハードウェア実装では、ミスアラインド・メモリ・アクセスのサポートを省略したり、
+SYSTEM命令をすべて1つのトラップとして扱ったりする以外には、
+サブセット化する動機がほとんどないように定義されています。
+\end{commentary}
+
+\begin{comment}
 \begin{commentary}
 The standard RISC-V assembly language syntax is documented in the
 Assembly Programmer's Manual~\cite{riscv-asm-manual}.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+RISC-Vの標準的なアセンブリ言語の文法は、
+Assembly Programmer's Manual~\cite{riscv-asm-manual}に記載されています。	
+\end{commentary}
+
+\begin{comment}
 \begin{commentary}
 Most of the commentary for RV32I also applies to the RV64I base.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+殆どのRV32Iにおけるコメント文は、RV64Iベースにも適用できます。
+\end{commentary}
+
+\begin{comment}
 \section{Programmers' Model for Base Integer ISA}
 
 Figure~\ref{gprs} shows the unprivileged state for the base integer
@@ -93,7 +133,69 @@ holds the address of the current instruction.
 \caption{RISC-V base unprivileged integer register state.}
 \label{gprs}
 \end{figure}
+\end{comment}
 
+\section{ベース整数命令のプログラマモデル}
+
+図~\ref{gprs}は、ベース整数ISAの非特権状態を示しています。
+RV32Iでは、32本のレジスタはそれぞれ32ビット幅(XLEN=32)で構成されています。
+レジスタ{\tt x0}は全てのビットがゼロに固定されています。
+汎用レジスタ{\tt x1} -- {\tt x31}は、ブール値の集合体、2の補数の符号付き2進整数、
+符号なし2進整数として、各種命令が解釈する値を保持します。
+
+もう一つ非特権レジスタが定義されています: プログラムカウンタ{\tt pc} は、
+現在実行中の命令のアドレスを保持しています。
+
+\begin{figure}[H]
+{\footnotesize
+\begin{center}
+\begin{tabular}{p{2in}}
+\instbitrange{XLEN-1}{0}                                  \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ \ \ x0 / zero}}      \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x1\ \ \ \ \ }}            \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x2\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x3\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x4\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x5\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x6\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x7\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x8\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ \ x9\ \ \ \ \ }}       \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x10\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x11\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x12\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x13\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x14\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x15\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x16\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x17\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x18\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x19\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x20\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x21\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x22\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x23\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x24\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x25\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x26\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x27\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x28\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x29\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x30\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{\ \ \ x31\ \ \ \ \ }}        \\ \cline{1-1}
+\multicolumn{1}{c}{XLEN}                                  \\
+
+\instbitrange{XLEN-1}{0}                                  \\ \cline{1-1}
+\multicolumn{1}{|c|}{\reglabel{pc}}                         \\ \cline{1-1}
+\multicolumn{1}{c}{XLEN}                                  \\
+\end{tabular}
+\end{center}
+}
+\caption{RISC-Vベース非特権整数レジスタの状態}
+\label{gprs}
+\end{figure}
+
+\begin{comment}
 \begin{commentary}
 There is no dedicated stack pointer or subroutine return address link
 register in the Base Integer ISA; the instruction encoding allows any
@@ -113,7 +215,27 @@ the assumption that {\tt x1} is the return address register and {\tt
  x2} is the stack pointer. Software using other conventions will
 operate correctly but may have greater code size.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+ベース整数ISAには、専用のスタックポインタやサブルーチンのリターンアドレスのリンクレジスタはなく、
+命令エンコーディングでは、どの{tt x}レジスタもこれらの目的に使用することができます。
+しかし、標準的なソフトウェアの呼び出し規則では、
+呼び出しのためのリターンアドレスを保持するためにレジスタ{\tt x1}を使用し、
+代わりのリンクレジスタとしてレジスタ{\tt x5}を使用します。
+また、標準的な呼び出し規則では、スタック・ポインタとしてレジスタ {\tt x2}を使用します。
+
+ハードウェアでは、関数の呼び出しと戻りを高速化するために、
+{\tt x1}や{\tt x5}を使用する場合があります。
+JAL命令とJALR命令の説明を参照してください。
+
+オプションの圧縮16ビット命令は、リターン・アドレス・レジスタを{\tt x1}、
+スタック・ポインタを{\tt x2}と仮定して設計されています。
+他の規則を利用するソフトウェアは正しく動作しますが、
+コードサイズが大きくなる可能性があります。
+\end{commentary}
+
+\begin{comment}
 \begin{commentary}
 The number of available architectural registers can have large impacts
 on code size, performance, and energy consumption.  Although 16
@@ -142,6 +264,32 @@ instruction-set extensions could support a much larger register space
 For resource-constrained embedded applications, we have defined the
 RV32E subset, which only has 16 registers (Chapter~\ref{rv32e}).
 \end{commentary}
+\end{comment}
+
+\begin{commentary}
+利用可能なアーキテクチャレジスタの数は、コードサイズ、性能、エネルギー消費に大きな影響を与えます。 
+コンパイルされたコードを実行する整数型ISAでは16本のレジスタで十分であることは間違いありませんが、
+16本のレジスタを持つ完全なISAを3アドレス形式の16ビット命令でエンコードすることは不可能です。
+2アドレスのフォーマットも可能ですが、命令数が増え、効率が悪くなります。
+私たちは、ベースハードウェアの実装を簡素化するために、
+中間的な命令サイズ(Xtensaの24ビット命令など)を避けたかったのですが、
+32ビットの命令サイズが採用されたことで、32本の整数レジスタをサポートすることが容易になりました。
+また、整数レジスタの数が多いほど、ループアンローリング、ソフトウェアパイプライン、
+キャッシュタイリングなどが多用される高性能コードでのパフォーマンスが向上します。
+
+これらの理由から、ベースISAでは従来のサイズである32本の整数レジスタを選択しました。
+動的なレジスタの使用率は、頻繁にアクセスされるいくつかのレジスタに支配される傾向があり、
+レジスタファイルの実装を最適化することで、
+頻繁にアクセスされるレジスタのアクセスエネルギーを削減することができます。 
+オプションの圧縮16ビット命令フォーマットは、ほとんどの場合、8本のレジスタにしかアクセスしないため、
+高密度の命令エンコーディングを提供することができますが、
+必要に応じて、追加の命令セット拡張により、
+より大きなレジスタ空間(フラットまたは階層)をサポートすることができます。
+
+また、リソースに制約のある組込みアプリケーション向けに、
+16本のレジスタしか持たないRV32Eサブセットを定義しています(第~ref{rv32e}章)。
+\end{commentary}
+
 
 \section{Base Instruction Formats}
 
