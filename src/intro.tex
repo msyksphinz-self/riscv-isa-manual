@@ -415,7 +415,34 @@ Chapter~\ref{rv128} sketches a future RV128I variant of the base
 integer instruction set supporting a flat 128-bit address space
 (XLEN=128).  The base integer instruction sets use a two's-complement
 representation for signed integer values.
+\end{comment}
 
+\section{RISC-V ISAの概要}
+
+RISC-V ISAは、すべての実装に存在しなければならない基本整数ISAと、
+基本ISAへのオプションの拡張として定義されます。
+基本整数ISAは、分岐遅延スロットがなく、オプションの可変長命令エンコーディングをサポートしている点を除いて、
+初期のRISCプロセッサのものと非常によく似ています。
+ベースはコンパイラ、アセンブラ、リンカ、およびオペレーティングシステム(追加の特権操作を含む)のための
+合理的なターゲットを提供するのに十分な最小限の命令セットに注意深く制限されているので、
+便利なISAおよびソフトウェアツールチェーン``スケルトン"よりカスタマイズされた
+プロセッサISAを構築することができます。
+
+RISC-V ISAという言い方は便利ですが、RISC-Vは実際には関連するISAのファミリーであり、
+現在4つのベースISAがあります。 
+各基本整数命令セットは、整数レジスタの幅とそれに対応するアドレス空間のサイズ、
+および整数レジスタの数によって特徴付けられます。 
+ベース整数にはRV32IとRV64Iの2種類があり、
+第~\ref{rv32}章および第\ref{rv64}章で説明されており、
+それぞれ32ビットと64ビットのアドレス空間を提供しています。
+ここでは，整数レジスタの幅(32ビットまたは64ビット)をXLENと呼ぶことにします。
+第~\ref{rv32e}章では、RV32I基本命令セットのサブセットであるRV32Eについて説明しています。
+RV32Eは、小型マイクロコントローラをサポートするために追加された命令セットで、整数レジスタの数が半分になっています。
+第~\ref{rv128}章では、フラットな128ビットのアドレス空間(XLEN=128)をサポートする基本整数命令セットの
+将来のRV128Iバリアントをスケッチしています。
+基本的な整数命令セットは、符号付き整数値に2の補数表現を使用します。
+
+\begin{comment}
 \begin{commentary}
 Although 64-bit address spaces are a requirement for larger systems,
 we believe 32-bit address spaces will remain adequate for many
@@ -425,7 +452,18 @@ address spaces are sufficient for educational purposes.  A larger flat
 128-bit address space might eventually be required, so we ensured this
 could be accommodated within the RISC-V ISA framework.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+大規模システムでは64ビットのアドレス空間が必要ですが、
+32ビットのアドレス空間は多くのエンベデッド・デバイスやクライアント・デバイスにとって今後も数十年の間
+十分なままであり、メモリ・トラフィックとエネルギー消費を削減することが望まれます。
+さらに、教育目的では32ビットのアドレス空間で十分です。
+将来的には128ビットのアドレス空間が必要になりますので、
+これをRISC-V ISAフレームワークに収めることができます。
+\end{commentary}
+
+\begin{comment}
 \begin{commentary}
 The four base ISAs in RISC-V are treated as distinct base ISAs.  A
 common question is why is there not a single ISA, and in particular,
@@ -485,100 +523,7 @@ It has been noted we could enable the *W variants as an extension to
 RV32I systems to provide a common encoding across RV64I and a future
 RV32 variant.
 \end{commentary}
-
-RISC-V has been designed to support extensive customization and
-specialization.  Each base integer ISA can be extended with one or
-more optional instruction-set extensions.  An extension may be
-categorized as either standard, custom, or non-conforming.
-For this purpose, we divide each RISC-V
-instruction-set encoding space (and related encoding spaces such as
-the CSRs) into three disjoint categories: {\em standard}, {\em
-  reserved}, and {\em custom}.  Standard extensions and encodings
-are defined by the Foundation; any extensions not defined by the
-Foundation are {\em non-standard}.
-Each base ISA and its standard extensions use only standard encodings,
-and shall not conflict with each other in their uses of these encodings.
-Reserved encodings are currently not defined but are saved for future
-standard extensions; once thus used, they become standard encodings.
-Custom encodings shall never be used for standard extensions and are
-made available for vendor-specific non-standard extensions.
-Non-standard extensions are either custom extensions, that use only
-custom encodings, or {\em non-conforming} extensions, that use any
-standard or reserved encoding.
-Instruction-set extensions are generally shared but may provide slightly different
-functionality depending on the base ISA.  Chapter~\ref{extensions}
-describes various ways of extending the RISC-V ISA.  We have also
-developed a naming convention for RISC-V base instructions and
-instruction-set extensions, described in detail in
-Chapter~\ref{naming}.
-
-To support more general software development, a set of standard
-extensions are defined to provide integer multiply/divide, atomic
-operations, and single and double-precision floating-point arithmetic.
-The base integer ISA is named ``I'' (prefixed by RV32 or RV64
-depending on integer register width), and contains integer
-computational instructions, integer loads, integer stores, and
-control-flow instructions.  The standard integer multiplication and
-division extension is named ``M'', and adds instructions to multiply
-and divide values held in the integer registers.  The standard atomic
-instruction extension, denoted by ``A'', adds instructions that
-atomically read, modify, and write memory for inter-processor
-synchronization.  The standard single-precision floating-point
-extension, denoted by ``F'', adds floating-point registers,
-single-precision computational instructions, and single-precision
-loads and stores.  The standard double-precision floating-point
-extension, denoted by ``D'', expands the floating-point registers, and
-adds double-precision computational instructions, loads, and stores.
-The standard ``C'' compressed instruction extension
-provides narrower 16-bit forms of common instructions.
-
-Beyond the base integer ISA and the standard GC extensions, we believe
-it is rare that a new instruction will provide a significant benefit
-for all applications, although it may be very beneficial for a certain
-domain.  As energy efficiency concerns are forcing greater
-specialization, we believe it is important to simplify the required
-portion of an ISA specification.  Whereas other architectures usually
-treat their ISA as a single entity, which changes to a new version as
-instructions are added over time, RISC-V will endeavor to keep the
-base and each standard extension constant over time, and instead layer
-new instructions as further optional extensions.  For example, the
-base integer ISAs will continue as fully supported standalone ISAs,
-regardless of any subsequent extensions.
 \end{comment}
-
-\section{RISC-V ISAの概要}
-
-RISC-V ISAは、すべての実装に存在しなければならない基本整数ISAと、
-基本ISAへのオプションの拡張として定義されます。
-基本整数ISAは、分岐遅延スロットがなく、オプションの可変長命令エンコーディングをサポートしている点を除いて、
-初期のRISCプロセッサのものと非常によく似ています。
-ベースはコンパイラ、アセンブラ、リンカ、およびオペレーティングシステム(追加の特権操作を含む)のための
-合理的なターゲットを提供するのに十分な最小限の命令セットに注意深く制限されているので、
-便利なISAおよびソフトウェアツールチェーン``スケルトン"よりカスタマイズされた
-プロセッサISAを構築することができます。
-
-RISC-V ISAという言い方は便利ですが、RISC-Vは実際には関連するISAのファミリーであり、
-現在4つのベースISAがあります。 
-各基本整数命令セットは、整数レジスタの幅とそれに対応するアドレス空間のサイズ、
-および整数レジスタの数によって特徴付けられます。 
-ベース整数にはRV32IとRV64Iの2種類があり、
-第~\ref{rv32}章および第\ref{rv64}章で説明されており、
-それぞれ32ビットと64ビットのアドレス空間を提供しています。
-ここでは，整数レジスタの幅(32ビットまたは64ビット)をXLENと呼ぶことにします。
-第~\ref{rv32e}章では、RV32I基本命令セットのサブセットであるRV32Eについて説明しています。
-RV32Eは、小型マイクロコントローラをサポートするために追加された命令セットで、整数レジスタの数が半分になっています。
-第~\ref{rv128}章では、フラットな128ビットのアドレス空間(XLEN=128)をサポートする基本整数命令セットの
-将来のRV128Iバリアントをスケッチしています。
-基本的な整数命令セットは、符号付き整数値に2の補数表現を使用します。
-
-\begin{commentary}
-大規模システムでは64ビットのアドレス空間が必要ですが、
-32ビットのアドレス空間は多くのエンベデッド・デバイスやクライアント・デバイスにとって今後も数十年の間
-十分なままであり、メモリ・トラフィックとエネルギー消費を削減することが望まれます。
-さらに、教育目的では32ビットのアドレス空間で十分です。
-将来的には128ビットのアドレス空間が必要になりますので、
-これをRISC-V ISAフレームワークに収めることができます。
-\end{commentary}
 
 \begin{commentary}
 RISC-Vの4つのベースISAは、それぞれ異なるベースISAとして扱われています。
@@ -627,6 +572,111 @@ RV64Iと将来のRV32バリアントで共通のエンコーディングを提�
 \end{commentary}
 
 \begin{comment}
+RISC-V has been designed to support extensive customization and
+specialization.  Each base integer ISA can be extended with one or
+more optional instruction-set extensions.  An extension may be
+categorized as either standard, custom, or non-conforming.
+For this purpose, we divide each RISC-V
+instruction-set encoding space (and related encoding spaces such as
+the CSRs) into three disjoint categories: {\em standard}, {\em
+  reserved}, and {\em custom}.  Standard extensions and encodings
+are defined by the Foundation; any extensions not defined by the
+Foundation are {\em non-standard}.
+Each base ISA and its standard extensions use only standard encodings,
+and shall not conflict with each other in their uses of these encodings.
+Reserved encodings are currently not defined but are saved for future
+standard extensions; once thus used, they become standard encodings.
+Custom encodings shall never be used for standard extensions and are
+made available for vendor-specific non-standard extensions.
+Non-standard extensions are either custom extensions, that use only
+custom encodings, or {\em non-conforming} extensions, that use any
+standard or reserved encoding.
+Instruction-set extensions are generally shared but may provide slightly different
+functionality depending on the base ISA.  Chapter~\ref{extensions}
+describes various ways of extending the RISC-V ISA.  We have also
+developed a naming convention for RISC-V base instructions and
+instruction-set extensions, described in detail in
+Chapter~\ref{naming}.
+\end{comment}
+
+RISC-Vは、広範なカスタマイズと特殊化をサポートするように設計されています。
+各基本整数ISAは、1つまたは複数のオプションの命令セット拡張で拡張することができます。
+拡張機能は、標準、カスタム、非規格化のいずれかに分類されます。
+このため、RISC-Vの各命令セットのエンコード空間(およびCSRなどの関連エンコード空間)を3つの独立したカテゴリ、{\em Standard}、{\em Reserved}、{\em Custom}に分けています。
+標準的な拡張機能とエンコーディングは財団によって定義されており、
+財団によって定義されていない拡張機能は``非標準'' です。
+各ベースISAとその標準拡張は、標準的なエンコーディングのみを使用しており、これらのエンコーディングの使用において互いに競合してはなりません。
+予約されたエンコーディングは、現在は定義されていませんが、将来の標準拡張のために保存されており、一度使用されると標準エンコーディングとなります。
+カスタム・エンコーディングは、標準的な拡張機能には決して使用してはならず、ベンダー固有の非標準的な拡張機能に使用されます。
+非標準の拡張機能とは、カスタムエンコーディングのみを使用するカスタム拡張機能か、
+標準または予約されたエンコーディングを使用する拡張機能のいずれかです。
+命令セット拡張は一般的に共有されていますが、ベースとなるISAによって若干異なる機能を提供する場合があります。
+第~\ref{extensions}章では、RISC-V ISAを拡張する様々な方法を説明しています。
+また、RISC-Vの基本命令と命令セット拡張のための命名規則を作成し、
+第~\ref{naming}章で詳しく説明しています。
+
+\begin{comment}
+To support more general software development, a set of standard
+extensions are defined to provide integer multiply/divide, atomic
+operations, and single and double-precision floating-point arithmetic.
+The base integer ISA is named ``I'' (prefixed by RV32 or RV64
+depending on integer register width), and contains integer
+computational instructions, integer loads, integer stores, and
+control-flow instructions.  The standard integer multiplication and
+division extension is named ``M'', and adds instructions to multiply
+and divide values held in the integer registers.  The standard atomic
+instruction extension, denoted by ``A'', adds instructions that
+atomically read, modify, and write memory for inter-processor
+synchronization.  The standard single-precision floating-point
+extension, denoted by ``F'', adds floating-point registers,
+single-precision computational instructions, and single-precision
+loads and stores.  The standard double-precision floating-point
+extension, denoted by ``D'', expands the floating-point registers, and
+adds double-precision computational instructions, loads, and stores.
+The standard ``C'' compressed instruction extension
+provides narrower 16-bit forms of common instructions.
+\end{comment}
+
+より一般的なソフトウェア開発をサポートするために、標準的な拡張機能が定義されており、
+整数の乗除算、原子演算、単精度および倍精度の浮動小数点演算を提供しています。
+基本となる整数ISAは``I''(整数レジスタ幅に応じてRV32またはRV64のプレフィックスが付く)と呼ばれ、
+整数演算命令、整数ロード、整数ストア、制御フロー命令が含まれています。
+標準的な整数の乗算・除算拡張は``M''と呼ばれ、
+整数レジスタに保持されている値を乗算・除算する命令が追加されています。
+標準アトミック命令拡張は``A''と表記され、プロセッサ間の同期をとるためにメモリの読み書きをアトミックに行う命令が追加されます。
+標準単精度浮動小数点拡張(``F'')は、浮動小数点レジスタ、単精度演算命令、単精度ロード・ストアを追加します。
+``D''で示される標準倍精度浮動小数点拡張は，浮動小数点レジスタを拡張し，
+倍精度の計算命令，ロードおよびストアを追加します。
+標準の圧縮命令拡張(``C'')は、一般的な命令をよりビット幅の狭い16ビット形式で提供します。
+
+\begin{comment}
+Beyond the base integer ISA and the standard GC extensions, we believe
+it is rare that a new instruction will provide a significant benefit
+for all applications, although it may be very beneficial for a certain
+domain.  As energy efficiency concerns are forcing greater
+specialization, we believe it is important to simplify the required
+portion of an ISA specification.  Whereas other architectures usually
+treat their ISA as a single entity, which changes to a new version as
+instructions are added over time, RISC-V will endeavor to keep the
+base and each standard extension constant over time, and instead layer
+new instructions as further optional extensions.  For example, the
+base integer ISAs will continue as fully supported standalone ISAs,
+regardless of any subsequent extensions.
+\end{comment}
+
+基本的な整数ISAと標準的なGCの拡張機能を超えて、
+新しい命令がすべてのアプリケーションに大きな利益をもたらすことは稀であると考えていますが、
+特定の領域では非常に有益であるかもしれません。
+エネルギー効率への配慮から特殊化が進む中、ISAの仕様で必要な部分をシンプルにすることが重要だと考えています。
+他のアーキテクチャでは、ISAを単一のものとして扱い、
+時間の経過とともに命令が追加されて新しいバージョンに変わるのが普通ですが、
+RISC-Vでは、基本と各標準拡張を時間の経過とともに一定に保ち、代わりに新しい命令を
+さらにオプションの拡張として重ねるように努めます。
+例えば、基本となる整数型ISAは、その後の拡張に関わらず、
+完全にサポートされたスタンドアロン型ISAとして継続されます。
+
+
+\begin{comment}
 \section{Memory}
 
 A RISC-V hart has a single byte-addressable address space
@@ -640,8 +690,21 @@ The memory address space is circular, so that the byte at address
 $2^{\text{XLEN}}-1$ is adjacent to the byte at address zero.  Accordingly, memory
 address computations done by the hardware ignore overflow and instead
 wrap around modulo $2^{\text{XLEN}}$.
+\end{comment}
 
+\section{メモリ}
 
+RISC-Vのhartは、すべてのメモリアクセスに対して、
+$2^{text{XLEN}}$バイトのシングルバイトアドレッシング可能なアドレス空間を持っています。 
+メモリの1{\em ワード}は、\wunits{32}{ビット}(\wunits{4}{バイト})と定義されます。
+これに対応して、{\em ハーフワード}は\wunits{16}{ビット}(\wunits{2}{バイト})であり、
+{\em ダブルワード}は\wunits{64}{ビット}(\wunits{8}{バイト})であり、
+{\em クワッドワード}は\wunits{128}{ビット}(\wunits{16}{バイト})です。
+また、メモリアドレス空間はリング状で，アドレス$2^{¥text{XLEN}}-1$のバイトはアドレス0のバイトに隣接しています。
+そのため、ハードウェアによるメモリアドレスの計算では、オーバーフローを無視して、
+modulo $2^{\text{XLEN}}$に折り返します。
+
+\begin{comment}
 The execution environment determines the mapping of hardware resources into
 a hart's address space.
 Different address ranges of a hart's address space may (1)~be vacant, or
@@ -651,12 +714,28 @@ to main memory cannot.
 Although it is possible for the execution environment to call everything in
 a hart's address space an I/O device, it is usually expected that some
 portion will be specified as main memory.
+\end{comment}
 
+実行環境によって、ハードウェアリソースのhartのアドレス空間へのマッピングが決まります。
+hartのアドレス空間の異なるアドレスレンジは、(1)~空き領域、(2)~定義済み{\em メインメモリ}、(3)~1つ以上の定義済み{\em I/Oデバイス}のいずれかとなります。
+I/Oデバイスの読み書きには目に見える副作用がありますが、
+メインメモリへのアクセスには副作用はありません。
+実行環境では、Hartのアドレス空間のすべてをI/Oデバイスと呼ぶことも可能ですが、
+通常は一部をメインメモリとして指定することが想定されます。
+
+\begin{comment}
 When a RISC-V platform has multiple harts, the address spaces of any two
 harts may be entirely the same, or entirely different, or may be partly
 different but sharing some subset of resources, mapped into the same or
 different address ranges.
+\end{comment}
 
+RISC-Vプラットフォームに複数のhartsがある場合、
+2つのhartsのアドレス空間は、全く同じであるか、全く異なるものであるか、
+部分的に異なるが、同じまたは異なるアドレス範囲にマッピングされたリソースの
+サブセットを共有するものであるかのいずれかです。
+
+\begin{comment}
 \begin{commentary}
 For a purely ``bare metal'' environment, all harts may see an identical
 address space, accessed entirely by physical addresses.
@@ -664,7 +743,16 @@ However, when the execution environment includes an operating system
 employing address translation, it is common for each hart to be given a
 virtual address space that is largely or entirely its own.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+純粋なベアメタル環境では、すべてのhartが同一のアドレス空間を持ち、
+完全に物理アドレスでアクセスされます。
+しかし、実行環境にアドレス変換機能を持つOSが含まれている場合、
+各hartには、大部分または全体が独自の仮想アドレス空間が与えられるのが一般的です。
+\end{commentary}
+
+\begin{comment}
 Executing each RISC-V machine instruction entails one or more memory
 accesses, subdivided into {\em
 implicit} and {\em explicit} accesses.  For each instruction executed, an {\em
@@ -675,7 +763,18 @@ perform an {\em explicit} read or write of memory at an address determined by
 the instruction.  The execution environment may dictate that instruction
 execution performs other {\em implicit} memory accesses (such as to implement
 address translation) beyond those documented for the unprivileged ISA.
+\end{comment}
 
+RISC-Vの機械語命令を実行するためには、1回以上のメモリアクセスが必要となりますが、
+そのアクセスは「暗黙的」と「明示的」に分けられます。
+各命令の実行時には、実行するコード化された命令を取得するために、
+メモリリード(命令フェッチ)が行われます。
+多くのRISC-V命令は、命令フェッチ以外のメモリアクセスを行いません。
+特定のロード命令やストア命令は、命令によって決定されたアドレスに対して、
+メモリのリードまたはライトを行います。
+実行環境によっては、非特権ISAに記載されている以外のメモリアクセス(アドレス変換の実装など)を行うことがあります。
+
+\begin{comment}
 The execution environment determines what portions of the
 non-vacant address space are
 accessible for each kind of memory access.  For example, the set of locations
@@ -686,7 +785,18 @@ a store instruction may be only a subset of locations that can be read.
 Ordinarily, if an instruction attempts to access memory at an inaccessible
 address, an exception is raised for the instruction.
 Vacant locations in the address space are never accessible.
+\end{comment}
 
+実行環境は、メモリアクセスの種類ごとに、空いていないアドレス空間のどの部分にアクセスできるかを決定します。
+例えば、命令フェッチのために暗黙的に読める場所のセットは、
+ロード命令で明示的に読める場所のセットと重なる部分があるかもしれませんし、
+ストア命令で明示的に書ける場所のセットは、
+読める場所のサブセットでしかないかもしれません。
+通常、アクセスできないアドレスのメモリにアクセスしようとすると、
+その命令に対して例外が発生します。
+また、アドレス空間内の空いている場所には決してアクセスできません。
+
+\begin{comment}
 Except when specified otherwise, implicit reads that do not raise an
 exception and that have no side effects
 may occur arbitrarily early and speculatively, even before the machine could
@@ -698,7 +808,19 @@ again.  To ensure that certain implicit reads are ordered only after writes to
 the same memory locations, software must execute specific fence or cache-control
 instructions defined for this purpose (such as the FENCE.I instruction
 defined in Chapter~\ref{chap:zifencei}).
+\end{comment}
 
+別段の定めがない限り、例外を発生させず、かつ副作用のない暗黙の読み出しは、
+任意の時期に投機的に発生する可能性があり、
+たとえその読み出しが必要であることをマシンが証明する前であってもです。 例えば、有効な実装では、最も早い機会にメインメモリのすべてを読み取り、
+後の命令フェッチのためにフェッチ可能な(実行可能な)バイトをできるだけ多くキャッシュし、
+命令フェッチのためにメインメモリを二度と読み取らないようにすることができます。
+特定の暗黙のリードが、同じメモリロケーションへのライトの後にのみ順序付けられるようにするには、
+ソフトウェアは、この目的のために定義された特定のフェンスまたは
+キャッシュコントロール命令(第~\ref{chap:zifencei}章で定義されたFENCE.I命令など)
+を実行する必要があります。
+
+\begin{comment}
 The memory accesses (implicit or explicit) made by a hart may appear to occur
 in a different order as perceived by another hart or by any other agent that
 can access the same memory.  This perceived reordering of memory accesses is
@@ -716,64 +838,6 @@ implicit reads, software must execute fence or cache-control instructions to
 ensure specific ordering of memory accesses beyond the requirements of the
 assumed memory consistency model and execution environment.
 \end{comment}
-
-\section{メモリ}
-
-RISC-Vのhartは、すべてのメモリアクセスに対して、
-$2^{text{XLEN}}$バイトのシングルバイトアドレッシング可能なアドレス空間を持っています。 
-メモリの1{\em ワード}は、\wunits{32}{ビット}(\wunits{4}{バイト})と定義されます。
-これに対応して、{\em ハーフワード}は\wunits{16}{ビット}(\wunits{2}{バイト})であり、
-{\em ダブルワード}は\wunits{64}{ビット}(\wunits{8}{バイト})であり、
-{\em クワッドワード}は\wunits{128}{ビット}(\wunits{16}{バイト})です。
-また、メモリアドレス空間はリング状で，アドレス$2^{¥text{XLEN}}-1$のバイトはアドレス0のバイトに隣接しています。
-そのため、ハードウェアによるメモリアドレスの計算では、オーバーフローを無視して、
-modulo $2^{\text{XLEN}}$に折り返します。
-
-実行環境によって、ハードウェアリソースのhartのアドレス空間へのマッピングが決まります。
-hartのアドレス空間の異なるアドレスレンジは、(1)~空き領域、(2)~定義済み{\em メインメモリ}、(3)~1つ以上の定義済み{\em I/Oデバイス}のいずれかとなります。
-I/Oデバイスの読み書きには目に見える副作用がありますが、
-メインメモリへのアクセスには副作用はありません。
-実行環境では、Hartのアドレス空間のすべてをI/Oデバイスと呼ぶことも可能ですが、
-通常は一部をメインメモリとして指定することが想定されます。
-
-RISC-Vプラットフォームに複数のhartsがある場合、
-2つのhartsのアドレス空間は、全く同じであるか、全く異なるものであるか、
-部分的に異なるが、同じまたは異なるアドレス範囲にマッピングされたリソースの
-サブセットを共有するものであるかのいずれかです。
-
-\begin{commentary}
-純粋なベアメタル環境では、すべてのhartが同一のアドレス空間を持ち、
-完全に物理アドレスでアクセスされます。
-しかし、実行環境にアドレス変換機能を持つOSが含まれている場合、
-各hartには、大部分または全体が独自の仮想アドレス空間が与えられるのが一般的です。
-\end{commentary}
-
-RISC-Vの機械語命令を実行するためには、1回以上のメモリアクセスが必要となりますが、
-そのアクセスは「暗黙的」と「明示的」に分けられます。
-各命令の実行時には、実行するコード化された命令を取得するために、
-メモリリード(命令フェッチ)が行われます。
-多くのRISC-V命令は、命令フェッチ以外のメモリアクセスを行いません。
-特定のロード命令やストア命令は、命令によって決定されたアドレスに対して、
-メモリのリードまたはライトを行います。
-実行環境によっては、非特権ISAに記載されている以外のメモリアクセス(アドレス変換の実装など)を行うことがあります。
-
-実行環境は、メモリアクセスの種類ごとに、空いていないアドレス空間のどの部分にアクセスできるかを決定します。
-例えば、命令フェッチのために暗黙的に読める場所のセットは、
-ロード命令で明示的に読める場所のセットと重なる部分があるかもしれませんし、
-ストア命令で明示的に書ける場所のセットは、
-読める場所のサブセットでしかないかもしれません。
-通常、アクセスできないアドレスのメモリにアクセスしようとすると、
-その命令に対して例外が発生します。
-また、アドレス空間内の空いている場所には決してアクセスできません。
-
-別段の定めがない限り、例外を発生させず、かつ副作用のない暗黙の読み出しは、
-任意の時期に投機的に発生する可能性があり、
-たとえその読み出しが必要であることをマシンが証明する前であってもです。 例えば、有効な実装では、最も早い機会にメインメモリのすべてを読み取り、
-後の命令フェッチのためにフェッチ可能な(実行可能な)バイトをできるだけ多くキャッシュし、
-命令フェッチのためにメインメモリを二度と読み取らないようにすることができます。 特定の暗黙のリードが、同じメモリロケーションへのライトの後にのみ順序付けられるようにするには、
-ソフトウェアは、この目的のために定義された特定のフェンスまたは
-キャッシュコントロール命令(第~\ref{chap:zifencei}章で定義されたFENCE.I命令など)
-を実行する必要があります。
 
 hartが行うメモリアクセス(暗黙的または明示的)は、
 他のhartや同じメモリにアクセスできる他のエージェントが知覚すると、
