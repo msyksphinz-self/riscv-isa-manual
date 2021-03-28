@@ -290,7 +290,7 @@ RV32E subset, which only has 16 registers (Chapter~\ref{rv32e}).
 16本のレジスタしか持たないRV32Eサブセットを定義しています(第~ref{rv32e}章)。
 \end{commentary}
 
-
+\begin{comment}
 \section{Base Instruction Formats}
 
 In the base RV32I ISA, there are four core instruction formats
@@ -302,7 +302,18 @@ four-byte aligned.  This exception is reported on the branch or jump
 instruction, not on the target instruction.  No
 instruction-address-misaligned exception is generated for a
 conditional branch that is not taken.
+\end{comment}
 
+\section{ベース命令フォーマット}
+
+ベースとなるRV32I ISAでは、図~ref{fig:baseinstformats}に示すように、4つのコア命令フォーマット(R/I/S/U)があります。
+いずれも長さは32ビット固定で、メモリ上の4バイト境界上にアラインメントする必要があります。 
+命令-アドレス-ミスアラインド例外は、ターゲットアドレスが4バイトアラインドでない場合、
+ブランチ成立時または無条件ジャンプで生成されます。
+この例外は、ターゲット命令ではなく、分岐命令やジャンプ命令で報告されます。
+不成立の条件付き分岐では、命令-アドレス-misaligned例外は発生しません。
+
+\begin{comment}
 \begin{commentary}
 The alignment constraint for base ISA instructions is relaxed to a
 two-byte boundary when instruction extensions with 16-bit lengths or
@@ -313,7 +324,18 @@ or jump that would cause instruction misalignment to help debugging,
 and to simplify hardware design for systems with IALIGN=32, where these
 are the only places where misalignment can occur.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+ベースISA命令のアライメント制約は、16ビット長または16ビット長の奇数倍の
+命令拡張が追加されると、2バイト境界に緩和されます(IALIGN=16)。
+
+命令-アドレス-ミスアラインドの例外は、命令のミスアラインメントの原因となる
+分岐やジャンプの際に報告され、デバッグを助け、また、IALIGN=32のシステムでは、
+これらの場所でしかミスアラインメントが発生しないため、ハードウェアの設計を簡素化されます。
+\end{commentary}
+
+\begin{comment}
 The behavior upon decoding a reserved instruction is \unspecified.
 \begin{commentary}
 Some platforms may require that opcodes reserved for standard use raise
@@ -321,7 +343,18 @@ an illegal-instruction exception.
 Other platforms may permit reserved opcode space be used for non-conforming
 extensions.
 \end{commentary}
+\end{comment}
 
+予約された命令をデコードしたときの動作は``不定''です。
+
+\begin{commentary}
+プラットフォームによっては、標準的な使用のために予約されたオペコードが、
+不正命令例外を発生させることを要求する場合があります。
+他のプラットフォームでは、予約されたオペコード領域を規格化されていない拡張に
+使用することを許可する場合があります。
+\end{commentary}
+
+\begin{comment}
 \begin{figure}[h]
 \begin{center}
 \setlength{\tabcolsep}{4pt}
@@ -376,7 +409,63 @@ U-type \\
   instruction's immediate field as is usually done.  }
 \label{fig:baseinstformats}
 \end{figure}
+\end{comment}
 
+\begin{figure}[h]
+\begin{center}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{1.2in}@{}p{0.8in}@{}p{0.8in}@{}p{0.6in}@{}p{0.8in}@{}p{1in}l}
+\\
+\instbitrange{31}{25} &
+\instbitrange{24}{20} &
+\instbitrange{19}{15} &
+\instbitrange{14}{12} &
+\instbitrange{11}{7} &
+\instbitrange{6}{0} \\
+\cline{1-6}
+\multicolumn{1}{|c|}{funct7} &
+\multicolumn{1}{c|}{rs2} &
+\multicolumn{1}{c|}{rs1} &
+\multicolumn{1}{c|}{funct3} &
+\multicolumn{1}{c|}{rd} &
+\multicolumn{1}{c|}{opcode} &
+R-type \\
+\cline{1-6}
+\\
+\cline{1-6}
+\multicolumn{2}{|c|}{imm[11:0]} &
+\multicolumn{1}{c|}{rs1} &
+\multicolumn{1}{c|}{funct3} &
+\multicolumn{1}{c|}{rd} &
+\multicolumn{1}{c|}{opcode} &
+I-type \\
+\cline{1-6}
+\\
+\cline{1-6}
+\multicolumn{1}{|c|}{imm[11:5]} &
+\multicolumn{1}{c|}{rs2} &
+\multicolumn{1}{c|}{rs1} &
+\multicolumn{1}{c|}{funct3} &
+\multicolumn{1}{c|}{imm[4:0]} &
+\multicolumn{1}{c|}{opcode} &
+S-type \\
+\cline{1-6}
+\\
+\cline{1-6}
+\multicolumn{4}{|c|}{imm[31:12]} &
+\multicolumn{1}{c|}{rd} &
+\multicolumn{1}{c|}{opcode} &
+U-type \\
+\cline{1-6}
+\end{tabular}
+\end{center}
+\caption{RISC-Vの基本命令フォーマット。 各即値サブフィールドには、
+通常、命令の即値フィールド内のビット位置ではなく、
+生成される即値のビット位置(imm[{\em x}\,])が表示されます}
+\label{fig:baseinstformats}
+\end{figure}
+
+\begin{comment}
 The RISC-V ISA keeps the source ({\em rs1} and {\em rs2}) and
 destination ({\em rd}) registers at the same position in all formats
 to simplify decoding.  Except for the 5-bit immediates used in CSR
@@ -385,6 +474,15 @@ sign-extended, and are generally packed towards the leftmost available
 bits in the instruction and have been allocated to reduce hardware
 complexity.  In particular, the sign bit for all immediates is always
 in bit 31 of the instruction to speed sign-extension circuitry.
+\end{comment}
+
+RISC-V ISAは、デコードを簡素化するために、ソース({\em rs1}および{\em rs2})と
+書き込み先({\em rd})レジスタをすべての形式で同じ位置に保持します。
+CSR命令で使用される5ビットの即値(Chapter~\ref{csrinsts})を除いて、
+即値は常に符号拡張され、通常、命令の左端の使用可能なビットに向かってパックされ、
+ハードウェアの複雑さを軽減するために割り当てられています。 
+特に、すべての即値の符号ビットは、符号拡張回路を高速化するために
+常に命令の31ビット目に配置されています。
 
 \begin{commentary}
 Decoding register specifiers is usually on the critical paths in
