@@ -484,6 +484,7 @@ CSR命令で使用される5ビットの即値(Chapter~\ref{csrinsts})を除い�
 特に、すべての即値の符号ビットは、符号拡張回路を高速化するために
 常に命令の31ビット目に配置されています。
 
+\begin{comment}
 \begin{commentary}
 Decoding register specifiers is usually on the critical paths in
 implementations, and so the instruction format was chosen to keep all
@@ -500,12 +501,35 @@ Immediates are sign-extended because we did not observe a benefit to
 using zero-extension for some immediates as in the MIPS ISA and wanted
 to keep the ISA as simple as possible.
 \end{commentary}
+\end{comment}
 
+\begin{commentary}
+レジスタ指定子のデコードは、通常、実装上のクリティカルパスに含まれるため、
+フォーマット間で即値ビットを移動させることを犠牲にして、すべてのフォーマットで
+すべてのレジスタ指定子を同じ位置に保つような命令フォーマットが選択されました
+(RISC-IV aka.SPUR~\cite{spur-jsscc1989}と共通の特性です)。
+
+実際には、ほとんどの即値は小さいか、またはすべてのXLENビットを必要とします。
+そこで、非対称の即値分割(12ビットの通常命令と、20ビットの特別なロードアップ即値命令)
+を採用し、通常命令で使用できるオペコード空間を増やしました。
+
+即値命令は符号拡張されていますが、これは一部の即値命令にゼロ拡張を使用することの
+利点が認められなかったためです。
+符号拡張されているのは、MIPS ISAのように一部の即席命令をゼロ拡張にするメリットがなく、
+可能な限りISAをできるだけシンプルにしたかったからです。
+\end{commentary}
+
+\begin{comment}
 \section{Immediate Encoding Variants}
 
 There are a further two variants of the instruction formats (B/J)
 based on the handling of immediates, as shown in
 Figure~\ref{fig:baseinstformatsimm}.
+\end{comment}
+
+\section{即値命令エンコーディング}
+
+命令フォーマット(B/J)には、即値の扱いに応じて図~\ref{fig:baseinstformatsimm}に示すように、さらに2つのバリエーションがあります。
 
 \begin{figure}[h]
 \begin{small}
@@ -582,10 +606,14 @@ J-type \\
 \end{tabular}
 \end{center}
 \end{small}
+\begin{comment}
 \caption{RISC-V base instruction formats showing immediate variants.}
+\end{comment}
+\caption{即値を持つRISC-Vベース命令フォーマット}
 \label{fig:baseinstformatsimm}
 \end{figure}
 
+\begin{comment}
 The only difference between the S and B formats is that the 12-bit
 immediate field is used to encode branch offsets in multiples of 2 in
 the B format.  Instead of shifting all bits in the
@@ -593,16 +621,36 @@ instruction-encoded immediate left by one in hardware as is
 conventionally done, the middle bits (imm[10:1]) and sign bit stay in
 fixed positions, while the lowest bit in S format (inst[7]) encodes a
 high-order bit in B format.
+\end{comment}
 
+SフォーマットとBフォーマットの唯一の違いは、Bフォーマットでは12ビットの即値フィールドを
+2倍することで分岐オフセットのエンコードに使用されることです。 
+従来のように、命令でエンコードされた即値のすべてのビットを
+ハードウェアで左に1ビットシフトするのではなく、
+中間ビット(imm[10:1])と符号ビットは固定されたままで、
+Sフォーマットの即値の最下位ビット(inst[7])はBフォーマットのより高い位置のビットをエンコードしています。
+
+\begin{comment}
 Similarly, the only difference between the U and J formats is
 that the 20-bit immediate is shifted left by 12 bits to form U
 immediates and by 1 bit to form J immediates.  The location of
 instruction bits in the U and J format immediates is chosen to
 maximize overlap with the other formats and with each other.
+\end{comment}
 
+同様に、UとJのフォーマットの違いは、20ビットの即値がU即値の場合は12ビット、
+J即値の場合は1ビットだけ左にシフトすることです。
+UおよびJフォーマットの即値の命令ビットの位置は、
+他のフォーマットや相互に最大限にオーバーラップするように選択されています。
+
+\begin{comment}
 Figure~\ref{fig:immtypes} shows the immediates produced by each of the
 base instruction formats, and is labeled to show which instruction
 bit (inst[{\em y}\,]) produces each bit of the immediate value.
+\end{comment}
+
+図~\ref{fig:immtypes}は、それぞれの基本命令フォーマットで生成される即時値を示しており、
+どの命令ビット(inst[{\em y}\,])が即値の各ビットを生成するかをラベルで示しています。
 
 \begin{figure}[h]
 \begin{center}
@@ -661,18 +709,30 @@ J-immediate \\
 \cline{1-7}
 \end{tabular}
 \end{center}
+\begin{comment}
 \caption{Types of immediate produced by RISC-V instructions.  The fields are labeled with the
   instruction bits used to construct their value.  Sign extension
   always uses inst[31].}
+\end{comment}
+\caption{RISC-V命令で生成される即値の種類。
+フィールドには、その値を構成するために使用される命令ビットが表示されています。
+符号拡張は常に inst[31] を使用します。}
 \label{fig:immtypes}
 \end{figure}
 
 \begin{commentary}
+\begin{comment}
 Sign-extension is one of the most critical operations on immediates
 (particularly for XLEN$>$32), and in RISC-V the sign bit for all immediates
 is always held in bit 31 of the instruction to allow sign-extension to
 proceed in parallel with instruction decoding.
+\end{comment}
 
+符号拡張は即値の最も重要な演算の1つであり(特にXLEN$>$32の場合)、
+RISC-Vではすべての即値の符号ビットは常に命令のビット31目に保持され、
+符号拡張が命令のデコードと並行して行われるようになっています。
+
+\begin{comment}
 Although more complex implementations might have separate adders for
 branch and jump calculations and so would not benefit from keeping the
 location of immediate bits constant across types of instruction, we
@@ -685,7 +745,18 @@ negligible time to static or ahead-of-time compilation.  For dynamic
 generation of instructions, there is some small additional
 overhead, but the most common short forward branches have
 straightforward immediate encodings.
+\end{comment}
+
+より複雑な実装では、分岐計算とジャンプ計算を別々の加算器で行うため、
+命令の種類に関わらず即時ビットの位置を一定にするメリットはありませんが、
+私たちは最もシンプルな実装でハードウェアコストを削減したいと考えました。
+即値を2倍にするためにダイナミックハードウェアMUXを使用する代わりに、
+B即値とJ即値の命令エンコーディングでビットを回転させることで、
+命令信号のファンアウトと即値MUXのコストを約2分の1に削減しました。 
+命令を動的に生成する場合には、若干の追加オーバーヘッドがありますが、
+最も一般的な短い順方向の分岐では、直接的な即時エンコーディングが行われます。
 \end{commentary}
+
 
 \section{Integer Computational Instructions}
 
