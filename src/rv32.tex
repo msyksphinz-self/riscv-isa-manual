@@ -1169,19 +1169,37 @@ ADDIは、(デコードで最適化されていない場合)様々なシステ�
 レジスタ・レジスタ間のADDや論理/シフト演算には追加のハードウェアが必要です。
 \end{commentary}
 
+\begin{comment}
 \section{Control Transfer Instructions}
+\end{comment}
+\section{制御転送命令}
 
+\begin{comment}
 RV32I provides two types of control transfer instructions:
 unconditional jumps and conditional branches.  Control transfer
 instructions in RV32I do {\em not} have architecturally visible delay
 slots.
+\end{comment}
 
+RV32Iには、無条件ジャンプと条件付き分岐の2種類の制御転送命令があります。
+RV32Iの制御転送命令には、アーキテクチャ的に見える遅延スロットがありません。
+
+\begin{comment}
 If an instruction access-fault or instruction page-fault exception occurs
 on the target of a jump or taken branch, the exception is reported on the
 target instruction, not on the jump or branch instruction.
+\end{comment}
 
+ジャンプ命令や分岐命令のターゲットで命令アクセス・フォールトや
+命令ページ・フォールトの例外が発生した場合、
+その例外はジャンプ命令や分岐命令ではなく、ターゲット命令で報告されます。
+
+\begin{comment}
 \subsubsection*{Unconditional Jumps}
+\end{comment}
+\subsubsection*{無条件ジャンプ命令}
 
+\begin{comment}
 \vspace{-0.1in} The jump and link (JAL) instruction uses the J-type
 format, where the J-immediate encodes a signed offset in multiples of
 2 bytes.  The offset is sign-extended and added to the address of
@@ -1191,18 +1209,37 @@ $\pm$\wunits{1}{MiB} range. JAL stores the address of the instruction
 following the jump ({\tt pc}+4) into register {\em rd}.  The standard
 software calling convention uses {\tt x1} as the return address
 register and {\tt x5} as an alternate link register.
+\end{comment}
+
+\vspace{-0.1in} ジャンプ\&リンク(JAL)命令はJ-typeフォーマットの命令で、
+J-immediateには2バイトの倍数の符号付きオフセットがエンコードされています。
+このオフセットは符号拡張され、ジャンプ命令のアドレスに加算されてジャンプ先のアドレスとなります。
+このため、ジャンプは$\pm$\wunits{1}{MiB}の範囲を対象とすることができます。
+JALは、ジャンプ命令の次の命令のアドレス({\tt PC}+4)をレジスタ{\em rd}に格納します。
+標準的なソフトウェアの呼び出し規則では、リターンアドレスレジスタとして{\tt x1}を、代替リンクレジスタとして{\tt x5}を使用します。
 
 \begin{commentary}
+\begin{comment}
 The alternate link register supports calling millicode routines (e.g.,
 those to save and restore registers in compressed code) while
 preserving the regular return address register.  The register {\tt x5}
 was chosen as the alternate link register as it maps to a temporary in
 the standard calling convention, and has an encoding that is only one
 bit different than the regular link register.
+\end{comment}
+代替リンク・レジスタは、通常のリターン・アドレス・レジスタを保持しながら、
+ミリコード・ルーチン(圧縮コードでレジスタを保存・復元するものなど)の呼び出しをサポートします。
+レジスタ{\tt x5}は、標準的な呼び出し方法でテンポラリにマッピングされ、
+通常のリンクレジスタとは1ビットだけ異なるエンコーディングを持つため、代替リンクレジスタとして選択されました。
 \end{commentary}
 
+\begin{comment}
 Plain unconditional jumps (assembler pseudoinstruction J) are encoded as a JAL
 with {\em rd}={\tt x0}.
+\end{comment}
+
+リンクしない無条件ジャンプ(アセンブラ擬似命令J)は、
+JALでは、{\em rd}={\tt x0}でエンコードされます。
 
 \vspace{-0.2in}
 \begin{center}
@@ -1227,6 +1264,7 @@ with {\em rd}={\tt x0}.
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The indirect jump instruction JALR (jump and link register) uses the
 I-type encoding.  The target address is obtained by adding the sign-extended
 12-bit I-immediate to the register {\em rs1}, then setting the
@@ -1234,6 +1272,14 @@ least-significant bit of the result to zero.  The address of
 the instruction following the jump ({\tt pc}+4) is written to register
 {\em rd}.  Register {\tt x0} can be used as the destination if the
 result is not required.
+\end{comment}
+
+間接ジャンプ命令JALR(jump and link register)は，I型エンコーディングを使用しています。 
+符号拡張された12ビットのI-immediateをレジスタ{\em rs1}に加算し、
+その結果の最下位ビットを0にすることでターゲットアドレスが得られます。
+ジャンプの次の命令のアドレス({\tt pc}+4)は、レジスタ{\em rd}に書き込まれます。
+結果が不要な場合は、レジスタ{\tt x0}を出力先として使用できます。
+
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{M@{}R@{}F@{}R@{}O}
@@ -1256,6 +1302,7 @@ offset[11:0] & base & 0 & dest & JALR \\
 \end{center}
 
 \begin{commentary}
+\begin{comment}
 The unconditional jump instructions all use PC-relative addressing to
 help support position-independent code.  The JALR instruction was
 defined to enable a two-instruction sequence to jump anywhere in a
@@ -1263,27 +1310,54 @@ defined to enable a two-instruction sequence to jump anywhere in a
   rs1} with the upper 20 bits of a target address, then JALR can add
 in the lower bits. Similarly, AUIPC then JALR can jump
 anywhere in a 32-bit {\tt pc}-relative address range.
+\end{comment}
 
+無条件ジャンプ命令は、位置に依存しないコードをサポートするために、すべてPC相対アドレッシングを使用しています。 JALR命令は、2つの命令で32ビットの絶対アドレス範囲のどこにでもジャンプできるように定義されています。 LUI命令では、まず上位20ビットのアドレスをロードし、JALRで下位ビットを追加します。同様に、AUIPC→JALRの順で、32ビットの{\ pc}相対アドレス範囲内のどこにでもジャンプできます。
+
+\begin{comment}
 Note that the JALR instruction does not treat the 12-bit immediate as
 multiples of 2 bytes, unlike the conditional branch instructions.
 This avoids one more immediate format in hardware.  In
 practice, most uses of JALR will have either a zero immediate or be
 paired with a LUI or AUIPC, so the slight reduction in range is not
 significant.
+\end{comment}
 
+JALR命令では、条件分岐命令とは異なり、12ビットの即値を2バイトの倍数として扱いません。
+これにより、ハードウェア上で即値のフォーマットが1つ増えることを避けられます。 
+実際には、JALRのほとんどの用途では、即値が0になるか、
+LUIやAUIPCとペアになるかのいずれかであるため、
+範囲がわずかに狭くなることは重要ではありません。
+
+\begin{comment}
 Clearing the least-significant bit when calculating the JALR target
 address both simplifies the hardware slightly and allows the
 low bit of function pointers to be used to store auxiliary
 information.  Although there is potentially a slight loss of error
 checking in this case, in practice jumps to an incorrect instruction
 address will usually quickly raise an exception.
+\end{comment}
 
+JALRのターゲットアドレスを計算する際に最下位ビットをクリアすることで、
+ハードウェアが若干簡素化されるとともに、
+関数ポインタの下位ビットを補助的な情報の格納に使用することができます。
+この場合、エラーチェック機能が若干失われる可能性がありますが、
+実際には誤った命令アドレスにジャンプするとすぐに例外が発生します。
+
+\begin{comment}
 When used with a base {\em rs1}$=${\tt x0}, JALR can be used to implement
 a single instruction subroutine call to the lowest \wunits{2}{KiB} or highest
 \wunits{2}{KiB} address region from anywhere in the address space, which could
 be used to implement fast calls to a small runtime library.  Alternatively,
 an ABI could dedicate a general-purpose register to point to a library
 elsewhere in the address space.
+\end{comment}
+
+JALRは、ベースとなる{\em rs1}$=${\em x0}とすることで、
+アドレス空間内の任意の場所から\wunits{2}{KiB}離れた下位のアドレスか、\wunits{2}{KiB}離れた上位のアドレス領域への
+単一命令によるサブルーチンコールを実装することができ、
+小さなランタイムライブラリへの高速な呼び出しを実現することができます。
+また、ABIはアドレス空間の別の場所にあるライブラリを指すように汎用レジスタを割り当てることもできます。
 \end{commentary}
 
 The JAL and JALR instructions will generate an
