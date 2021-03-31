@@ -754,10 +754,10 @@ straightforward immediate encodings.
 B即値とJ即値の命令エンコーディングでビットを回転させることで、
 命令信号のファンアウトと即値MUXのコストを約2分の1に削減しました。 
 命令を動的に生成する場合には、若干の追加オーバーヘッドがありますが、
-最も一般的な短い順方向の分岐では、直接的な即時エンコーディングが行われます。
+最も一般的な短い順方向の分岐では、直接的な即値エンコーディングが行われます。
 \end{commentary}
 
-
+\begin{comment}
 \section{Integer Computational Instructions}
 
 Most integer computational instructions operate on XLEN bits of values
@@ -767,35 +767,73 @@ format or as register-register operations using the R-type format.
 The destination is register {\em rd} for both register-immediate and
 register-register instructions.  No integer computational instructions
 cause arithmetic exceptions.
+\end{comment}
+
+\section{整数算術演算命令}
+
+ほとんどの整数演算命令は、整数レジスタファイルに保持されている値の
+XLENビットに対して演算を行います
+整数演算命令は、Iタイプのフォーマットを使用したレジスタ即値演算、
+またはRタイプのフォーマットを使用したレジスタ・レジスタ演算としてエンコードされます。
+レジスタ即値演算とレジスタ・レジスタ演算のどちらの命令でも、出力先はレジスタ{\em rd}です。
+算術例外を発生させる整数演算命令はありません。
 
 \begin{commentary}
+\begin{comment}
 We did not include special instruction-set support for overflow checks
 on integer arithmetic operations in the base instruction set, as many
 overflow checks can be cheaply implemented using RISC-V branches.
 Overflow checking for unsigned addition requires only a single
 additional branch instruction after the addition:
 \verb! add t0, t1, t2; bltu t0, t1, overflow!.
+\end{comment}
 
+整数演算のオーバーフローチェックは、RISC-Vの分岐を使って安価に実装できるものが多いため、
+基本命令セットには特別な命令セットのサポートは含まれていません。
+符号なし加算のオーバーフローチェックは、加算後に1回の分岐命令を追加するだけで済みます。\verb! add t0, t1, t2; bltu t0, t1, overflow!
+
+\begin{comment}
 For signed addition, if one operand's sign is known, overflow checking
 requires only a single branch after the addition:
 \verb! addi t0, t1, +imm; blt t0, t1, overflow!.  This covers the
 common case of addition with an immediate operand.
+\end{comment}
 
+符号付き加算の場合、片方のオペランドの符号がわかっていれば、
+オーバーフローのチェックは加算後に1回の分岐で済みます。
+\verb! addi t0, t1, +imm; blt t0, t1, overflow!
+これは、即値オペランドでの加算という一般的なケースをカバーしています。
+
+\begin{comment}
 For general signed addition, three additional instructions after the
 addition are required, leveraging the observation that the sum should
 be less than one of the operands if and only if the other operand is
 negative.
+\end{comment}
+
+一般的な符号付き加算では、加算後に3つの追加命令が必要となりますが、
+これは「もう一方のオペランドが負の場合に限り、和が一方のオペランドよりも小さくなるはず」というものを利用しています。
+
 \begin{verbatim}
          add t0, t1, t2
          slti t3, t2, 0
          slt t4, t0, t1
          bne t3, t4, overflow
 \end{verbatim}
+\begin{comment}
 In RV64I, checks of 32-bit signed additions can be optimized further by
 comparing the results of ADD and ADDW on the operands.
+\end{comment}
+
+RV64Iでは，オペランドのADDとADDWの結果を比較することで，32ビット符号付き加算のチェックをさらに最適化することができます。
+※ 訳者注：on the operands, どういう意味？
 \end{commentary}
 
+\begin{comment}
 \subsubsection*{Integer Register-Immediate Instructions}
+\end{comment}
+\subsubsection*{整数レジスタ即値命令}
+
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{M@{}R@{}S@{}R@{}O}
@@ -817,11 +855,19 @@ I-immediate[11:0] & src & ADDI/SLTI[U]  & dest & OP-IMM \\
 I-immediate[11:0] & src & ANDI/ORI/XORI & dest & OP-IMM \\
 \end{tabular}
 \end{center}
+
+\begin{comment}
 ADDI adds the sign-extended 12-bit immediate to register {\em rs1}.
 Arithmetic overflow is ignored and the result is simply the low
 XLEN bits of the result.  ADDI {\em rd, rs1, 0} is used to implement the
 MV {\em rd, rs1} assembler pseudoinstruction.
+\end{comment}
 
+ADDIは、符号拡張された12ビットの即値をレジスタ{\em rs1}と加算します。
+算術オーバーフローは無視され、結果は単に結果の下位XLENビットとなります。
+ADDI {\em rd, rs1, 0} は、MV {\em rd, rs1} アセンブラ疑似命令の実装に使用されます。
+
+\begin{comment}
 SLTI (set less than immediate) places the value 1 in register {\em rd}
 if register {\em rs1} is less than the sign-extended immediate when
 both are treated as signed numbers, else 0 is written to {\em rd}.
@@ -830,12 +876,27 @@ the immediate is first sign-extended to XLEN bits then treated as an
 unsigned number).  Note, SLTIU {\em rd, rs1, 1} sets {\em rd}
 to 1 if {\em rs1} equals zero, otherwise sets {\em rd} to 0 (assembler
 pseudoinstruction SEQZ {\em rd, rs}).
+\end{comment}
 
+SLTI(set less than immediate)は、
+レジスタが符号付き整数として扱われているときに、レジスタ{\em rs1}が符号拡張した即値より小さい場合は、
+レジスタ{\em rd}に値1を、そうでない場合は0を書き込みます。
+SLTIUも同様ですが、値を符号なしの数値として比較します(つまり、即値をまずXLENビットに符号拡張してから、符号なしの数値として扱います)。
+なお、SLTIU {\em rd, rs1, 1} は、{\em rs1} が0であれば{\em rd}に1、{\em rs1}が0でなければ0に設定されます
+(アセンブラの擬似命令SEQZ {\em rd, rs})。
+
+\begin{comment}
 ANDI, ORI, XORI are logical operations that perform bitwise AND, OR,
 and XOR on register {\em rs1} and the sign-extended 12-bit immediate
 and place the result in {\em rd}.  Note, XORI {\em rd, rs1, -1}
 performs a bitwise logical inversion of register {\em rs1} (assembler
 pseudoinstruction NOT {\em rd, rs}).
+\end{comment}
+
+ANDI、ORI、XORIは、レジスタ{\em rs1}と符号拡張された12ビットの即値に対して、
+ビット単位のAND、OR、XORを行い、その結果を{\em rd}に格納する論理演算です。
+なお、XORI {\em rd, rs1, -1} はレジスタ {\em rs1} をビット単位で論理反転させるものです。
+(アセンブラの疑似命令 NOT {\em rd, rs})
 
 \vspace{-0.2in}
 \begin{center}
@@ -862,6 +923,7 @@ pseudoinstruction NOT {\em rd, rs}).
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Shifts by a constant are encoded as a specialization of the
 I-type format.  The operand to be shifted is in {\em rs1}, and the
 shift amount is encoded in the lower 5 bits of the I-immediate field.
@@ -870,6 +932,13 @@ SLLI is a logical left shift (zeros are shifted into the lower bits);
 SRLI is a logical right shift (zeros are shifted into the upper bits);
 and SRAI is an arithmetic right shift (the original sign bit is copied
 into the vacated upper bits).
+\end{comment}
+
+定数によるシフトは、I-typeフォーマットの特殊な場合としてエンコードされます。
+シフトされるオペランドは、I-immediateフィールドの下位5ビットにエンコードされます。
+右シフトの種類は、ビット30でエンコードされます。
+SLLIは論理的左シフト(下位ビットにゼロがシフトされる)、SRLIは論理的右シフト(上位ビットにゼロがシフトされる)、
+SRAIは算術的右シフト(空いた上位ビットに元の符号ビットがコピーされる)です。
 
 \vspace{-0.2in}
 \begin{center}
@@ -889,40 +958,85 @@ U-immediate[31:12] & dest & AUIPC
 \end{tabular}
 \end{center}
 
+\begin{comment}
 LUI (load upper immediate) is used to build 32-bit constants and uses
 the U-type format.  LUI places the 32-bit U-immediate value into
 the destination register {\em rd}, filling in the lowest 12
 bits with zeros.
+\end{comment}
 
+LUI(load upper immediate)は32ビットの定数を構築するためのもので、
+U-Typeのフォーマットを使用します。
+LUIは、32ビットのU-Immediateを、下位12ビットをゼロで埋めて、書き込みレジスタ{\em rd}に格納します。
+
+\begin{comment}
 AUIPC (add upper immediate to {\tt pc}) is used to build {\tt pc}-relative
 addresses and uses the U-type format.  AUIPC forms a 32-bit offset from the
 U-immediate, filling in the lowest 12 bits with zeros, adds this offset
 to the address of the AUIPC instruction, then places the result in register {\em rd}.
+\end{comment}
+
+AUIPC(add upper immediate to {\tt pc})は、相対アドレスを構築するための命令で、
+U-Immediateのフォーマットを使用します。
+AUIPCは、U-immediateから32ビットのオフセットを形成し、そのオフセットをAUIPC命令のアドレスに加算し、
+その結果をレジスタ{\em rd}に格納します。
 
 \begin{commentary}
+\begin{comment}
 The assembly syntax for {\tt lui} and {\tt auipc} does not represent the lower
 12 bits of the U-immediate, which are always zero.
+\end{comment}
 
+{\tt lui}と{\tt auipc}のアセンブリの構文では、
+U-immediateの下位12ビットが表現されておらず、常に0となっています。
+
+\begin{comment}
 The AUIPC instruction supports two-instruction sequences to access
 arbitrary offsets from the PC for both control-flow transfers and data
 accesses.  The combination of an AUIPC and the 12-bit immediate in a
 JALR can transfer control to any 32-bit PC-relative address, while an
 AUIPC plus the 12-bit immediate offset in regular load or store
 instructions can access any 32-bit PC-relative data address.
+\end{comment}
 
+AUIPC命令は、制御フロー転送とデータアクセスの両方において、
+PCからの任意のオフセットにアクセスするための2つの命令シーケンスをサポートしています。 
+AUIPCとJALRの12ビット即値の組み合わせでは、任意の32ビットPC相対アドレスに制御を移すことができ、
+通常のロード命令やストア命令では、AUIPCと12ビット即値のオフセットで任意の
+32ビットPC相対データアドレスにアクセスすることができます。
+
+\begin{comment}
 The current PC can be obtained by setting the U-immediate to 0.
 Although a JAL +4 instruction could also be used to obtain the local
 PC (of the instruction following the JAL), it might cause pipeline
 breaks in simpler microarchitectures or pollute BTB structures in more
 complex microarchitectures.
+\end{comment}
+
+現在のPCは、U-Immediateを0にすることで取得できます。 
+JAL+4命令で(JALに続く命令の)ローカルPCを取得することも可能ですが、
+単純なマイクロアーキテクチャではパイプラインの切断を引き起こし、
+複雑なマイクロアーキテクチャではBTB構造を汚染する可能性があります。
+
 \end{commentary}
 
+\begin{comment}
 \subsubsection*{Integer Register-Register Operations}
+\end{comment}
 
+\subsubsection*{整数レジスタ・レジスタ演算命令}
+
+\begin{comment}
 RV32I defines several arithmetic R-type operations.  All operations
 read the {\em rs1} and {\em rs2} registers as source operands and
 write the result into register {\em rd}.  The {\em funct7} and {\em
   funct3} fields select the type of operation.
+\end{comment}
+
+RV32Iでは、いくつかのR型の算術演算が定義されています。
+すべての演算はレジスタ{\em rs1}と{\em rs2} をソースオペランドとして読み込み、
+結果をレジスタ{\em rd}に書き込みます。
+演算の種類は、{\em funct7}と{\em funct3}で選択します。
 
 \vspace{-0.2in}
 \begin{center}
@@ -950,6 +1064,7 @@ write the result into register {\em rd}.  The {\em funct7} and {\em
 \end{tabular}
 \end{center}
 
+\begin{comment}
 ADD performs the addition of {\em rs1} and {\em rs2}. SUB performs the
 subtraction of {\em rs2} from {\em rs1}.  Overflows are ignored and the low XLEN
 bits of results are written to the destination {\em rd}.
@@ -959,12 +1074,30 @@ respectively, writing 1 to {\em rd} if $\mbox{\em rs1} < \mbox{\em
 {\em rd} to 1 if {\em rs2} is not equal to zero, otherwise sets {\em
   rd} to zero (assembler pseudoinstruction SNEZ {\em rd, rs}).  AND, OR, and
 XOR perform bitwise logical operations.
+\end{comment}
 
+ADDは、{\em rs1}と{
+\em rs2}の加算を行います。
+SUBは、{\em rs1}から{\em rs2}の減算を行います。
+オーバーフローは無視され、結果の下位XLENビットが出力先の{\em rd}に書き込まれます。
+SLTとSLTUは、それぞれ符号付きと符号なしの比較を行い、$\mbox{\em rs1} < \mbox{\em rs1}$より大きい場合に1を書き込み、それ以外は0を書き込みます。
+なお、SLTU {\em rd}, {\em x0}, {\em rs2}は、 {\em rs2}が0でなければ1、そうでなければ0を{\em rd}に設定します
+(アセンブラの擬似命令SNEZ {\em rd, rs}のことです)。
+AND、OR、XORはビット単位の論理演算を行います。
+
+\begin{comment}
 SLL, SRL, and SRA perform logical left, logical right, and arithmetic
 right shifts on the value in register {\em rs1} by the shift amount
 held in the lower 5 bits of register {\em rs2}.
+\end{comment}
+SLL, SRL, SRAは、レジスタの下位5ビットに保持されているシフト量で、
+レジスタの値を左へ論理シフト、右へ論理シフト、右へ算術シフトします。
 
+\begin{comment}
 \subsubsection*{NOP Instruction}
+\end{comment}
+\subsubsection*{NOP命令}
+
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{M@{}R@{}S@{}R@{}O}
@@ -986,11 +1119,18 @@ held in the lower 5 bits of register {\em rs2}.
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The NOP instruction does not change any architecturally visible state, except for
 advancing the {\tt pc} and incrementing any applicable performance
 counters.  NOP is encoded as ADDI {\em x0, x0, 0}.
+\end{comment}
+
+NOP命令は、アーキテクチャ的に見える状態を一切変更しません。
+ただし、パフォーマンスカウンタを進めたり、使用可能なパフォーマンスカウンタをインクリメントしたりします。
+NOPはADDI {\em x0, x0, 0}としてエンコードされます。
 
 \begin{commentary}
+\begin{comment}
 NOPs can be used to align code segments to microarchitecturally
 significant address boundaries, or to leave space for inline code
 modifications.  Although there are many possible ways to encode a NOP,
@@ -998,7 +1138,16 @@ we define a canonical NOP encoding to allow microarchitectural
 optimizations as well as for more readable disassembly output.  The
 other NOP encodings are made available for HINT instructions
 (Section~\ref{sec:rv32i-hints}).
+\end{comment}
 
+NOPは、コードセグメントをマイクロアーキテクチャ的に重要なアドレス境界に合わせたり、
+インラインコードの修正のためにスペースを残したりするために使用することができます。 
+NOPをエンコードする方法はたくさんありますが、
+マイクロアーキテクチャの最適化を可能にし、より読みやすい逆アセンブル出力を実現するために、
+標準的なNOPエンコードを定義します。
+他のNOPエンコーディングはHINT命令(~\ref{sec:rv32i-hints}節)で利用できます。
+
+\begin{comment}
 ADDI was chosen for the NOP encoding as this is most likely to take
 fewest resources to execute across a range of systems (if not
 optimized away in decode).  In particular, the instruction only reads
@@ -1008,6 +1157,16 @@ operation.  In particular, address-generation functional units can
 execute ADDI using the same hardware needed for base+offset address
 calculations, while register-register ADD or logical/shift operations
 require additional hardware.
+\end{comment}
+
+ADDIは、(デコードで最適化されていない場合)様々なシステムで実行するのに
+最も少ないリソースを必要とする可能性が高いため、NOPエンコーディングに選ばれました。
+特に、この命令は1つのレジスタしか読み取りません。
+また、加算は最も一般的な演算であるため、スーパースカラ設計ではADDI機能ユニットが
+利用できる可能性が高くなります。
+特に、アドレス生成機能ユニットは、ベース+オフセットのアドレス計算に必要なのと
+同じハードウェアを使用してADDIを実行できますが、
+レジスタ・レジスタ間のADDや論理/シフト演算には追加のハードウェアが必要です。
 \end{commentary}
 
 \section{Control Transfer Instructions}
