@@ -1360,16 +1360,27 @@ JALRは、ベースとなる{\em rs1}$=${\em x0}とすることで、
 また、ABIはアドレス空間の別の場所にあるライブラリを指すように汎用レジスタを割り当てることもできます。
 \end{commentary}
 
+\begin{comment}
 The JAL and JALR instructions will generate an
 instruction-address-misaligned exception if the target address is not
 aligned to a four-byte boundary.
+\end{comment}
+JALおよびJALR命令は、ターゲットアドレスが4バイト境界にアラインされていない場合、
+命令アドレスミスアライン例外を発生させます。
 
 \begin{commentary}
+\begin{comment}
 Instruction-address-misaligned exceptions are not possible on machines
 that support extensions with 16-bit aligned instructions, such as the
 compressed instruction-set extension, C.
+\end{comment}
+
+命令アドレスミスアライン例外は、圧縮命令セット拡張であるC拡張など、
+16ビットアラインド命令を持つ拡張をサポートするマシンでは発生しません。
+
 \end{commentary}
 
+\begin{comment}
 Return-address prediction stacks are a common feature of
 high-performance instruction-fetch units, but require accurate
 detection of instructions used for procedure calls and returns to be
@@ -1378,6 +1389,16 @@ implicitly via the register numbers used.  A JAL instruction should
 push the return address onto a return-address stack (RAS) only when
 {\em rd} is {\tt x1} or {\tt x5}.  JALR instructions should push/pop a
 RAS as shown in the Table~\ref{rashints}.
+\end{comment}
+
+リターンアドレス予測スタック(Return Address Prediction stack)は、
+高性能な命令フェッチユニットの一般的な機能ですが、その効果を発揮するためには、
+プロシージャコールやリターンに使用される命令を正確に検出する必要があります。
+RISC-Vでは、使用されるレジスタ番号によって、命令の使用方法に関するヒントが暗黙のうちにエンコードされます。
+JAL命令では、RAS(Return-Address Stack)にリターンアドレスをプッシュしますが、
+その際には、{\em rd}が{\tt x1}または{\tt x5}である必要があります。
+JALR命令は、表のようにRASに挿入・取り出しを行います。
+
 \begin{table}[hbt]
 \centering
 \begin{tabular}{|c|c|c|l|}
@@ -1393,17 +1414,27 @@ RAS as shown in the Table~\ref{rashints}.
   Yes & Yes & Yes & Push \\
    \hline
 \end{tabular}
+\begin{comment}
 \caption{Return-address stack prediction hints encoded in the register
   operands of a JALR instruction.}
+\end{comment}
+\caption{リターンアドレス予測スタックはJALR命令のレジスタオペランドによってエンコードされたヒントを提供する}
 \label{rashints}
 \end{table}
 
 \begin{commentary}
+\begin{comment}
 Some other ISAs added explicit hint bits to their indirect-jump instructions
 to guide return-address stack manipulation.  We use implicit hinting tied to
 register numbers and the calling convention to reduce the encoding space used
 for these hints.
+\end{comment}
+他のISAでは、リターンアドレスのスタック操作を誘導するために、
+間接ジャンプ命令に明示的なヒントビットを追加していました。 
+私たちは、レジスタ番号と呼び出し規則に関連した暗黙のヒントを使用して、
+これらのヒントに使用されるエンコーディングスペースを減らしています。
 
+\begin{comment}
 When two different link registers ({\tt x1} and {\tt x5}) are given as
 {\em rs1} and {\em rd}, then the RAS is both popped and pushed to
 support coroutines.  If {\em rs1} and {\em rd} are the same link
@@ -1411,15 +1442,35 @@ register (either {\tt x1} or {\tt x5}), the RAS is only pushed to
 enable macro-op fusion of the sequences:\linebreak
 {\tt lui ra, imm20; jalr ra, imm12(ra)} \ and \ 
 {\tt auipc ra, imm20; jalr ra, imm12(ra)}
+\end{comment}
+
+2つの異なるリンクレジスタ({\tt x1}と{\tt x5})がそれぞれ{\em rs1}と{\em rd}に与えられた場合、
+コルーチンをサポートするために、RASは取り出しと挿入の両方が行われます。
+{\em rs1}と{\em rd}が同じリンクレジスタ({\tt x1}もしくは{\tt x5})の場合は、
+RASは以下のプログラム列のマクロな演算結合のためにRASに挿入のみを行います:
+\linebreak
+{\tt lui ra, imm20; jalr ra, imm12(ra)} \ と \ 
+{\tt auipc ra, imm20; jalr ra, imm12(ra)}
 \end{commentary}
 
+\begin{comment}
 \subsubsection*{Conditional Branches}
+\end{comment}
+\subsubsection*{条件分岐命令}
 
+\begin{comment}
 All branch instructions use the B-type instruction format.  The
 12-bit B-immediate encodes signed offsets in multiples of 2 bytes.
 The offset is sign-extended and added
 to the address of the branch instruction to give the target address.  The
 conditional branch range is $\pm$\wunits{4}{KiB}.
+\end{comment}
+
+すべての分岐命令は、B型命令フォーマットを使用します。 
+12ビットのB型中間子は、2バイトの倍数の符号付きオフセットをエンコードします。
+オフセットは符号拡張され、分岐命令のアドレスに加算されてターゲットアドレスとなります。
+すべての分岐命令はBタイプの命令フォーマットを使用しますが、
+条件分岐の範囲は$\pm$\wunits{4}{KiB}です。 
 
 \vspace{-0.2in}
 \begin{center}
@@ -1450,6 +1501,7 @@ conditional branch range is $\pm$\wunits{4}{KiB}.
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Branch instructions compare two registers.  BEQ and BNE take the
 branch if registers {\em rs1} and {\em rs2} are equal or unequal
 respectively.  BLT and BLTU take the branch if {\em rs1} is less than
@@ -1458,27 +1510,58 @@ BGEU take the branch if {\em rs1} is greater than or equal to {\em rs2},
 using signed and unsigned comparison respectively. Note, BGT, BGTU,
 BLE, and BLEU can be synthesized by reversing the operands to BLT,
 BLTU, BGE, and BGEU, respectively.
+\end{comment}
+
+分岐命令は2つのレジスタを比較します。
+BEQとBNEは、レジスタが等しければ分岐し、等しくなければ分岐しません。
+BLT および BLTU は、それぞれ符号付きおよび符号なしの比較を使用して、
+{\em rs1} が {\em rs2} よりも小さい場合に分岐します。
+BGEとBGEUは、それぞれ符号付きと符号なしの比較を用いて、{\em rs1}が{\em rs2}よりも大きいか等しい場合に分岐します。
+なお、BGT、BGTU、BLE、BLEUは、それぞれBLT、BLTU、BGE、BGEUのオペランドを逆にして合成することができます。
 
 \begin{commentary}
+\begin{comment}
 Signed array bounds may be checked with a single BLTU instruction, since
 any negative index will compare greater than any nonnegative bound.
+\end{comment}
+符号付き配列の境界は、1つのBLTU命令で調べることができます。
+負のインデックスは、非負の境界よりも大きく比較されるからです。
 \end{commentary}
 
+\begin{comment}
 Software should be optimized such that the sequential code path is the
 most common path, with less-frequently taken code paths placed out of
 line.  Software should also assume that backward branches will be
 predicted taken and forward branches as not taken, at least the
 first time they are encountered.  Dynamic predictors should quickly
 learn any predictable branch behavior.
+\end{comment}
 
+ソフトウェアは、シーケンシャル・コード・パスが最も一般的なパスであり、
+あまり頻繁に使用されないコード・パスはライン外に配置されるように最適化されるべきです。 
+また、ソフトウェアは、少なくとも最初に遭遇したときには、
+後方への分岐は取られると予測され、前方への分岐は取られないと予測されるべきです。
+動的予測器は、予測可能な分岐の動作をすぐに学ぶべきです。
+
+\begin{comment}
 Unlike some other architectures, the RISC-V jump (JAL with {\em
   rd}={\tt x0}) instruction should always be used for unconditional
 branches instead of a conditional branch instruction with an
 always-true condition.  RISC-V jumps are also PC-relative and support
 a much wider offset range than branches, and will not pollute
 conditional-branch prediction tables.
+\end{comment}
+
+他のいくつかのアーキテクチャとは異なり、
+RISC-Vのジャンプ({\em rd}={\tt x0}のJAL命令)は、
+常に真の条件を持つ条件付き分岐命令の代わりに、
+常に無条件の分岐に使用されるべきです。
+RISC-Vのジャンプは、PC相対で、
+分岐(訳者注:これは条件分岐命令のことを示しているものと思われる)よりもはるかに広いオフセット範囲をサポートしており、
+条件分岐の予測テーブルを汚染することはありません。
 
 \begin{commentary}
+\begin{comment}
 The conditional branches were designed to include arithmetic
 comparison operations between two registers (as also done in PA-RISC,
 Xtensa, and MIPS R6), rather than use condition codes (x86, ARM, SPARC,
@@ -1496,13 +1579,35 @@ in the front-end instruction stream, and so can be predicted earlier.
 There is perhaps an advantage to a design with condition codes in the
 case where multiple branches can be taken based on the same condition
 codes, but we believe this case to be relatively rare.
+\end{comment}
 
+条件分岐は、条件コードを使用したり(x86, ARM, SPARC, PowerPC)、
+1つのレジスタをゼロと比較するだけにしたり(Alpha, MIPS)、
+2つのレジスタを等しく比較するだけにしたり(MIPS)するのではなく、
+2つのレジスタ間の算術比較演算を含むように設計されています(PA-RISC, Xtensa, MIPS R6でも同様)。
+この設計は、比較と分岐を組み合わせた命令が通常のパイプラインに収まり、
+追加の条件コードの状態や一時的なレジスタの使用を回避し、
+静的なコードサイズと動的な命令フェッチのトラフィックを削減できるという観察に基づいています。 
+もう1つのポイントは、ゼロとの比較には自明ではない回路遅延が必要であり(特に高度なプロセスでスタティック・ロジックに移行した後)、
+そのために算術的な大きさの比較とほぼ同じコストがかかることです。 
+比較と分岐を融合させた命令のもう一つの利点は、
+分岐がフロントエンドの命令ストリームの早い段階で観測されるため、
+早い段階で予測することができることです。
+同一の条件コードに基づいて複数の分岐を行う場合には、
+条件コードを用いた設計の利点があるかもしれませんが、このようなケースは比較的少ないと考えています。
+
+\begin{comment}
 We considered but did not include static branch hints in the
 instruction encoding.  These can reduce the pressure on dynamic
 predictors, but require more instruction encoding space and
 software profiling for best results, and can result in poor
 performance if production runs do not match profiling runs.
+\end{comment}
 
+静的な分岐ヒントを命令エンコーディングに含めることも検討しましたが，今回は見送りました． 
+しかし，最良の結果を得るためには，より多くの命令エンコーディングスペースとソフトウェアプロファイリングが必要となります．
+
+\begin{comment}
 We considered but did not include conditional moves or predicated
 instructions, which can effectively replace unpredictable short
 forward branches.  Conditional moves are the simpler of the two, but
@@ -1519,7 +1624,24 @@ predication instead of branches can result in lower performance on
 inputs not included in the compiler training set, especially given
 that unpredictable branches are rare, and becoming rarer as branch
 prediction techniques improve.
+\end{comment}
 
+予測不可能な短い順方向の分岐を効果的に置き換えることができる、
+条件付き移動やプリディケーテッド命令を検討しましたが、採用しませんでした。 
+条件付き移動は、この2つのうちではシンプルな方ですが、
+例外が発生する可能性のある条件付きコード(メモリ・アクセスや浮動小数点演算)では使用することが困難です。 
+プレディケート命令はシステムに追加のフラグ状態を追加し、フラグを設定およびクリアするための追加の命令、
+およびすべての命令に追加のエンコーディング・オーバーヘッドを追加します。
+条件付き移動命令とプレディケート付き命令の両方とも、
+アウトオブオーダー・マイクロアーキテクチャに複雑さをもたらします。
+プレディケートが成立しない場合には、書き込みアーキテクチャレジスタの元の値をリネームされた
+書き込み物理レジスタにコピーする必要があるため、暗黙の第3ソース・オペランドが追加されます。 
+また、分岐の代わりにプレディケートを使用するという静的なコンパイル時の決定は、
+コンパイラのトレーニングセットに含まれていない入力に対する性能を低下させる可能性があります。
+特に、予測できない分岐はまれであり、分岐予測技術の向上に伴い、
+分岐予測できない場合はますます減っています。
+
+\begin{comment}
 We note that various microarchitectural techniques exist to
 dynamically convert unpredictable short forward branches into
 internally predicated code to avoid the cost of flushing pipelines on
@@ -1534,18 +1656,40 @@ cores add internal predicates on instructions in the branch shadow,
 with the internal predicate value written by the branch instruction,
 allowing the branch and following instructions to be executed
 speculatively and out-of-order with respect to other code~\cite{ibmpower7}.
+\end{comment}
+
+予測不可能な短い順方向の分岐を内部で予測されたコードに動的に変換し、
+分岐の予測失敗に伴うパイプラインのフラッシュコストを回避する様々なマイクロアーキテクチャー技術が存在し、
+商用プロセッサに実装されていることに注目しました。
+最も単純な手法は、フェッチパイプライン全体ではなく、分岐シャドウ内の命令のみをフラッシュすることで、
+誤予測された短い順方向の分岐から回復する際のペナルティを軽減したり、
+より幅の広い命令フェッチやアイドル命令フェッチスロットを使用して両サイドから命令をフェッチすることです。 
+アウトオブオーダーコアのためのより複雑な技術は、分岐シャドウ内の命令に内部プレディケートを追加し、
+内部プレディケートの値は分岐命令によって書き込まれ、分岐とそれに続く命令が投機的に実行され、
+他のコードに対してアウトオブオーダーで実行されることを可能にします~\cite{ibmpower7}。
 \end{commentary}
 
+\begin{comment}
 The conditional branch instructions will generate an
 instruction-address-misaligned exception if the target address is not
 aligned to a four-byte boundary and the branch condition evaluates
 to true.  If the branch condition evaluates to false, the
 instruction-address-misaligned exception will not be raised.
+\end{comment}
+
+条件分岐命令は、ターゲットアドレスが4バイト境界にアラインされておらず、
+分岐条件が真と評価された場合に命令アドレスミスアライン例外を発生させます。
+分岐条件が不成立と評価された場合は、命令アドレスミスアライン例外は発生しません。
 
 \begin{commentary}
+\begin{comment}
 Instruction-address-misaligned exceptions are not possible on machines
 that support extensions with 16-bit aligned instructions, such as the
 compressed instruction-set extension, C.
+\end{comment}
+
+圧縮命令セット拡張であるCなど、16ビットアラインドの命令を持つ拡張をサポートするマシンでは、
+命令アドレスミスアライン例外は発生しません。
 \end{commentary}
 
 \section{Load and Store Instructions}
