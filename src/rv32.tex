@@ -1692,9 +1692,13 @@ compressed instruction-set extension, C.
 命令アドレスミスアライン例外は発生しません。
 \end{commentary}
 
+\begin{comment}
 \section{Load and Store Instructions}
+\end{comment}
+\section{ロードストア命令}
 \label{sec:rv32:ldst}
 
+\begin{comment}
 RV32I is a load-store architecture, where only load and store
 instructions access memory and arithmetic instructions only operate on
 CPU registers.  RV32I provides a 32-bit address space that is
@@ -1704,26 +1708,60 @@ which instructions (e.g., some addresses might be read only, or
 support word access only).  Loads with a destination of {\tt x0} must
 still raise any exceptions and cause any other side effects even
 though the load value is discarded.
+\end{comment}
 
+RV32Iはロード・ストア・アーキテクチャで、ロード命令とストア命令のみがメモリにアクセスし、
+演算命令はCPUレジスタのみを操作します。 
+RV32Iは、バイトアドレス方式の32ビットのアドレス空間を提供します。
+EEIは、アドレス空間のどの部分がどのような命令でアクセスするのが有効であるかを定義します
+(例えば、いくつかのアドレスは読み取り専用であったり、ワードアクセスのみをサポートしたりします)。
+宛先が{\tt x0}のロードは、ロード値が破棄されても、
+例外が発生したり、その他の副作用が発生したりしなければなりません。
+
+\begin{comment}
 The EEI will define whether the memory system is little-endian or big-endian.
 In RISC-V, endianness is byte-address invariant.
+\end{comment}
+
+EEIは、メモリシステムがリトルエンディアンかビッグエンディアンのどちらかとして定義されます。
+RISC-Vでは、エンディアンはバイトアドレスで不変です。
+
 \begin{commentary}
+\begin{comment}
 In a system for which endianness is byte-address invariant, the following
 property holds: if a byte is stored to memory at some address in some
 endianness, then a byte-sized load from that address in any endianness returns
 the stored value.
+\end{comment}
 
+エンディアンがバイトアドレス不変のシステムでは以下の性質があります:
+あるエンディアンでアドレスにバイトデータがメモリに格納されている場合、
+どのようなエンディアンでもそのアドレスからバイトサイズのロードを行うと、ストアした値が返されます。
+
+\begin{comment}
 In a little-endian configuration, multibyte stores write the least-significant
 register byte at the lowest memory byte address, followed by the other
 register bytes in ascending order of their significance.
 Loads similarly transfer the contents of the lesser memory byte addresses to
 the less-significant register bytes.
+\end{comment}
 
+リトルエンディアンの構成では、マルチバイトストアは、最下位のメモリバイトアドレスに最下位のレジスタバイトを書き込み、
+その後、他のレジスタバイトをアドレスの昇順で書き込みます。
+ロードの場合も同様に、下位のメモリバイトアドレスの内容を下位のレジスタバイトに転送します。
+
+\begin{comment}
 In a big-endian configuration, multibyte stores write the most-significant
 register byte at the lowest memory byte address, followed by the other
 register bytes in descending order of their significance.
 Loads similarly transfer the contents of the greater memory byte addresses to
 the less-significant register bytes.
+\end{comment}
+
+ビッグエンディアン構成の場合、マルチバイトストアは最下位のメモリバイトアドレスに最上位のレジスタバイトを書き込み、
+その後、バイトアドレスの降順で他のレジスタバイトを書き込みます。
+ロードも同様に、上位のメモリバイトアドレスの内容を下位のレジスタバイトに転送します。
+
 \end{commentary}
 
 \vspace{-0.4in}
@@ -1770,13 +1808,22 @@ offset[11:5] & src & base & width & offset[4:0] & STORE \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Load and store instructions transfer a value between the registers and
 memory.  Loads are encoded in the I-type format and stores are
 S-type.  The effective address is obtained by adding register
 {\em rs1} to the sign-extended 12-bit offset.  Loads copy a value
 from memory to register {\em rd}.  Stores copy the value in register
 {\em rs2} to memory.
+\end{comment}
 
+ロード命令とストア命令は、レジスタとメモリの間で値を転送します。
+ロードはI-Type、ストアはS-Typeでエンコードされます。
+実効アドレスは、符号拡張された12ビットのオフセットに、レジスタ{\em rs1}を加算したものになります。
+ロードは、メモリからレジスタに値をコピーします。
+ストアは、レジスタ{\em rs2}の値をメモリにコピーします。
+
+\begin{comment}
 The LW instruction loads a 32-bit value from memory into {\em rd}.  LH
 loads a 16-bit value from memory, then sign-extends to 32-bits before
 storing in {\em rd}. LHU loads a 16-bit value from memory but then
@@ -1784,14 +1831,30 @@ zero extends to 32-bits before storing in {\em rd}.  LB and LBU are
 defined analogously for 8-bit values.  The SW, SH, and SB instructions
 store 32-bit, 16-bit, and 8-bit values from the low bits of register
 {\em rs2} to memory.
+\end{comment}
 
+LWは、メモリから32ビットの値をロードする命令です。 
+LHは16ビットの値をメモリからロードし、32ビットに符号拡張してから格納します。
+LHUは16ビットの値をメモリからロードしますが、32ビットにゼロ拡張してから格納します。
+LBとLBUは、8ビット値の場合と同様に定義されます。
+SW、SH、SB命令は、32ビット、16ビット、8ビットの値をレジスタの下位ビットからメモリに格納します。
+
+\begin{comment}
 Regardless of EEI, loads and stores whose effective addresses are
 naturally aligned shall not raise an address-misaligned exception.
 Loads and stores whose effective address is not naturally aligned
 to the referenced datatype (i.e., the effective address is
 not divisible by the size of the access in bytes) have behavior
 dependent on the EEI.
+\end{comment}
 
+EEIにかかわらず、実効アドレスが自然にアラインされているロードおよびストアは、
+アドレスミスアライン例外を発生してはなりません。
+有効なアドレスが参照されるデータ型に対して自然にアラインされていない
+(すなわち、有効なアドレスがアクセスのバイトサイズで割り切れない)ロードおよびストアは、
+EEIに依存した動作をします。
+
+\begin{comment}
 An EEI may guarantee that misaligned loads and stores are fully
 supported, and so the software running inside the execution
 environment will never experience a contained or fatal
@@ -1799,7 +1862,15 @@ address-misaligned trap.  In this case, the misaligned loads and
 stores can be handled in hardware, or via an invisible trap into the
 execution environment implementation, or possibly a combination of
 hardware and invisible trap depending on address.
+\end{comment}
 
+EEIは、ミスアラインド・ロードとストアが完全にサポートされていることを保証し、
+実行環境内で実行されているソフトウェアが、致命的なアドレス・ミスアライン例外が発生することがないようにすることができます。 
+この場合、ミスアラインド・ロードとストアは、ハードウェアで処理するか、
+実行環境の実装に不可視のトラップを介して処理するか、
+あるいはアドレスに応じてハードウェアと不可視のトラップを組み合わせて処理することができます。
+
+\begin{comment}
 An EEI may not guarantee misaligned loads and stores are handled
 invisibly.  In this case, loads and stores that are not naturally
 aligned may either complete execution successfully or raise an
@@ -1814,8 +1885,21 @@ must define if exceptions caused by address misalignment result in a
 contained trap (allowing software running inside the execution
 environment to handle the trap) or a fatal trap (terminating
 execution).
+\end{comment}
+
+EEIは、ミスアラインロードとストアが目に見えない形で処理されることを保証しない場合があります。 
+この場合、自然にアラインされていないロードとストアは、
+正常に実行を完了するか、または例外を発生させることがあります。
+発生する例外には、アドレスミスアラインド例外とアクセスフォルト例外があります。 
+アライメントがずれていなければ完了するはずのメモリ・アクセスでも、メモリ領域へのアクセスに副作用があるなど、
+ミスアラインド・アクセスをエミュレートすべきでない場合は、
+アドレス・ミスアライン例外ではなく、アクセス・フォールト例外を発生させることができます。 
+EEIがミスアラインド・ロードとストアが目に見えない形で処理されることを保証しない場合、
+EEIはアドレス・ミスアラインよる例外が、contained trap(実行環境内で動作するソフトウェアがトラップを処理できるようにする)
+とフェイタル・トラップ(実行を終了する)のどちらになるかを定義しなければなりません。
 
 \begin{commentary}
+\begin{comment}
 Misaligned accesses are occasionally required when porting legacy
 code, and help performance on applications when using any form of
 packed-SIMD extension or handling externally packed data structures.
@@ -1836,16 +1920,43 @@ alignment, which complicates code generation and adds to loop startup
 overhead.  New misaligned hardware addressing modes take considerable
 space in the instruction encoding or require very simplified
 addressing modes (e.g., register indirect only).
+\end{comment}
+
+従来のコードを移植する際にミスアライン・アクセスが必要になることがあります。
+また、何らかの形でPacked-SIMD拡張を使用したり、
+外部からパックされたデータ構造を扱うアプリケーションでは、パフォーマンスの向上に役立ちます。
+EEIが通常のロード/ストア命令によるミスアラインアクセスのサポートを選択できるようにした理由は、
+ミスアライン・ハードウェア・サポートの追加を容易にするためです。 
+そのためには、ソフトウェアがミスアラインアクセスを処理するための特別な命令を用意するか、
+ミスアラインアクセスのための新しいハードウェア・アドレッシング・モードを用意するかのいずれかを選択する必要があります。 
+特別な命令は使いにくく、ISAを複雑にし、しばしば新しいプロセッサの状態を追加したり(例：SPARC VISアラインアドレスオフセットレジスタ)、
+既存のプロセッサの状態へのアクセスを複雑にします(例：MIPS LWL/LWRパーシャルレジスタライト)。
+さらに、ループ指向のpacked-SIMDコードでは、
+オペランドがミスアラインされた場合にオーバーヘッドが増えるため、
+ソフトウェアはオペランドのアラインメントに応じて複数のループ形態を提供する必要があり、
+コード生成が複雑になり、ループ起動時のオーバーヘッドも増えることになります。
+新しいミスアライン・ハードウェア・アドレッシング・モードは、命令エンコーディングに大きなスペースを必要としたり、
+非常にシンプルなアドレッシング・モード(例：レジスタ間接のみ)に限定されます。
 \end{commentary}
 
+\begin{comment}
 Even when misaligned loads and stores complete successfully, these
 accesses might run extremely slowly depending on the implementation
 (e.g., when implemented via an invisible trap).  Furthermore, whereas
 naturally aligned loads and stores are guaranteed to execute
 atomically, misaligned loads and stores might not, and hence
 require additional synchronization to ensure atomicity.
+\end{comment}
+
+ミスアラインド・ロード/ストアが正常に完了した場合でも、
+実装によっては(invisible trapを使って実装されている場合など)、
+これらのアクセスが非常に遅くなることがあります。 
+さらに、自然にアラインされたロードとストアはアトミックに実行されることが保証されていますが、
+ミスアラインされたロードとストアはアトミックに実行されない可能性があるため、
+アトミック性を確保するために追加の同期が必要になります。
 
 \begin{commentary}
+\begin{comment}
 We do not mandate atomicity for misaligned accesses so execution
 environment implementations can use an invisible machine trap and
 a software handler to handle some or all misaligned accesses.  If
@@ -1853,6 +1964,15 @@ hardware misaligned support is provided, software can exploit this by
 simply using regular load and store instructions.  Hardware can then
 automatically optimize accesses depending on whether runtime addresses
 are aligned.
+\end{comment}
+
+実行環境の実装では、不可視のマシントラップとソフトウェアハンドラーを使用して、
+一部またはすべてのミスアラインドアクセスを処理することができるように、
+ミスアラインドアクセスのアトミック性を義務付けていません。 
+ハードウェアのミスアラインサポートが提供されている場合、
+ソフトウェアは通常のロードおよびストア命令を使用するだけでこれを利用することができます。 
+ハードウェアは、ランタイムアドレスがアラインされているかどうかに応じて、
+アクセスを自動的に最適化することができます。
 \end{commentary}
 
 \pagebreak
