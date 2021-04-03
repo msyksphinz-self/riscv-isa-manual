@@ -2166,8 +2166,12 @@ I/Oの順序とメモリのR/Wの順序を分離することで、
 すべての操作に対して常に保守的なフェンスを実行することができます。
 \end{commentary}
 
+\begin{comment}
 \section{Environment Call and Breakpoints}
+\end{comment}
+\section{実行環境支援要求とブレークポイント}
 
+\begin{comment}
 SYSTEM instructions are used to access system functionality that might
 require privileged access and are encoded using the I-type instruction
 format.  These can be divided into two main classes: those that
@@ -2175,12 +2179,24 @@ atomically read-modify-write control and status registers (CSRs), and
 all other potentially privileged instructions. CSR instructions are
 described in Chapter~\ref{csrinsts}, and the base unprivileged instructions
 are described in the following section.
+\end{comment}
+
+SYSTEM命令は、特権的なアクセスを必要とする可能性のあるシステム機能にアクセスするために使用され、
+I-type命令フォーマットを使用してエンコードされます。 
+これらの命令は大きく2つのクラスに分けられます。
+1つは制御レジスタとステータスレジスタ(CSR)をアトミックレベルで読み書きするもので、
+もう1つはその他の特権的な命令です。CSR命令については第~\ref{csrinsts}章で説明し、
+基本的な非特権命令については次のセクションで説明します。
 
 \begin{commentary}
+\begin{comment}
 The SYSTEM instructions are defined to allow simpler implementations
 to always trap to a single software trap handler.  More sophisticated
 implementations might execute more of each system instruction in
 hardware.
+\end{comment}
+SYSTEM命令は、シンプルな実装では常に1つのソフトウェア・トラップ・ハンドラにトラップされるように定義されています。 
+より洗練された実装では、各システム命令をより多くハードウェアで実行することができます。
 \end{commentary}
 
 \vspace{-0.2in}
@@ -2205,30 +2221,55 @@ EBREAK  & 0 & PRIV & 0 & SYSTEM \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 These two instructions cause a precise requested trap to the
 supporting execution environment.
+\end{comment}
 
+これらの2つの命令は、サポートする実行環境に正確な要求トラップを引き起こします。
+
+\begin{comment}
 The ECALL instruction is used to make a service request to the
 execution environment.  The EEI will define how parameters for the
 service request are passed, but usually these will be in defined
 locations in the integer register file.
+\end{comment}
 
+ECALL命令は、実行環境にサービスリクエストを行うために使用します。 
+サービス・リクエストのパラメータをどのように渡すかはEEIによって定義されますが、
+通常は整数レジスタ・ファイルの定義された位置に渡されます。
+
+\begin{comment}
 The EBREAK instruction is used to return control to a debugging
 environment.
+\end{comment}
+
+EBREAK命令は、制御をデバッグ環境に戻すために使用されます。
 
 \begin{commentary}
+\begin{comment}
 ECALL and EBREAK were previously named SCALL and SBREAK.  The
 instructions have the same functionality and encoding, but were
 renamed to reflect that they can be used more generally than to call a
 supervisor-level operating system or debugger.
+\end{comment}
+ECALLおよびEBREAKは、以前はSCALLおよびSBREAKと呼ばれていました。 
+これらの命令の機能とエンコーディングは同じですが、
+スーパーバイザレベルのOSやデバッガを呼び出す以外にも使用できることを反映して名称が変更されました。
 \end{commentary}
 
 \begin{commentary}
+\begin{comment}
   EBREAK was primarily designed to be used by a debugger to cause
   execution to stop and fall back into the debugger. EBREAK is also
   used by the standard gcc compiler to mark code paths that should not
   be executed.
+\end{comment}
 
+EBREAKは、主にデバッガで使用され、実行を停止してデバッガにフォールバックさせるために設計されました。
+EBREAKは、標準のgccコンパイラでも、実行してはいけないコードパスをマークするために使われています。
+
+\begin{comment}
   Another use of EBREAK is to support ``semihosting'', where the
   execution environment includes a debugger that can provide services
   over an alternate system call interface built around the EBREAK
@@ -2236,27 +2277,62 @@ supervisor-level operating system or debugger.
   one EBREAK instruction, RISC-V semihosting uses a special sequence of
   instructions to distinguish a semihosting EBREAK from a debugger
   inserted EBREAK.
+\end{comment}
+EBREAKのもう一つの使い方は、``セミホスティング(semihosting)''をサポートすることです。
+実行環境には、EBREAK命令を中心に構築された代替システムコールインターフェースを介してサービスを提供できるデバッガが含まれています。
+RISC-VベースISAは複数のEBREAK命令を提供していないため、
+RISC-Vセミホスティングでは、セミホスティングEBREAKとデバッガ挿入EBREAKを
+区別するために特別な命令シーケンスを使用します。
+\begin{comment}
 \begin{verbatim}
     slli x0, x0, 0x1f   # Entry NOP
     ebreak              # Break to debugger
     srai x0, x0, 7      # NOP encoding the semihosting call number 7
 \end{verbatim}
+\end{comment}
+\begin{verbatim}
+    slli x0, x0, 0x1f   # エントリ：NOP
+    ebreak              # デバッガにブレークする
+    srai x0, x0, 7      # セミホスティング call番号7にエンコーディングするNOP
+\end{verbatim}
+\begin{comment}
    Note that these three instructions must be 32-bit-wide instructions,
    i.e., they mustn't be among the compressed 16-bit instructions
    described in Chapter~\ref{compressed}.
+\end{comment}
+これらの3つの命令は32ビット幅の命令でなければならず、
+第~\ref{compressed}章で説明されている圧縮された16ビット命令を
+使用してはならないことに注意してください。
 
+\begin{comment}
    The shift NOP instructions are still considered available for use as
    HINTS.
+\end{comment}
 
+なお、シフトNOP命令はHINTSとして使用することができます。
+
+\begin{comment}
    Semihosting is a form of service call and would be more naturally
    encoded as an ECALL using an existing ABI, but this would require
    the debugger to be able to intercept ECALLs, which is a newer
    addition to the debug standard.  We intend to move over to using
    ECALLs with a standard ABI, in which case, semihosting can share a
    service ABI with an existing standard.
+\end{comment}
 
+セミホスティングはサービスコールの一種であり、既存のABIを使用してECALLとしてエンコードする方が自然ですが、
+そのためにはデバッガがECALLをインターセプトできるようにする必要があり、
+これはデバッグ標準に新しく追加されたものです。 
+私たちは、標準ABIでECALLを使用するように移行するつもりです。
+その場合、セミホストは既存の標準でサービスABIを共有することができます。
+
+\begin{comment}
    We note that ARM processors have also moved to using SVC instead of
    BKPT for semihosting calls in newer designs.
+\end{comment}
+
+また、ARMプロセッサでは、最近の設計ではセミホストコールに
+BKPTではなくSVCを使用するようになっています。
 \end{commentary}
 
 \section{HINT Instructions}
