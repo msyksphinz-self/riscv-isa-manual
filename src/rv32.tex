@@ -1977,7 +1977,10 @@ are aligned.
 
 \pagebreak
 
+\begin{comment}
 \section{Memory Ordering Instructions}
+\end{comment}
+\section{メモリオーダリング命令}
 \label{sec:fence}
 
 \vspace{-0.2in}
@@ -2017,6 +2020,7 @@ FM & \multicolumn{4}{c}{predecessor} & \multicolumn{4}{c}{successor} & 0 & FENCE
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The FENCE instruction is used to order device I/O and
 memory accesses as viewed by other RISC-V harts and external devices
 or coprocessors.  Any combination of device input (I), device output
@@ -2027,7 +2031,17 @@ hart or external device can observe any operation in the {\em
   predecessor} set preceding the FENCE.
 Chapter~\ref{ch:memorymodel} provides a precise description of the
 RISC-V memory consistency model.
-  
+\end{comment}
+
+FENCE命令は、他のRISC-V hartや外部デバイス、コプロセッサから見て、
+デバイスのI/Oやメモリアクセスを順序付けるために使用されます。
+デバイスの入力(I)、デバイスの出力(O)、メモリの読み出し(R)、メモリの書き込み(W)の任意の組み合わせを
+基準にして順序付けすることができます。
+非公式ではありますが、他のRISC-V hartや外部デバイスは、
+FENCEの{\em 後続の}操作を、FENCEに{\em 先行する}操作の前に観察することはできません。
+第~\ref{ch:memorymodel}章では、RISC-Vのメモリ一貫性モデルについて詳しく説明しています。
+
+\begin{comment}
 The EEI will define what I/O operations are possible, and in
 particular, which memory addresses when accessed by load and store instructions will be treated and
 ordered as device input and device output operations respectively
@@ -2037,18 +2051,28 @@ are ordered using the I and O bits rather than the R and W bits.
 Instruction-set extensions might also describe new I/O
 instructions that will also be ordered using the I and O bits in a
 FENCE.
+\end{comment}
+
+EEIでは、どのようなI/O操作が可能か、特に、ロード命令やストア命令でアクセスされたときに、
+どのメモリアドレスが、メモリのリード/ライトではなく、デバイスのインプット/アウトプット操作として扱われ、
+順序付けられるかを定義します。
+例えば、メモリマップされたI/Oデバイスは、
+キャッシュされていないロードとストアでアクセスされ、
+RビットやWビットではなく、IビットやOビットを使って順序付けされるのが一般的です。
+また、命令セット拡張では、FENCEのIビットとOビットを使用して順序付けされた新しいI/O命令が記述されることもあります。
+
 
 \begin{table}[htp]
 \begin{small}
 \begin{center}
 \begin{tabular}{|c|c|l|}
 \hline
-{\em fm} field & Mnemonic & Meaning \\
+{\em fm} フィールド & ニーモニック & 意味 \\
 \hline
-0000 & \em none & Normal Fence \\
+0000 & \em none & 通常のフェンス \\
 \hline
-\multirow{2}{*}{1000} & \multirow{2}{*}{TSO} & With FENCE RW,RW: exclude write-to-read ordering \\
-                      &                      & Otherwise: \em Reserved for future use. \\
+\multirow{2}{*}{1000} & \multirow{2}{*}{TSO} & FENCE RW,RWの場合、書き込み後読み出し(Write-to-read)以外のオーダリングを守る \\
+                      &                      & そうでない場合、 \em 将来の予約 \\
 \hline
 \multicolumn{2}{|c|}{\em other} & \em Reserved for future use. \\
 \hline
@@ -2059,10 +2083,17 @@ FENCE.
 \label{fm}
 \end{table}
 
+\begin{comment}
 The fence mode field {\em fm} defines the semantics of the FENCE.  A
 FENCE with {\em fm}=0000 orders all memory operations in its
 predecessor set before all memory operations in its successor set. 
+\end{comment}
 
+FENCE MODEフィールド{\em fm}は、FENCEのセマンティクスを定義します。
+FENCEの{\em fm}=0000は、先行するすべてのメモリ操作を、
+後続のすべてのメモリ操作の前に順序付けます。
+
+\begin{comment}
 The optional FENCE.TSO instruction is encoded as a FENCE instruction
 with {\em fm}=1000, {\em predecessor}=RW, and {\em successor}=RW.
 FENCE.TSO orders all load
@@ -2071,14 +2102,30 @@ successor set, and all store operations in its predecessor set before
 all store operations in its successor set.  This leaves non-AMO store
 operations in the FENCE.TSO's predecessor set unordered with non-AMO
 loads in its successor set.
+\end{comment}
+
+オプションのFENCE.TSO命令は、FENCE命令としてコード化されており、
+{\em fm}=1000、{\em 先行操作}=RW、{\em 後続操作}=RWとなっています。
+FENCE.TSOは、先行するすべてのロード操作を後続のすべてのメモリ操作の前に、
+先行するすべてのストア操作を後続するすべてのストア操作の前に命令します。 
+これにより、FENCE.TSOの先行する操作内の非AMOのストア操作は、
+その後続操作内の非AMOのロードで順序付けられない状態になります。
 
 \begin{commentary}
+\begin{comment}
   The FENCE.TSO encoding was added as an optional extension to the
   original base FENCE instruction encoding.  The base definition
   requires that implementations ignore any set bits and treat the
   FENCE as global, and so this is a backwards-compatible extension.
+\end{comment}
+
+FENCE.TSOエンコーディングは、オリジナルのベースとなるFENCE命令の
+エンコーディングにオプションで追加されたものです。 
+ベースの定義では、実装がセットビットを無視してFENCEをグローバルに
+扱うことが要求されているため、これは後方互換性のある拡張となります。
 \end{commentary}
 
+\begin{comment}
 The unused fields in the FENCE instructions---{\em rs1} and {\em rd}---are
 reserved for finer-grain fences in future extensions.  For forward
 compatibility, base implementations shall ignore these fields, and standard
@@ -2087,8 +2134,18 @@ predecessor/successor set settings in Table~\ref{fm} are also reserved
 for future use.  Base implementations shall treat all such reserved
 configurations as normal fences with {\em fm}=0000, and standard
 software shall use only non-reserved configurations.
+\end{comment}
+
+FENCE命令の未使用フィールドである{\em rs1}と{\em rd}は、
+将来の拡張でより細かい粒度のフェンスを実現するために予約されています。 
+互換性を確保するために、基本的な実装ではこれらのフィールドを無視し、
+標準的なソフトウェアではこれらのフィールドをゼロにする必要があります。
+同様に、表~\ref{fm}の多くの{\em fm}や先行命令/皇族命令の設定も将来の使用のために予約されています。 
+基本的な実装では、このような予約済みの設定をすべて {\em fm}=0000 の通常のフェンスとして扱い、
+標準ソフトウェアでは予約されていない設定のみを使用するものとします。
 
 \begin{commentary}
+\begin{comment}
 We chose a relaxed memory model to allow high performance from simple
 machine implementations and from likely future
 coprocessor or accelerator extensions.  We separate out I/O ordering
@@ -2097,6 +2154,16 @@ device-driver hart and also to support alternative non-memory paths
 to control added coprocessors or I/O devices.  Simple implementations
 may additionally ignore the {\em predecessor} and {\em successor}
 fields and always execute a conservative fence on all operations.
+\end{comment}
+
+シンプルなマシンの実装でも、将来のコプロセッサやアクセラレータの拡張でも高い性能を発揮できるように、
+制約の少ないメモリモデルを採用しました。
+I/Oの順序とメモリのR/Wの順序を分離することで、
+デバイスドライバー hart内での不要なシリアライズを回避し、
+追加されたコプロセッサやI/Oデバイスを制御するためのメモリ以外の
+代替パスをサポートしています。 
+単純な実装であれば、さらに、{\em precedessor}と{\em successor}フィールドを無視して、
+すべての操作に対して常に保守的なフェンスを実行することができます。
 \end{commentary}
 
 \section{Environment Call and Breakpoints}
