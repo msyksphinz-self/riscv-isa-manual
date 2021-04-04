@@ -1,23 +1,40 @@
+\begin{comment}
 \chapter{``Zifencei'' Instruction-Fetch Fence, Version 2.0}
+\end{comment}
+\chapter{``Zifencei'' 命令フェッチフェンス, Version 2.0}
+
 \label{chap:zifencei}
 
+\begin{comment}
 This chapter defines the ``Zifencei'' extension, which includes the
 FENCE.I instruction that provides explicit synchronization between
 writes to instruction memory and instruction fetches on the same hart.
 Currently, this instruction is the only standard mechanism to ensure
 that stores visible to a hart will also be visible to its instruction
 fetches.
+\end{comment}
+
+本章では、FENCE.I命令を含む``Zifencei''エクステンションを定義しています。
+FENCE.I命令は、命令メモリへの書き込みと、同じhart上での命令フェッチを明示的に同期させるものです。
+現在のところ、この命令は、あるhartで見えるストアが、
+そのhartの命令フェッチでも見えることを保証する唯一の標準的なメカニズムです。
 
 \begin{commentary}
+\begin{comment}
 We considered but did not include a ``store instruction word''
 instruction (as in MAJC~\cite{majc}).  JIT compilers may generate a
 large trace of instructions before a single FENCE.I, and amortize any
 instruction cache snooping/invalidation overhead by writing translated
 instructions to memory regions that are known not to reside in the
 I-cache.
+\end{comment}
+MAJC~\cite{majc}のような） ``store instruction word''命令も検討しましたが、採用しませんでした。 JITコンパイラーは、1つのFENCE.Iの前に大量の命令トレースを生成し、
+翻訳された命令をIキャッシュに存在しないことがわかっているメモリ領域に書き込むことで、
+命令キャッシュのスヌーピング/検証のオーバーヘッドを償却することができます。
 \end{commentary}
 
 \begin{commentary}
+\begin{comment}
 The FENCE.I instruction was designed to support a wide variety of
 implementations.  A simple implementation can flush the local
 instruction cache and the instruction pipeline when the FENCE.I is
@@ -28,12 +45,30 @@ primary instruction cache when they are being written by a local store
 instruction.  If instruction and data caches are kept coherent in this
 way, or if the memory system consists of only uncached RAMs, then just
 the fetch pipeline needs to be flushed at a FENCE.I.
+\end{comment}
 
+FENCE.I命令は、様々な実装に対応できるように設計されています。 
+単純な実装では、FENCE.Iが実行されたときにローカル命令キャッシュと
+命令パイプラインをフラッシュすることができます。 
+より複雑な実装では、データ(命令)キャッシュがミスするたびに命令(データ)キャッシュをスヌープしたり、
+ローカルストア命令で書き込まれているときにプライマリ命令キャッシュからの行を
+無効にするために包括的なユニファイド・プライベートL2キャッシュを使用したりします。 
+このように命令キャッシュとデータキャッシュがコヒーレントに保たれている場合や、
+メモリシステムがキャッシュされていないRAMのみで構成されている場合には、
+フェッチパイプラインだけをFENCE.Iでフラッシュする必要があります。
+
+\begin{comment}
 The FENCE.I instruction was previously part of the base I instruction
 set.  Two main issues are driving moving this out of the mandatory
 base, although at time of writing it is still the only standard method
 for maintaining instruction-fetch coherence.
+\end{comment}
 
+FENCE.I命令は、これまでベースI命令セットに含まれていましたが、
+2つの主な問題により、命令フェッチのコヒーレンスを維持するための
+唯一の標準的な方法として、必須ではなくなりました。
+
+\begin{comment}
 First, it has been recognized that on some systems, FENCE.I will be
 expensive to implement and alternate mechanisms are being discussed in
 the memory model task group.  In particular, for designs that have an
@@ -43,7 +78,17 @@ both caches must be completely flushed when a FENCE.I instruction is
 encountered.  This problem is exacerbated when there are multiple
 levels of I and D cache in front of a unified cache or outer memory
 system.
+\end{comment}
 
+まず、一部のシステムでは、FENCE.Iの実装にコストがかかることが認識されており、
+代替メカニズムがメモリモデルタスクグループで議論されています。 
+特に、インコヒーレントな命令キャッシュとインコヒーレントなデータキャッシュを持つデザインや、
+命令キャッシュのリフィルがコヒーレントなデータキャッシュをスヌープしないデザインでは、
+FENCE.I命令に遭遇した場合、両方のキャッシュを完全にフラッシュしなければなりません。 
+この問題は、ユニファイドキャッシュやアウターメモリシステムの前に、
+複数のレベルのIおよびDキャッシュがある場合に悪化します。
+
+\begin{comment}
 Second, the instruction is not powerful enough to make available at
 user level in a Unix-like operating system environment.  The FENCE.I
 only synchronizes the local hart, and the OS can reschedule the user
@@ -55,11 +100,35 @@ maintain instruction-fetch coherence, which allows the OS to minimize
 the number of FENCE.I executions required on current systems and
 provides forward-compatibility with future improved instruction-fetch
 coherence mechanisms.
+\end{comment}
 
+第二に、この命令は、UnixのようなOS環境でユーザーレベルで利用できるほど強力ではありません。 
+FENCE.Iはローカルのhartを同期させるだけで、
+OSはFENCE.Iの後にユーザーのhartを別の物理的なハートにリスケジュールすることができます。
+このため、OSはコンテキスト・マイグレーションのたびに追加のFENCE.Iを実行する必要があります。
+このため、標準的なLinux ABIでは、FENCE.Iをユーザーレベルから削除し、
+命令フェッチのコヒーレンスを維持するためにシステムコールを必要としています。
+これにより、OSは現在のシステムで必要なFENCE.Iの実行回数を最小限に抑え、
+将来的に改善される命令フェッチのコヒーレンス・メカニズムとの互換性を確保することができます。 
+FENCE.Iはローカルhartを同期させるだけで、
+OSはFENCE.Iの後にユーザー・ハートを別の物理的ハートにリスケジュールすることができます。
+このため、OSはコンテキスト・マイグレーションのたびに追加のFENCE.Iを実行する必要があります。
+このため、標準的なLinux ABIでは、FENCE.Iをユーザーレベルから削除し、
+命令フェッチのコヒーレンスを維持するためにシステムコールを必要としています。
+これにより、OSは現在のシステムで必要なFENCE.Iの実行回数を最小限に抑えることができ、
+将来的に改善される命令フェッチのコヒーレンスメカニズムとの互換性も確保されます。
+
+\begin{comment}
 Future approaches to instruction-fetch coherence under discussion
 include providing more restricted versions of FENCE.I that only target
 a given address specified in {\em rs1}, and/or allowing software to use an
 ABI that relies on machine-mode cache-maintenance operations.
+\end{comment}
+
+命令フェッチのコヒーレンスについては、FENCE.Iをより限定的にして、
+{\em rs1}で指定されたアドレスのみを対象とするようにしたり、
+マシンモードのキャッシュメンテナンス操作に依存するABIをソフトウェアに
+使用させるようにしたりすることが検討されています。
 \end{commentary}
 
 \vspace{-0.4in}
@@ -83,6 +152,7 @@ ABI that relies on machine-mode cache-maintenance operations.
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The FENCE.I instruction is used to synchronize the instruction and
 data streams.  RISC-V does not guarantee that stores to instruction
 memory will be made visible to instruction fetches on a RISC-V
@@ -94,18 +164,44 @@ instruction fetches will observe the local hart's stores in a
 multiprocessor system. To make a store to instruction memory visible
 to all RISC-V harts, the writing hart also has to execute a data FENCE
 before requesting that all remote RISC-V harts execute a FENCE.I.
+\end{comment}
 
+FENCE.I命令は、命令ストリームとデータストリームを同期させるために使用されます。
+RISC-Vは、RISC-V hartがFENCE.I命令を実行するまで、
+命令メモリへのストアがRISC-V hartの命令フェッチから見えるようになることを保証しません。
+FENCE.I命令は、RISC-V hart上の後続の命令フェッチが、
+同じRISC-Vハートに既に表示されている以前のデータストアを見ることを保証します。
+FENCE.Iは、マルチプロセッサ・システムにおいて、
+他のRISC-V hartの命令フェッチがローカル hartのストアを見ることを保証します。
+命令メモリへのストアをすべてのRISC-V hartから見えるようにするためには、
+書き込みを行うhartは、すべてのリモートRISC-VハートにFENCE.Iの
+実行を要求する前に、データFENCEを実行する必要があります。
+
+\begin{comment}
 The unused fields in the FENCE.I instruction, {\em imm[11:0]}, {\em rs1}, and
 {\em rd}, are reserved for finer-grain fences in future extensions.  For
 forward compatibility, base implementations shall ignore these fields, and
 standard software shall zero these fields.
+\end{comment}
+
+FENCE.I命令で使用されていないフィールドである、{\em imm[11:0]}、{\em rs1}、{\em rd}は、
+将来の拡張機能でより細かいフェンスを実現するために予約されています。 
+前方互換性のため、基本的な実装ではこれらのフィールドを無視し、
+標準的なソフトウェアではこれらのフィールドをゼロにする必要があります。
 
 \begin{commentary}
+\begin{comment}
 Because FENCE.I only orders stores with a hart's own instruction
 fetches, application code should only rely upon FENCE.I if the
 application thread will not be migrated to a different hart.  The EEI
 can provide mechanisms for efficient multiprocessor instruction-stream
 synchronization.
+\end{comment}
+FENCE.IはHart自身の命令フェッチでストアを注文するだけなので、
+アプリケーション・コードは、アプリケーション・スレッドが別のHartに
+移行しない場合にのみFENCE.Iに頼るべきです。 
+EEIは、効率的なマルチプロセッサの命令ストリーム同期の
+ためのメカニズムを提供することができます。
 \end{commentary}
 
 
