@@ -1,17 +1,33 @@
+\begin{comment}
 \chapter{``Zihintpause'' Pause Hint, Version 1.0}
+\end{comment}
+\chapter{``Zihintpause'' ポーズヒント, Version 1.0}
 \label{chap:zihintpause}
 
+\begin{comment}
 The PAUSE instruction is a HINT that indicates the current hart's rate of
 instruction retirement should be temporarily reduced or paused.  The duration of its
 effect must be bounded and may be zero.  No architectural state is changed.
+\end{comment}
+
+PAUSE命令は、現在のhartの命令リタイア率を一時的に減少させるか、一時停止させるべきであることを示すヒント命令です。
+その効果の持続時間は制限されなければならず、ゼロであっても構いません。
+アーキテクチャの状態は変更されません。
 
 \begin{commentary}
+\begin{comment}
 Software can use the PAUSE instruction to reduce energy consumption while
 executing spin-wait code sequences.  Multithreaded cores might temporarily
 relinquish execution resources to other harts when PAUSE is executed.
 It is recommended that a PAUSE instruction generally be included in the code
 sequence for a spin-wait loop.
+\end{comment}
 
+ソフトウェアはPAUSE命令を使用して、スピンウェイトコード列の実行中のエネルギー消費を抑えることができます。 
+マルチスレッドのコアでは、PAUSE命令を実行すると、一時的に実行リソースを他のhartに譲ることがあります。
+スピンウェイト・ループのコード列には、通常、PAUSE命令を含めることをお勧めします。
+
+\begin{comment}
 A future extension might add primitives similar to the x86 MONITOR/MWAIT
 instructions, which provide a more efficient mechanism to wait on writes to
 a specific memory location.
@@ -19,34 +35,77 @@ However, these instructions would not supplant PAUSE.
 PAUSE is more appropriate when polling for non-memory events, when polling for
 multiple events, or when software does not know precisely what events it is
 polling for.
+\end{comment}
 
+将来的には、x86のMONITOR/WAIT命令のようなプリミティブが追加されるかもしれません。
+このプリミティブは、特定のメモリロケーションへの書き込みを待つための、
+より効率的なメカニズムを提供します。
+しかし、これらの命令はPAUSEに取って代わるものではありません。
+PAUSEは、メモリ以外のイベントをポーリングする場合や、複数のイベントをポーリングする場合、
+ソフトウェアがどのイベントをポーリングしているのか正確に把握していない場合などに適しています。
+
+\begin{comment}
 The duration of a PAUSE instruction's effect may vary significantly within and
 among implementations.
 In typical implementations this duration should be much less than the time to
 perform a context switch, probably more on the rough order of an on-chip cache
 miss latency or a cacheless access to main memory.
+\end{comment}
 
+PAUSE命令の効果の持続時間は、実装によって大きく異なる場合があります。
+一般的な実装では、この時間はコンテキストスイッチを実行する時間よりもはるかに短く、
+オンチップキャッシュのミスレイテンシーやメインメモリへのキャッシュレスアクセスのような
+大まかな時間になるはずです。
+
+\begin{comment}
 A series of PAUSE instructions can be used to create a cumulative delay loosely
 proportional to the number of PAUSE instructions.
 In spin-wait loops in portable code, however, only one PAUSE instruction should
 be used before re-evaluating loop conditions, else the hart might stall longer
 than optimal on some implementations, degrading system performance.
+\end{comment}
+
+一連のPAUSE命令を使用することで、
+PAUSE命令の数に緩やかに比例した累積遅延を作り出すことができます。
+しかし、ポータブルコードのスピンウェイトループでは、
+ループの条件を再評価する前に1つのPAUSE命令のみを使用する必要があります。
+そうしないと、実装によってはhartが最適な時間よりも長くストールしてしまい、
+システムのパフォーマンスが低下してしまいます。
 \end{commentary}
 
 PAUSE is encoded as a FENCE instruction with {\em pred}=W, {\em succ}=0,
 {\em fm}=0, {\em rd}={\tt x0}, and {\em rs1}={\tt x0}.
 
+PAUSE命令はFENCE命令における{\em pred}=W, {\em succ}=0, 
+{\em fm}=0, {\em rd}={\tt x0}, {\em rs1}={\tt x0}としてエンコードされます。
+
 \begin{commentary}
+\begin{comment}
 PAUSE is encoded as a hint within the FENCE opcode because some
 implementations are expected to deliberately stall the PAUSE instruction until outstanding
 memory transactions have completed.
 Because the successor set is null, however, PAUSE does not {\em mandate} any
 particular memory ordering---hence, it truly is a HINT.
+\end{comment}
 
+PAUSEは、未処理のメモリトランザクションが完了するまでPAUSE命令を意図的にストールさせる実装があるため、
+FENCEオペコード内のヒントとしてエンコードされています。
+しかし、後続命令の集合は空なので、PAUSEは特定のメモリ順序を強制するものではなく、まさにHINTです。
+
+\begin{comment}
 Like other FENCE instructions, PAUSE cannot be used within LR/SC sequences
 without voiding the forward-progress guarantee.
+\end{comment}
 
+他のFENCE命令と同様に、PAUSEはフォワードプログレス保証を無効にすることなく、LR/SCシーケンス内で使用することはできません。
+
+\begin{comment}
 The choice of a predecessor set of W is arbitrary, since the successor set is
 null.
 Other HINTs similar to PAUSE might be encoded with other predecessor sets.
+\end{comment}
+
+Wの先行命令集合の選択は任意であり、後続命令の集合は空となります。
+PAUSEに似た他のHINTは、他の前置集合でエンコードされるかもしれません。
+
 \end{commentary}
