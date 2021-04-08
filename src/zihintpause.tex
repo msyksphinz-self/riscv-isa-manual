@@ -73,8 +73,10 @@ PAUSE命令の数に緩やかに比例した累積遅延を作り出すことが
 システムのパフォーマンスが低下してしまいます。
 \end{commentary}
 
+\begin{comment}
 PAUSE is encoded as a FENCE instruction with {\em pred}=W, {\em succ}=0,
 {\em fm}=0, {\em rd}={\tt x0}, and {\em rs1}={\tt x0}.
+\end{comment}
 
 PAUSE命令はFENCE命令における{\em pred}=W, {\em succ}=0, 
 {\em fm}=0, {\em rd}={\tt x0}, {\em rs1}={\tt x0}としてエンコードされます。
