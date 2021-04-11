@@ -1,26 +1,53 @@
+\begin{comment}
 \chapter{RV64I Base Integer Instruction Set, Version 2.1}
+\end{comment}
+\chapter{RV64Iベース命令セット, Version 2.1}
 \label{rv64}
 
+\begin{comment}
 This chapter describes the RV64I base integer instruction set, which
 builds upon the RV32I variant described in Chapter~\ref{rv32}.  This
 chapter presents only the differences with RV32I, so should be read in
 conjunction with the earlier chapter.
+\end{comment}
 
+この章では、RV64Iの基本となる整数命令セットについて説明します。
+RV64Iは~\ref{rv32}で説明されるRV32I上に構成されます。
+この章では、RV32Iとの違いのみを説明していますので、前の章と合わせて読んでください。
+
+\begin{comment}
 \section{Register State}
+\end{comment}
+\section{レジスタステート}
 
+\begin{comment}
 RV64I widens the integer registers and supported user address space to
 64 bits (XLEN=64 in Figure~\ref{gprs}).
+\end{comment}
 
+RV64Iは、整数レジスタとサポートされるユーザーアドレス空間を64ビットに拡張します(図~\ref{gprs}において、XLEN=64とする)。
+
+\begin{comment}
 \section{Integer Computational Instructions}
+\end{comment}
+\section{整数算術演算命令}
 
+\begin{comment}
 Most integer computational instructions operate on XLEN-bit values.
 Additional instruction variants are provided to manipulate 32-bit
 values in RV64I, indicated by a `W' suffix to the opcode.  These
 ``*W'' instructions ignore the upper 32 bits of their inputs and
 always produce 32-bit signed values, sign-extending them to 64 bits,
 i.e. bits XLEN-1 through 31 are equal.
+\end{comment}
+
+ほとんどの整数演算命令は、XLENビットの値を取り扱います。
+RV64Iの32ビット値を操作するために、オペコードに「W」というサフィックスを付けた追加の命令バリエーションが用意されています。
+これらの``*W''命令は、入力の上位32ビットを無視し、常に32ビットの符号付き値を生成し、
+符号を64ビットに拡張します。
 
 \begin{commentary}
+\begin{comment}
 The compiler and calling convention maintain an invariant that all 32-bit
 values are held in a sign-extended format in 64-bit registers.  Even 32-bit
 unsigned integers extend bit 31 into bits 63 through 32.  Consequently,
@@ -32,10 +59,22 @@ existing 64-bit wide logical operations on 32-bit sign-extended integers
 preserve the sign-extension property.  A few new instructions
 (ADD[I]W/SUBW/SxxW) are required for addition and shifts to ensure reasonable
 performance for 32-bit values.
+\end{comment}
+コンパイラと呼び出し規則は、すべての32ビット値が64ビットレジスタに符号拡張された形式で保持されるという不変性を維持しています。
+32ビットの符号なし整数であっても、63ビットから32ビット目は31ビットから符号拡張されます。
+そのため、符号なしと符号ありの32ビット整数間の変換は、符号ありの32ビット整数から符号ありの64ビット整数への変換と同様に演算が不要となります
+既存の64ビット幅のSLTUや符号なしの分岐比較は、この不変性の下でも符号なしの32ビット整数に対して正しく動作します。
+同様に、32ビットの符号付き整数に対する既存の64ビット幅の論理演算でも、
+符号拡張の特性が維持されます。
+32ビットの値に対して適切なパフォーマンスを確保するためには、
+加算とシフトのためにいくつかの新しい命令(ADD[I]W/SUBW/SxxW)が必要です。
 \end{commentary}
 
 \newpage
+\begin{comment}
 \subsubsection*{Integer Register-Immediate Instructions}
+\end{commenT}
+\subsubsection*{整数レジスタ-即値命令}
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{M@{}R@{}S@{}R@{}O}
@@ -57,6 +96,7 @@ I-immediate[11:0] & src & ADDIW  & dest & OP-IMM-32 \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 ADDIW is an RV64I instruction that adds the sign-extended 12-bit
 immediate to register {\em rs1} and produces the proper sign-extension
 of a 32-bit result in {\em rd}.  Overflows are ignored and the result
@@ -64,6 +104,13 @@ is the low 32 bits of the result sign-extended to 64 bits.  Note,
 ADDIW {\em rd, rs1, 0} writes the sign-extension of the lower 32 bits
 of register {\em rs1} into register {\em rd} (assembler pseudoinstruction
 SEXT.W).
+\end{comment}
+
+ADDIWはRV64I命令で、符号拡張された12ビットの即値をレジスタに追加し、
+32ビットの結果を適切に符号拡張してRV64Iに出力します。
+オーバーフローは無視され、結果の下位32ビットが符号拡張されて64ビットになります。
+なお、ADDIW {\em rd, rs1, 0}では、レジスタ{\em rs1}の下位32ビットを
+符号拡張してレジスタ{\em rd}に書き込みます(アセンブラの疑似命令 SEXT.W)。
 
 \vspace{-0.4in}
 \begin{center}
@@ -95,6 +142,7 @@ SEXT.W).
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Shifts by a constant are encoded as a specialization of the I-type
 format using the same instruction opcode as RV32I.  The operand to be
 shifted is in {\em rs1}, and the shift amount is encoded in the lower
@@ -103,16 +151,37 @@ encoded in bit 30.  SLLI is a logical left shift (zeros are shifted
 into the lower bits); SRLI is a logical right shift (zeros are shifted
 into the upper bits); and SRAI is an arithmetic right shift (the
 original sign bit is copied into the vacated upper bits).
+\end{comment}
 
+定数によるシフトは、RV32Iと同じ命令オペコードを用いて、I型フォーマットの特殊なケースとしてエンコードされます。
+シフトされるオペランドは{\em rs1}で、シフト量はRV64IのI-immediateフィールドの下位6ビットにエンコードされます。
+右シフト命令はビット30にエンコードされます。
+SLLIは，論理的な左シフト(下位ビットにゼロがシフトされる)、
+SRLIは，論理的な右シフト(上位ビットにゼロがシフトされる)、
+SRAIは，算術的な右シフト(空いた上位ビットに元の符号ビットがコピーされる)です。
+
+\begin{comment}
 SLLIW, SRLIW, and SRAIW are RV64I-only instructions that are
 analogously defined but operate on 32-bit values and
 sign-extend their 32-bit results to 64 bits.
 SLLIW, SRLIW, and SRAIW encodings with $imm[5] \neq 0$ are reserved.
+\end{comment}
+
+SLLIW, SRLIW, SRAIWはRV64I専用の命令で、
+定義は似ていますが、32ビットの値を操作し、
+32ビットの結果を64ビットに符号拡張します。
+SLLIW、SRLIW、およびSRAIWのうち、$imm[5] \neq 0$の
+エンコーディングは予約済みです。
 
 \begin{commentary}
+\begin{comment}
   Previously, SLLIW, SRLIW, and SRAIW with $imm[5] \neq 0$ were defined to
   cause illegal instruction exceptions, whereas now they are marked as
   reserved.  This is a backwards-compatible change.
+\end{comment}
+  従来、SLLIW、SRLIW、SRAIW($imm[5] \neq 0$)は、不正な命令例外を引き起こすと定義されていましたが、
+今回は予約済みとされました。
+これは後方互換性のための変更です。
 \end{commentary}
 
 \vspace{-0.2in}
@@ -133,11 +202,19 @@ U-immediate[31:12] & dest & AUIPC
 \end{tabular}
 \end{center}
 
+\begin{comment}
 LUI (load upper immediate) uses the same opcode as RV32I.  LUI places
 the 32-bit U-immediate into register {\em rd}, filling in the lowest 12
 bits with zeros.
 The 32-bit result is sign-extended to 64 bits.
+\end{comment}
 
+LUI(load upper immediate)は、RV32Iと同じオペコードを使用します。
+LUIは、32ビットのU-Immediateを、下位12ビットをゼロで埋めて、
+レジスタ{\em rd}に入れます。
+32ビットの結果は符号拡張されて64ビットになります。
+
+\begin{comment}
 AUIPC (add upper immediate to {\tt pc}) uses the same opcode as RV32I.
 AUIPC is used to build {\tt
   pc}-relative addresses and uses the U-type format.  AUIPC forms a 32-bit
@@ -145,14 +222,30 @@ offset from the U-immediate, filling in the lowest 12 bits with zeros,
 sign-extends the result to 64 bits,
 adds it to the address of the AUIPC instruction,
 then places the result in register {\em rd}.
+\end{comment}
+
+AUIPC(add upper immediate to {\tt pc})は、RV32Iと同じオペコードを使用します。
+AUIPCは、{\tt pc}-相対アドレスを構築するためのもので、U-Typeのフォーマットを使用します。
+AUIPCは、U-Immediateから32ビットのオフセットを形成し、
+下位12ビットをゼロで埋め、その結果を64ビットに符号拡張して、
+AUIPC命令のアドレスに加算し、その結果をレジスタ{\em rd}に格納します。
 
 \begin{commentary}
+\begin{comment}
 Note that the set of address offsets that can be formed by pairing LUI
 with LD, AUIPC with JALR, etc.\@ in RV64I is
 [${-}2^{31}{-}2^{11}$, $2^{31}{-}2^{11}{-}1$].
+\end{comment}
+なお、RV64IでLUIとLD、AUIPCとJALRなどをペアにして
+形成されるアドレスオフセットのセットは
+[${-}2^{31}{-}2^{11}$, $2^{31}{-}2^{11}{-}1$].
+となります。
 \end{commentary}
 
+\begin{comment}
 \subsubsection*{Integer Register-Register Operations}
+\end{comment}
+\subsubsection*{整数レジスタ・レジスタ演算命令}
 
 \vspace{-0.2in}
 \begin{center}
@@ -181,25 +274,49 @@ with LD, AUIPC with JALR, etc.\@ in RV64I is
 \end{tabular}
 \end{center}
 
+\begin{comment}
 ADDW and SUBW are RV64I-only instructions that are defined analogously
 to ADD and SUB but operate on 32-bit values and produce signed 32-bit
 results.  Overflows are ignored, and the low 32-bits of the result is
 sign-extended to 64-bits and written to the destination register.
+\end{comment}
 
+ADDWとSUBWはRV64I専用の命令で、ADDとSUBと同様に定義されていますが、32ビットの値を操作し、符号付き32ビットの結果を生成します。 
+オーバーフローは無視され，結果の下位32ビットが符号付きで64ビットに拡張され、書き込みレジスタに書き込まれます。
+
+\begin{comment}
 SLL, SRL, and SRA perform logical left, logical right, and arithmetic
 right shifts on the value in register {\em rs1} by the shift amount
 held in register {\em rs2}.  In RV64I, only the low 6 bits of {\em
   rs2} are considered for the shift amount.
+\end{comment}
 
+SLL，SRL，SRAは、レジスタに保持されているシフト量だけ、レジスタの値を左に論理シフト、右に論理シフト、右に算術シフトします。
+RV64Iでは、レジスタの下位6ビットのみがシフト量として考慮されます。
+
+\begin{comment}
 SLLW, SRLW, and SRAW are RV64I-only instructions that are analogously
 defined but operate on 32-bit values and
 sign-extend their 32-bit results to 64 bits.
 The shift amount is given by {\em rs2[4:0]}.
+\end{comment}
 
+SLLW，SRLW，SRAWはRV64I専用の命令で、定義は似ていますが、32ビットの値で動作し、
+32ビットの結果を64ビットに符号拡張します。
+シフト量は，{\em rs2[4:0]}で与えられる。
+
+\begin{comment}
 \section{Load and Store Instructions}
+\end{comment}
+\section{ロード・ストア命令}
 
+\begin{comment}
 RV64I extends the address space to 64 bits.  The execution environment
 will define what portions of the address space are legal to access.
+\end{comment}
+
+RV64Iは、アドレス空間を64ビットに拡張します。 
+実行環境によって、アドレス空間のどの部分にアクセスするのが有効かが決まります。
 
 \vspace{-0.4in}
 \begin{center}
@@ -245,9 +362,14 @@ offset[11:5] & src & base & width & offset[4:0] & STORE \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The LD instruction loads a 64-bit value from memory into register {\em
   rd} for RV64I.
+\end{comment}
 
+LD命令は，メモリから64ビットの値をRV64I用のレジスタ{\em rd}にロードする．
+
+\begin{comment}
 The LW instruction loads a 32-bit value from memory and sign-extends
 this to 64 bits before storing it in register {\em rd} for RV64I.  The
 LWU instruction, on the other hand, zero-extends the 32-bit value from
@@ -255,19 +377,43 @@ memory for RV64I.  LH and LHU are defined analogously for 16-bit
 values, as are LB and LBU for 8-bit values.  The SD, SW, SH, and SB
 instructions store 64-bit, 32-bit, 16-bit, and 8-bit values from the
 low bits of register {\em rs2} to memory respectively.
+\end{comment}
 
+LW命令は、メモリから32ビットの値をロードし、これを64ビットに符号拡張した後、
+RV64I用のレジスタ{\em rd}に格納します。
+一方、LWU命令は、メモリからの32ビット値をゼロ拡張してRV64Iに格納します。
+LHとLHUは16ビットの値に対して、LBとLBUは8ビットの値に対して同様に定義されています。
+SD，SW，SH，SB命令は，それぞれ64ビット，32ビット，16ビット，8ビットの値を
+レジスタの下位ビットからメモリに格納します。
+
+\begin{comment}
 \section{HINT Instructions}
+\end{comment}
+\section{ヒント命令}
 \label{sec:rv64i-hints}
 
+\begin{comment}
 All instructions that are microarchitectural HINTs in RV32I (see
 Section~\ref{sec:rv32i-hints}) are also HINTs in RV64I.  The
 additional computational instructions in RV64I expand both the standard and
 custom HINT encoding spaces.
+\end{comment}
 
+RV32Iでマイクロアーキテクチャーのヒント(第~\ref{sec:rv32i-hints}節を参照)となっている全ての命令は、
+RV64Iでもヒントとなります。
+RV64Iの追加の計算命令は、標準ヒントとカスタムヒントの両方のエンコーディングスペースを拡張します。
+
+\begin{comment}
 Table~\ref{tab:rv64i-hints} lists all RV64I HINT code points.  91\% of the HINT
 space is reserved for standard HINTs, but none are presently defined.  The
 remainder of the HINT space is designated for custom HINTs; no standard HINTs
 will ever be defined in this subspace.
+\end{comment}
+
+表~\ref{tab:rv64i-hints}には、すべてのRV64I ヒントコードポイントがリストアップされています。
+ヒント空間の91\%は標準ヒント用に予約されていますが、現在は定義されていません。
+残りのヒントスペースはカスタムヒント用に指定されており、
+このサブスペースに標準ヒントが定義されることはありません。
 
 \begin{table}[hbt]
 \centering

@@ -2038,7 +2038,7 @@ FENCE命令は、他のRISC-V hartや外部デバイス、コプロセッサか�
 デバイスの入力(I)、デバイスの出力(O)、メモリの読み出し(R)、メモリの書き込み(W)の任意の組み合わせを
 基準にして順序付けすることができます。
 非公式ではありますが、他のRISC-V hartや外部デバイスは、
-FENCEの{\em 後続の}操作を、FENCEに{\em 先行する}操作の前に観察することはできません。
+FENCEの{\em 後続の操作}を、FENCEに{\em 先行する操作}の前に観察することはできません。
 第~\ref{ch:memorymodel}章では、RISC-Vのメモリ一貫性モデルについて詳しく説明しています。
 
 \begin{comment}
@@ -2071,7 +2071,7 @@ RビットやWビットではなく、IビットやOビットを使って順序�
 \hline
 0000 & \em none & 通常のフェンス \\
 \hline
-\multirow{2}{*}{1000} & \multirow{2}{*}{TSO} & FENCE RW,RWの場合、書き込み後読み出し(Write-to-read)以外のオーダリングを守る \\
+\multirow{2}{*}{1000} & \multirow{2}{*}{TSO} & FENCE RW,RWの場合、書き込み後読み出し(Write-to-read)以外のオーダリングを守る。 \\
                       &                      & そうでない場合、 \em 将来の予約 \\
 \hline
 \multicolumn{2}{|c|}{\em other} & \em Reserved for future use. \\
@@ -2089,7 +2089,7 @@ FENCE with {\em fm}=0000 orders all memory operations in its
 predecessor set before all memory operations in its successor set. 
 \end{comment}
 
-FENCE MODEフィールド{\em fm}は、FENCEのセマンティクスを定義します。
+FENCE の MODEフィールド{\em fm}は、FENCEのセマンティクスを定義します。
 FENCEの{\em fm}=0000は、先行するすべてのメモリ操作を、
 後続のすべてのメモリ操作の前に順序付けます。
 
@@ -2140,7 +2140,7 @@ FENCE命令の未使用フィールドである{\em rs1}と{\em rd}は、
 将来の拡張でより細かい粒度のフェンスを実現するために予約されています。 
 互換性を確保するために、基本的な実装ではこれらのフィールドを無視し、
 標準的なソフトウェアではこれらのフィールドをゼロにする必要があります。
-同様に、表~\ref{fm}の多くの{\em fm}や先行命令/皇族命令の設定も将来の使用のために予約されています。 
+同様に、表~\ref{fm}の多くの{\em fm}や先行命令/後続命令の設定も将来の使用のために予約されています。 
 基本的な実装では、このような予約済みの設定をすべて {\em fm}=0000 の通常のフェンスとして扱い、
 標準ソフトウェアでは予約されていない設定のみを使用するものとします。
 
