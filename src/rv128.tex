@@ -1,17 +1,29 @@
+\begin{comment}
 \chapter{RV128I Base Integer Instruction Set, Version 1.7}
+\end{comment}
+\chapter{RV128I ベース整数命令セット, Version 1.7}
 \label{rv128}
 
 \begin{quote}
+\begin{comment}
 {\em ``There is only one mistake that can be made in computer design that is
 difficult to recover from---not having enough address bits for memory
 addressing and memory management.''} Bell and Strecker, ISCA-3, 1976.
+\end{comment}
+{\em ``コンピュータの設計において、唯一、取り返しのつかない失敗があります。それは、メモリアドレスやメモリ管理のためのアドレスビットが十分でないことです。''} Bell and Strecker, ISCA-3, 1976
 \end{quote}
 
+\begin{comment}
 This chapter describes RV128I, a variant of the RISC-V ISA
 supporting a flat 128-bit address space.  The variant is a
 straightforward extrapolation of the existing RV32I and RV64I designs.
+\end{comment}
+
+本章では、フラットな128ビットアドレス空間をサポートするRISC-V ISAのバリアントである
+RV128Iについて説明します。 このバリアントは、既存のRV32IとRV64Iの設計をそのまま拡張したものです。
 
 \begin{commentary}
+\begin{comment}
 The primary reason to extend integer register width is to support
 larger address spaces.  It is not clear when a flat address space larger
 than 64 bits will be required.  At the time of writing, the fastest
@@ -25,18 +37,43 @@ spaces.  Exascale systems research is targeting \wunits{100}{PB}
 memory systems, which occupy 57 bits of address space.  At historic
 rates of growth, it is possible that greater than 64 bits of address
 space might be required before 2030.
+\end{comment}
 
+整数レジスタ幅を拡張する最大の理由は、より大きなアドレス空間をサポートするためです。
+64ビット以上のフラットなアドレス空間がいつ必要になるかは明らかではありません。
+本稿執筆時点では、Top500ベンチマークで計測された世界最速のスーパーコンピュータには、\wunits{1}{PB}以上のDRAMが搭載されており、
+すべてのDRAMを単一のアドレス空間に配置した場合、50ビット以上のアドレス空間が必要になります。 
+ウェアハウス規模のコンピュータの中には、すでにさらに大量のDRAMを搭載しているものもありますが、
+新しい高密度のソリッドステート不揮発性メモリや高速インターコネクト技術によって、
+さらに大きなメモリ空間が求められるようになるかもしれません。
+エクサスケールシステムの研究では、57ビットのアドレス空間を占有する\wunits{100}{PB}メモリシステムを目標としています。
+これまでの成長率を考えると、2030年までに64ビット以上のアドレス空間が必要になる可能性があります。
+
+\begin{comment}
 History suggests that whenever it becomes clear that more than 64 bits
 of address space is needed, architects will repeat intensive debates
 about alternatives to extending the address space, including
 segmentation, 96-bit address spaces, and software workarounds, until,
 finally, flat 128-bit address spaces will be adopted as the simplest
 and best solution.
+\end{comment}
 
+歴史を振り返ると、64ビット以上のアドレス空間が必要であることが明らかになるたびに、
+アーキテクトたちは、セグメント化、96ビットのアドレス空間、ソフトウェアの回避策など、
+アドレス空間を拡張するための代替案について集中的な議論を繰り返し、
+最終的にはフラットな128ビットのアドレス空間が最もシンプルで最良の解決策として採用されることになるでしょう。
+
+\begin{comment}
 We have not frozen the RV128 spec at this time, as there might be need
 to evolve the design based on actual usage of 128-bit address spaces.
+\end{comment}
+
+実際の128ビットアドレス空間の利用状況に応じて設計を進化させる必要があるため、
+現時点ではRV128の仕様を凍結していません。
+
 \end{commentary}
 
+\begin{comment}
 RV128I builds upon RV64I in the same way RV64I builds upon RV32I, with
 integer registers extended to 128 bits (i.e., XLEN=128).  Most integer
 computational instructions are unchanged as they are defined to
@@ -48,26 +85,55 @@ held in the low bits of the 128-bit integer registers and sign extend
 their results from bit 63 to bit 127.  The ``*D'' instructions consume
 two major opcodes (OP-IMM-64 and OP-64) in the standard 32-bit
 encoding.
+\end{comment}
+
+RV128Iは、RV64IがRV32Iをベースにしているのと同じように、整数レジスタを128ビットに拡張しています(XLEN=128)。
+ほとんどの整数演算命令は、XLENビットで動作するように定義されているため、変更はありません。 
+レジスタの下位ビットで32ビットの値を演算するRV64Iの「*W」整数命令はそのままですが、
+演算結果の符号が31ビットから127ビットまで拡張されています。
+128ビット整数レジスタの下位ビットに保持されている64ビット値を操作し、
+その結果をビット63からビット127まで符号拡張する新しい「*D」整数命令群が追加されました。
+この「*D」命令は、標準の32ビットエンコーディングでは2つの主要なオペコード（OP-IMM-64とOP-64）を消費します。
 
 \begin{commentary}
+\begin{comment}
   To improve compatibility with RV64, in a reverse of how RV32 to RV64
   was handled, we might change the decoding around to rename RV64I ADD
   as a 64-bit ADDD, and add a 128-bit ADDQ in what was previously the
   OP-64 major opcode (now renamed the OP-128 major opcode).
+\end{comment}
+
+RV64との互換性を高めるために、RV32からRV64への対応とは逆に、デコードを変更してRV64I ADDを64ビットADDDに改名し、
+従来のOP-64メジャーオペコード（現在はOP-128メジャーオペコードに改名）に128ビットADDQを追加することが考えられます。
 \end{commentary}
 
+\begin{comment}
 Shifts by an immediate (SLLI/SRLI/SRAI) are now encoded using the low
 7 bits of the I-immediate, and variable shifts (SLL/SRL/SRA) use the
 low 7 bits of the shift amount source register.
+\end{comment}
 
+即値シフト(SLLI/SRLI/SRAI)はI即値の下位7ビットを使用し、
+可変シフト(SLL/SRL/SRA)はシフト量ソースレジスタの下位7ビットを使用してエンコードするようになりました。
+
+\begin{comment}
 A LDU (load double unsigned) instruction is added using the existing
 LOAD major opcode, along with new LQ and SQ instructions to load and
 store quadword values.  SQ is added to the STORE major opcode, while
 LQ is added to the MISC-MEM major opcode.
+\end{comment}
 
+既存のLOADメジャー・オペコードを使用したLDU（load double unsigned）命令が追加され、
+4ワード値をロードおよびストアするLQおよびSQ命令も追加されました。
+SQはSTOREメジャー・オペコードに、LQはMISC-MEMメジャー・オペコードに追加されています。
+
+\begin{comment}
 The floating-point instruction set is unchanged, although the 128-bit
 Q floating-point extension can now support FMV.X.Q and FMV.Q.X
 instructions, together with additional FCVT instructions to and from
 the T (128-bit) integer format.
+\end{comment}
 
-
+浮動小数点命令セットは変更されていませんが、
+128ビットQ浮動小数点拡張命令はFMV.X.QおよびFMV.Q.X命令をサポートし、
+さらにT(128ビット)整数フォーマットとの間でFCVT命令が追加されています。
