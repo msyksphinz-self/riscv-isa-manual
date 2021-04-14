@@ -1,6 +1,10 @@
+\begin{comment}
 \chapter{``A'' Standard Extension for Atomic Instructions, Version 2.1}
+\end{comment}
+\chapter{アトミック命令のための``A'' 標準拡張, Version 2.1}
 \label{atomics}
 
+\begin{comment}
 The standard atomic-instruction extension, named ``A'',
 contains instructions that atomically
 read-modify-write memory to support synchronization between multiple
@@ -11,22 +15,46 @@ of atomic instruction support various memory consistency orderings
 including unordered, acquire, release, and sequentially consistent
 semantics.  These instructions allow RISC-V to support the RCsc memory
 consistency model~\cite{Gharachorloo90memoryconsistency}.
+\end{comment}
+
+``A''と名付けられた標準のアトミック命令拡張には、メモリの読み書きをアトミックに行う命令が含まれており、
+同じメモリ空間で動作する複数のRISC-V hart間の同期をサポートしています。
+アトミック命令には、Load-reserved/Store-conditional命令と、Atomic fetch-and-op命令の2種類があります。
+両タイプのアトミック命令は、unordered、acquire、release, シーケンシャルコンシステンシ動作など、
+さまざまなメモリ・コンシステンシの動作をサポートします。 これらの命令により、
+RISC-VはRCscメモリコンシステンシモデル~\cite{Gharachorloo90memoryconsistency}をサポートしています。
 
 \begin{commentary}
+\begin{comment}
 After much debate, the language community and architecture community
 appear to have finally settled on release consistency as the standard
 memory consistency model and so the RISC-V atomic support is built
 around this model.
+\end{comment}
+多くの議論の末、言語コミュニティとアーキテクチャコミュニティは、
+標準的なメモリコンシステンシモデルとしてリリースコンシステンシに最終的に落ち着いたようで、
+RISC-Vのアトミックサポートはこのモデルを中心に構築されています。
 \end{commentary}
 
+\begin{comment}
 \section{Specifying Ordering of Atomic Instructions}
+\end{comment}
+\section{アトミック命令のオーダリング指定}
 
+\begin{comment}
 The base RISC-V ISA has a relaxed memory model, with the FENCE
 instruction used to impose additional ordering constraints.  The
 address space is divided by the execution environment into memory and
 I/O domains, and the FENCE instruction provides options to order
 accesses to one or both of these two address domains.
+\end{comment}
 
+ベースとなるRISC-V ISAでは、リラックスメモリモデルが採用されており、
+FENCE命令を使用して追加の順序制約が課せられています。
+アドレス空間は実行環境によってメモリ領域とI/O領域に分けられ、
+FENCE命令はこれら2つのアドレス領域の一方または両方へのアクセスを順序付けるオプションを提供します。
+
+\begin{comment}
 To provide more efficient support for release
 consistency~\cite{Gharachorloo90memoryconsistency}, each atomic
 instruction has two bits, {\em aq} and {\em rl}, used to specify
@@ -36,7 +64,16 @@ memory or I/O, depending on which address domain the atomic
 instruction is accessing.  No ordering constraint is implied to
 accesses to the other domain, and a FENCE instruction should be used
 to order across both domains.
+\end{comment}
 
+リリースコンシステンシ~\cite{Gharachorloo90memoryconsistency}をより効率的にサポートするために、
+各アトミック命令には、他のRISC-V hartから見て追加のメモリ順序制約を指定するための2つのビット、{\em aq} and {\em rl}があります。
+これらのビットは、アトミック命令がアクセスしているアドレス領域に応じて、
+メモリまたはI/Oの2つのアドレスドメインのいずれかへのアクセスを順序付けます。
+もう一方のドメインへのアクセスには順序付けの制約はなく、
+両方のドメインに渡って順序付けを行うにはFENCE命令を使用する必要があります。
+
+\begin{comment}
 If both bits are clear, no additional ordering constraints are imposed
 on the atomic memory operation.  If only the {\em aq} bit is set, the
 atomic memory operation is treated as an {\em acquire} access, i.e.,
@@ -50,8 +87,22 @@ atomic memory operation is {\em sequentially consistent} and cannot be
 observed to happen before any earlier memory operations or after any
 later memory operations in the same RISC-V hart and to the same
 address domain.
+\end{comment}
 
+両方のビットがクリアの場合、アトミックメモリ操作に追加の順序制約は課されません。
+{\em aq}ビットのみがセットされている場合、アトミックメモリは{\em acquire}アクセスとして扱われます。
+つまり、acquireアクセスの前に、このRISC-V hart上で次のメモリ操作が行われることはありません。
+{\em rl}ビットのみがセットされている場合は、アトミックメモリ操作は、{\em release}アクセスとして扱われます。 
+つまり、このRISC-V hartでは、先に行われたメモリ操作の前に、releaseメモリ操作が行われていることは観測できません。 
+また、{\em aq}ビットと{\em rl}ビットの両方が設定されている場合、
+アトミックなメモリ操作は{\em シーケンシャルコンシステンシ動作}であり、
+同じRISC-V hart内の同じアドレスドメインに対して、
+先に行われたメモリ操作の前や、後に行われたメモリ操作の後に起こることはありません。
+
+\begin{comment}
 \section{Load-Reserved/Store-Conditional Instructions}
+\end{comment}
+\section{Load-Reserved/Store-Conditional命令}
 \label{sec:lrsc}
 
 \vspace{-0.2in}
@@ -82,6 +133,7 @@ SC.W/D & \multicolumn{2}{c}{ordering} & src & addr & width & dest & AMO  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Complex atomic memory operations on a single memory word or doubleword are performed
 with the load-reserved (LR) and store-conditional (SC) instructions.
 LR.W loads a word from the address in {\em rs1}, places the sign-extended
@@ -98,6 +150,19 @@ Regardless of success or failure, executing an SC.W instruction invalidates
 any reservation held by this hart.
 LR.D and SC.D act analogously on doublewords and are only available on RV64.
 For RV64, LR.W and SC.W sign-extend the value placed in {\em rd}.
+\end{comment}
+
+Load Reserved(LR)命令とStore Conditional(SC)命令は、
+1つのメモリ・ワードまたはダブルワードに対する複雑なアトミック・メモリ操作を行います。
+LR.Wは、ワードを{\em rs1}のアドレスからロードし、符号拡張された値を{\em rd}に格納し、
+アドレスされたワードのバイトを包含するバイトセットである{\em reservation set}を登録します。
+SC.W は条件付きで、{\em rs2}のワードを{\em rs1}に含まれるアドレスに書き込みます。
+SC.W が成功した場合、この命令はメモリ上に{\em rs2}のワードを書き込み、{\em rd} には0を書き込みます。
+SC.Wが失敗した場合は、メモリへの書き込みは行われず、0以外の値が書き込まれます。
+成功、失敗にかかわらず、SC.W命令を実行すると、このhartが持っていたreservationは無効になります。
+LR.DとSC.Dはダブルワードに類似した動作をし、RV64でのみ使用可能です。
+RV64では、LR.WとSC.Wは{\em rd}に置かれた値を符号拡張します。
+
 
 \begin{commentary}
 Both compare-and-swap (CAS) and LR/SC can be used to build lock-free
