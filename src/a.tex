@@ -165,6 +165,7 @@ RV64では、LR.WとSC.Wは{\em rd}に置かれた値を符号拡張します。
 
 
 \begin{commentary}
+\begin{comment}
 Both compare-and-swap (CAS) and LR/SC can be used to build lock-free
 data structures.  After extensive discussion, we opted for LR/SC for
 several reasons: 1) CAS suffers from the ABA problem, which LR/SC
@@ -183,7 +184,22 @@ it only requires one load as opposed to two with CAS (one load before
 the CAS instruction to obtain a value for speculative computation,
 then a second load as part of the CAS instruction to check if value is
 unchanged before updating).
+\end{comment}
 
+ロックフリーのデータ構造を構築するには、compare-and-swap(CAS)とLR/SCの両方を使用することができます。
+議論の結果、いくつかの理由からLR/SCを採用しました。
+1)CASにはABA問題があるが、LR/SCはデータ値の変更のみをチェックするのではなく、
+アドレスへのすべての書き込みを監視するため、ABA問題を回避できる。
+2)CASは、3つのソースオペランド(アドレス、比較値、スワップ値)をサポートするための新しい整数命令フォーマットと、
+異なるメモリシステムメッセージフォーマットを必要とするため、マイクロアーキテクチャが複雑になる。
+3) さらに、ABAの問題を回避するために、DW-CAS(Double-Wide CAS)を用意して、データワードと一緒にカウンタのテストやインクリメントを行うシステムもあります。
+この場合、1つの命令で5つのレジスタを読み出し、2つのレジスタを書き込む必要があり、
+また、新たに大きなメモリシステムのメッセージタイプが必要となるため、実装がさらに複雑になります。
+4)LR/SCは、CASでは2回のロードが必要である(CAS命令の前に1回ロードして投機的計算のための値を取得し、
+CAS命令の一部として2回目のロードを行い、値が変化していないかを確認してから更新する)
+のに対し、1回のロードで済むため、多くのプリミティブをより効率的に実装することができます。
+
+\begin{comment}
 The main disadvantage of LR/SC over CAS is livelock, which we avoid,
 under certain circumstances,
 with an architected guarantee of eventual forward progress as
@@ -193,26 +209,53 @@ synchronization libraries and other software that assumes DW-CAS is
 the basic machine primitive.  A possible mitigating factor is the
 recent addition of transactional memory instructions to x86, which
 might cause a move away from DW-CAS.
+\end{comment}
 
+LR/SCのCASに対する主な欠点はライブロックであるが、後述するように最終的な前進を保証するアーキテクチャにより、
+特定の状況下ではライブロックを回避している。
+また、DW-CASを持つx86アーキテクチャの影響により、
+DW-CASを基本的なマシン・プリミティブとして想定している同期ライブラリ
+などのソフトウェアの移植が困難になるのではないかという懸念もある。
+しかし、最近x86にトランザクションメモリ命令が追加されたことで、
+DW-CASからの脱却が進む可能性がある。
+
+\begin{comment}
 More generally, a multi-word atomic primitive is desirable, but there is
 still considerable debate about what form this should take, and
 guaranteeing forward progress adds complexity to a system.  Our
 current thoughts are to include a small limited-capacity transactional
 memory buffer along the lines of the original transactional memory
 proposals as an optional standard extension ``T''.
-\end{commentary}
+\end{comment}
 
+より一般的には、マルチワード・アトミック・プリミティブが望ましいとされていますが、
+これがどのような形であるべきかについてはまだ大きな議論があり、
+前進を保証することはシステムに複雑さをもたらします。
+私たちの現在の考えは、オリジナルのトランザクション・メモリの提案に沿った小さな
+限定容量のトランザクション・メモリ・バッファを、オプションの標準拡張機能``T''に含めることです。
+
+\end{commentary}
+\begin{comment}
 The failure code with value 1 is reserved to encode an unspecified
 failure.  Other failure codes are reserved at this time, and portable
 software should only assume the failure code will be non-zero.
+\end{comment}
+値1の失敗コードは、不特定の失敗を表すために予約されています。
+その他の失敗コードは現時点では予約済みであり、移植可能なソフトウェアは失敗コードが0以外であることのみを想定する必要があります。
 
 \begin{commentary}
+\begin{comment}
 We reserve a failure code of 1 to mean ``unspecified'' so that simple
 implementations may return this value using the existing mux required
 for the SLT/SLTU instructions.  More specific failure codes might be
 defined in future versions or extensions to the ISA.
+\end{comment}
+SLT/SLTU命令に必要な既存のmuxを使って、簡単な実装でこの値を返せるように、
+失敗コードの1は「不特定多数」を意味するものとして確保しています。
+より具体的な失敗コードは、ISAの将来のバージョンや拡張機能で定義されるかもしれません。
 \end{commentary}
 
+\begin{comment}
 For LR and SC, the A extension requires that the address held in {\em
   rs1} be naturally aligned to the size of the operand (i.e.,
 eight-byte aligned for 64-bit words and four-byte aligned for 32-bit
@@ -221,14 +264,30 @@ exception or an access-fault exception will be generated.  The access-fault
 exception can be generated for a memory access that would otherwise be
 able to complete except for the misalignment, if the misaligned access
 should not be emulated.
+\end{comment}
+
+LRとSCでは、A拡張機能を使用する際に、{\em rs1}に保持されるアドレスがオペランドのサイズに
+自然にアラインされていることが必要です(64ビットワードでは8バイトアライン、32ビットワードでは4バイトアラインとなります)。
+アドレスが自然にアラインされていない場合は、アドレスミスアライン例外またはアクセスフォルト例外が発生します。
+アクセスフォルト例外は、ミスアラインアクセスがエミュレートされるべきでない場合、
+ミスアライン発生時を除けば完了するはずのメモリ・アクセスに対して発生することができます。
 
 \begin{commentary}
+\begin{comment}
 Emulating misaligned LR/SC sequences is impractical in most systems.
+\end{comment}
 
+ずれたLR/SCシーケンスをエミュレートすることは、ほとんどのシステムでは現実的ではありません。
+
+\begin{comment}
 Misaligned LR/SC sequences also raise the possibility of accessing multiple
 reservation sets at once, which present definitions do not provide for.
+\end{comment}
+
+また、LR/SCの配列がずれていると、複数の予約セットに一度にアクセスする可能性が出てきますが、現在の定義ではこれを想定していません。
 \end{commentary}
 
+\begin{comment}
 An implementation can register an arbitrarily large reservation set on each
 LR, provided the reservation set includes all bytes of the addressed data word
 or doubleword.
@@ -242,19 +301,42 @@ to the bytes accessed by the LR instruction can be observed to have occurred
 between the LR and SC.
 Note this LR might have had a different effective address and data size, but
 reserved the SC's address as part of the reservation set.
+\end{comment}
+
+実装では、データワードまたはダブルワードの全バイトを含む予約セットであれば、
+各LRに任意の大きさの予約セットを登録することができます。
+SCは、プログラム順に最新のLRとのみペアリングできます。
+SCは、LRとSCの間に他のhartから予約セットへのストアが発生していないことが確認でき、
+かつ、LRと自身の間にプログラム順に他のSCが存在しない場合にのみ成功します。
+SCは、LRとSCの間に、LR命令でアクセスされたバイトへのhart以外のデバイスからの書き込みが
+発生していないことが確認できた場合にのみ成功します。
+なお、このLRは異なる実効アドレスとデータサイズを持っていたかもしれませんが、
+予約セットの一部としてSCのアドレスを予約しています。
+
 \begin{commentary}
+\begin{comment}
 Following this model, in systems with memory translation, an SC is allowed to
 succeed if the earlier LR reserved the same location using an alias with
 a different virtual address, but is also allowed to fail if the virtual
 address is different.
+\end{comment}
+このモデルに従うと、メモリトランスレーションを備えたシステムでは、
+先のLRが同じ場所を異なる仮想アドレスのエイリアスを使って予約していた場合にはSCは成功しますが、
+仮想アドレスが異なる場合には失敗することもあります。
 \end{commentary}
 \begin{commentary}
+\begin{comment}
 To accommodate legacy devices and buses, writes from devices other than RISC-V
 harts are only required to invalidate reservations when they overlap the bytes
 accessed by the LR.  These writes are not required to invalidate the
 reservation when they access other bytes in the reservation set.
+\end{comment}
+レガシーデバイスやバスに対応するため、RISC-V hart以外のデバイスからの書き込みは、
+LRでアクセスするバイトと重なった場合にのみ予約を無効にする必要があります。
+これらの書き込みは予約セットの他のバイトにアクセスされた場合には無効化する必要がありません。
 \end{commentary}
 
+\begin{comment}
 The SC must fail if the address is not within the reservation set of the most
 recent LR in program order.
 The SC must fail if a store to the reservation set from another hart can be
@@ -267,6 +349,16 @@ An SC must fail if there is another SC (to any address) between the LR and the
 SC in program order.
 The precise statement of the atomicity requirements for successful LR/SC
 sequences is defined by the Atomicity Axiom in Section~\ref{sec:rvwmo}.
+\end{comment}
+
+SCは、アドレスがプログラム順に直近のLRの予約セット内にない場合、失敗しなければなりません。
+LRとSCの間に、他のデバイスから予約セットへのストアが発生した場合、SCは失敗します。
+LRとSCの間で、他のデバイスからLRがアクセスするバイトへの書き込みが発生した場合、
+SCは失敗しなければなりません(このようなデバイスが予約セットを書き込んでも、
+LRがアクセスしたバイトを書き込まない場合、SCは失敗してもしなくてもよい)。
+プログラム順にLRとSCの間に別のSCが(任意のアドレスに)存在する場合、SCは失敗しなければならない。
+LR/SCシーケンスを成功させるためのアトミック性要件の正確な記述は、
+第~\ref{sec:rvwmo}節のアトミック性の原理によって定義されています。
 
 \begin{commentary}
 The platform should provide a means to determine the size and shape of the
