@@ -361,17 +361,27 @@ LR/SCシーケンスを成功させるためのアトミック性要件の正確
 第~\ref{sec:rvwmo}節のアトミック性の原理によって定義されています。
 
 \begin{commentary}
+\begin{comment}
 The platform should provide a means to determine the size and shape of the
 reservation set.
+\end{comment}
+プラットフォームは、予約セットのサイズと形状を決定する手段を提供する必要があります。
 
+\begin{comment}
 A platform specification may constrain the size and shape of the reservation
 set.
 For example, the Unix platform is expected to require of main memory that the
 reservation set be of fixed size, contiguous, naturally aligned, and no
 greater than the virtual memory page size.
+\end{comment}
+プラットフォームの仕様は、予約セットのサイズと形状を制約することがあります。
+たとえば、Unixプラットフォームでは、予約セットが固定サイズであること、
+連続していること、自然に整列していること、
+仮想メモリのページサイズ以下であることをメインメモリに要求すると考えられます。
 \end{commentary}
 
 \begin{commentary}
+\begin{comment}
 A store-conditional instruction to a scratch word of memory should be used
 to forcibly invalidate any existing load reservation:
 \begin{itemize}
@@ -379,17 +389,34 @@ to forcibly invalidate any existing load reservation:
 \item if necessary when changing virtual to physical address mappings,
   such as when migrating pages that might contain an active reservation.
 \end{itemize}
+\end{comment}
+
+既存のLoad Reservedを強制的に無効にするには、
+メモリのスクラッチワードへのStore-Conditional命令を使用する必要があります:
+\begin{itemize}
+\item プリエンプティブなコンテキストスイッチの間
+\item アクティブな予約を含む可能性のあるページを移行するときなど、
+仮想アドレスと物理アドレスのマッピングを変更するときに必要な場合。
+\end{itemize}
 \end{commentary}
 
 \begin{commentary}
+\begin{comment}
 The invalidation of a hart's reservation when it executes an LR or SC
 imply that a hart can only hold one reservation at a time, and that
 an SC can only pair with the most recent LR, and LR with the next
 following SC, in program order.  This is a restriction to the
 Atomicity Axiom in Section~\ref{sec:rvwmo} that ensures software runs
 correctly on expected common implementations that operate in this manner.
+\end{comment}
+LRやSCを実行したときにhartの予約セットが無効になるということは、
+hartは一度に1つの予約しか保持できず、SCは最新のLRと、LRはその次のSCと、
+プログラム順にしかペアになれないことを意味します。
+これは、第~\ref{sec:rvwmo}節のアトミック性の原理に対する制限であり、
+この方法で動作する予想される一般的な実装上でソフトウェアが正しく動作することを保証するものです。
 \end{commentary}
 
+\begin{comment}
 An SC instruction can never be observed by another RISC-V hart
 before the LR instruction that established the reservation.
 The LR/SC
@@ -400,20 +427,44 @@ by setting the {\em rl} bit on the SC instruction.  Setting the {\em
   rl} bit on the SC instruction makes the LR/SC sequence sequentially
 consistent, meaning that it cannot be reordered with earlier or
 later memory operations from the same hart.
+\end{comment}
 
+SC命令は、予約セットを確立したLR命令以前に、他のRISC-V hartによって観測されることはありません。
+LR/SCシーケンスは、LR命令の{\em aq}ビットを設定することでアクイジションセマンティクスを与えることができる。
+また、SC命令の{\em rl}ビットを設定することで、
+LR/SCシーケンスにリリースセマンティクスを付与することができます。
+LR命令に {\em aq}ビットを設定し、SC命令に{\em aq}ビットと{\em rl}ビットの両方を設定することで、
+LR/SCシーケンスは順序的に一貫したものとなり、
+同じhartからの前または後のメモリ操作で順序を変更することができなくなります。
+
+\begin{comment}
 If neither bit is set on both LR and SC, the LR/SC sequence can be
 observed to occur before or after surrounding memory operations from
 the same RISC-V hart.  This can be appropriate when the LR/SC
 sequence is used to implement a parallel reduction operation.
+\end{comment}
 
+LRとSCの両方にどちらのビットも設定されていない場合、LR/SCシーケンスは、
+同じRISC-V hart からの周辺のメモリ操作の前または後に発生することが観察できる。
+これは、LR/SCシーケンスを使用して並列リダクション動作を実行する場合に適しています。
+
+\begin{comment}
 Software should not set the {\em rl} bit on an LR instruction unless the {\em
 aq} bit is also set, nor should software set the {\em aq} bit on an SC
 instruction unless the {\em rl} bit is also set.  LR.{\em rl} and SC.{\em aq}
 instructions are not guaranteed to provide any stronger ordering than those
 with both bits clear, but may result in lower performance.
+\end{comment}
+
+ソフトウェアは LR命令の{\em aq}ビットが設定されていない場合には LR 命令の{\em rl}ビットを設定してはいけません。
+また、{\em rl}ビットがセットされていないSC命令の{\em aq}ビットを設定してはなりません。
+LR.{\em rl}およびSC.{\em aq}命令は、
+両ビットをクリアした場合よりも強力な順序付けを行うことは保証されていませんが、
+結果として性能が低下する可能性があります。
 
 \begin{figure}[h!]
 \begin{center}
+\begin{comment}
 \begin{verbatim}
         # a0 holds address of memory location 
         # a1 holds expected value
@@ -430,19 +481,48 @@ with both bits clear, but may result in lower performance.
         li a0, 1             # Set return to failure.
         jr ra                # Return.
 \end{verbatim}
+\end{comment}
+\begin{verbatim}
+        # a0はメモリアドレスを保持している
+        # a1は想定する値を持っている
+        # a2はアップデートする値を持っている
+        # もし成功したらa0は0、そうでなければ0以外を保持する
+    cas:
+        lr.w t0, (a0)        # オリジナルの値をロードする
+        bne t0, a1, fail     # 一致しなければ失敗である
+        sc.w t0, a2, (a0)    # アップデートを試行する
+        bnez t0, cas         # Store-Conditionalが失敗した場合、再試行する
+        li a0, 0             # 成功した場合には0を設定し終了する
+        jr ra                # 戻る
+    fail:
+        li a0, 1             # 1を設定し失敗する
+        jr ra                # 戻る
+\end{verbatim}
 \end{center}
+\begin{comment}
 \caption{Sample code for compare-and-swap function using LR/SC.}
+\end{comment}
+\caption{Compare-and-swap関数をLR/SCを使って実現するサンプルコード}
 \label{cas}
 \end{figure}
 
+\begin{comment}
 LR/SC can be used to construct lock-free data structures.  An example
 using LR/SC to implement a compare-and-swap function is shown in
 Figure~\ref{cas}.  If inlined, compare-and-swap functionality need
 only take four instructions.
+\end{comment}
+LR/SCはロックフリーのデータ構造を構築するために使用することができます。 
+LR/SCを使ってcompare-and-swap機能を実装した例を図~\ref{cas}に示します。
+インライン化すれば、compare-and-swap機能は4命令で実現できます。
 
+\begin{comment}
 \section{Eventual Success of Store-Conditional Instructions}
+\end{comment}
+\section{Store-Conditional命令の成功にむけて}
 \label{sec:lrscseq}
 
+\begin{comment}
 The standard A extension defines {\em constrained LR/SC loops}, which have
 the following properties:
 \vspace{-0.2in}
@@ -468,12 +548,40 @@ the following properties:
 \item The SC must be to the same effective address and of the same data size as
   the latest LR executed by the same hart.
 \end{itemize}
+\end{comment}
 
+標準A拡張では、次のような特性を持つ{\em 制限のあるLR/SCループ}を定義しています:
+\vspace{-0.2in}
+\begin{itemize}
+\parskip 0pt
+\itemsep 1pt
+\item このループは、LR/SCシーケンスと、失敗した場合にシーケンスを再試行するコードのみで構成されており、
+最大で16個の命令をメモリ上に順次配置する必要があります。
+\item LR/SCシーケンスは、LR命令で始まり、SC命令で終わります。
+LR命令とSC命令の間に実行される動的なコードには、基本となる``I''命令セットの命令のみを含めることができ、
+ロード、ストア、バックワードジャンプ、逆方向への分岐、
+JALR、FENCE、SYSTEMの各命令は含まれません。
+``C''エクステンションがサポートされている場合には、前述の``I''命令の圧縮形式も許可されます。
+\item 失敗したLR/SCシーケンスを再試行するコードは、
+後方ジャンプやLR/SCシーケンスを繰り返すための分岐を含むことができますが、
+それ以外はLRとSCの間のコードと同じ制約を持ちます。
+\item LRおよびSCのアドレスは、{\em LR/SC eventuality} 特性を持つメモリ領域内になければならない。
+どの領域がこの特性を持つかは、実行環境が責任を持って定義する。
+\item SCは、同じhartで実行された最新のLRと同じ実効アドレス、同じデータサイズでなければならない。
+\end{itemize}
+
+\begin{comment}
 LR/SC sequences that do not lie within constrained LR/SC loops are {\em
 unconstrained}.  Unconstrained LR/SC sequences might succeed on some attempts
 on some implementations, but might never succeed on other implementations.
+\end{comment}
+
+制約されたLR/SCループ内にないLR/SCシーケンスに{\em 制約はありません}。
+制約のないLR/SC配列は、ある実装では成功するかもしれませんが、
+他の実装では絶対に成功しないかもしれません。
 
 \begin{commentary}
+\begin{comment}
 We restricted the length of LR/SC loops to fit within 64 contiguous
 instruction bytes in the base ISA to avoid undue restrictions on instruction
 cache and TLB size and associativity.
@@ -484,14 +592,31 @@ The restrictions on branches and jumps limit the time that
 can be spent in the sequence.  Floating-point operations and integer
 multiply/divide were disallowed to simplify the operating system's emulation
 of these instructions on implementations lacking appropriate hardware support.
+\end{comment}
 
+LR/SCのループの長さは、命令キャッシュやTLBのサイズや連想性に過度な制限がかからないように、
+ベースISAの連続した64命令バイト以内に収まるように制限した。
+同様に、プライベートキャッシュ内の予約を追跡するような単純な実装では、
+データキャッシュの連想性への制約を避けるため、ループ内での他のロードやストアを禁止した。
+分岐とジャンプの制限により、シーケンスに費やすことのできる時間が制限されます。
+浮動小数点演算と整数の乗除算は、適切なハードウェア・サポートを持たない実装において、
+オペレーティング・システムによるこれらの命令のエミュレーションを容易にするために禁止されています。
+
+\begin{comment}
 Software is not forbidden from using unconstrained LR/SC sequences, but
 portable software must detect the case that the sequence repeatedly fails,
 then fall back to an alternate code sequence that does not rely on an
 unconstrained LR/SC sequence.  Implementations are permitted to
 unconditionally fail any unconstrained LR/SC sequence.
+\end{comment}
+
+ソフトウェアが制約のないLR/SCシーケンスを使用することは禁止されていませんが、
+ポータブルソフトウェアは、シーケンスが繰り返し失敗する場合を検出し、
+制約のないLR/SCシーケンスに依存しない代替コードシーケンスにフォールバックしなければなりません。
+実装は、制約のないLR/SCシーケンスを無条件に失敗させることができます。
 \end{commentary}
 
+\begin{comment}
 If a hart {\em H} enters a constrained LR/SC loop, the execution environment
 must guarantee that one of the following events eventually occurs:
 \vspace{-0.2in}
@@ -506,14 +631,32 @@ must guarantee that one of the following events eventually occurs:
 \item {\em H} executes a branch or jump that exits the constrained LR/SC loop.
 \item {\em H} traps.
 \end{itemize}
+\end{comment}
+
+Hart{\em H}が制約付きLR/SCループに入る場合、最終的に以下のいずれかの事象が発生することを実行環境が保証しなければならない:
+\vspace{-0.2in}
+\begin{itemize}
+\parskip 0pt
+\itemsep 1pt
+\item Hまたは他のhartが、制約付きLR/SCループ内のLR命令の予約セットに対してSCを成功させる。
+\item 他のhartが{\em H}の制約付きLR/SCループ内のLR命令の予約セットに対して無条件に
+StoreやAMO命令を実行したり、システム内の他のデバイスがその予約セットに書き込みを行う。
+\item {\em H} 制約されたLR/SCループを抜ける分岐やジャンプを実行する。
+\item {\em H} がトラップを発生させる。
+\end{itemize}
 
 \begin{commentary}
+\begin{comment}
 Note that these definitions permit an implementation to fail an SC instruction
 occasionally for any reason, provided the aforementioned guarantee is not
 violated.
+\end{comment}
+これらの定義は、前述の保証に違反しない限り、
+実装が何らかの理由でSC命令を時々失敗させることを許可していることに注意してください。
 \end{commentary}
 
 \begin{commentary}
+\begin{comment}
 As a consequence of the eventuality guarantee, if some harts in an execution
 environment are executing constrained LR/SC loops, and no other harts or
 devices in the execution environment execute an unconditional store or AMO to
@@ -521,7 +664,15 @@ that reservation set, then at least one hart will eventually exit its
 constrained LR/SC loop.
 By contrast, if other harts or devices continue to write to that reservation
 set, it is not guaranteed that any hart will exit its LR/SC loop.
+\end{comment}
 
+このような保証(eventuality guarantee)の結果として、実行環境の一部のhartが制約付きLR/SCループを実行しており、
+実行環境の他のhartやデバイスがその予約セットに対して無条件のストアやAMOを実行していない場合、
+少なくとも1つのhartが最終的にその制約付きLR/SCループを抜けることになります。
+これに対して、他のhartや機器がその予約セットへの書き込みを継続した場合、
+どのhartもそのLR/SCループを抜けることは保証されません。
+
+\begin{comment}
 Loads and load-reserved instructions do not by themselves impede the progress
 of other harts' LR/SC sequences.
 We note this constraint implies, among other things, that loads and
@@ -533,21 +684,44 @@ Typically, this implies reservations are tracked independently of
 evictions from any shared cache.
 Similarly, cache misses caused by speculative execution within a hart cannot
 impede LR/SC progress indefinitely.
+\end{comment}
 
+ロードおよびLoad-Reserved命令は、それ自体が他のhartのLR/SCシーケンスの進行を妨げません。
+この制約は、特に、他のhart(場合によっては同一コア内)が実行するロードおよびLoad-Reserved命令が
+LR/SCの進行を無期限に妨げることができないことを意味することに注意してください。
+例えば、キャッシュを共有している他のhartによって引き起こされるキャッシュの退避は、
+LR/SCの進行を無制限に妨げることはできません。
+一般的に、これは予約セットが共有キャッシュからの退避とは独立して追跡されることを意味します。
+同様に、hart内での投機的な実行によるキャッシュミスも、LR/SCの進行を無期限に妨げることはできません。
+
+\begin{comment}
 These definitions admit the possibility that SC instructions may spuriously
 fail for implementation reasons, provided progress is eventually made.
+\end{comment}
+これらの定義は、SC命令が実装上の理由で偽りの失敗をする可能性を認めていますが、最終的にはコードは前進します。
 \end{commentary}
 
 \begin{commentary}
+\begin{comment}
 One advantage of CAS is that it guarantees that some hart eventually
 makes progress, whereas an LR/SC atomic sequence could livelock
 indefinitely on some systems.  To avoid this concern, we added an
 architectural guarantee of livelock freedom for certain LR/SC sequences.
+\end{comment}
 
+CASの利点の1つは、LR/SCのアトミックシーケンスがシステムによっては無期限に
+ライブロックする可能性があるのに対し、あるhartが最終的に前進することを保証することです。
+この懸念を回避するために、特定のLR/SCシーケンスに対してライブロックのないことをアーキテクチャ的に保証しました。
+
+\begin{comment}
 Earlier versions of this specification imposed a stronger starvation-freedom
 guarantee.  However, the weaker livelock-freedom guarantee is sufficient to
 implement the C11 and C++11 languages, and is substantially easier to provide
 in some microarchitectural styles.
+\end{comment}
+この仕様の初期のバージョンでは、より強力なスターベイション・フリーダムの保証が課されていました。
+しかし、C11およびC++11言語を実装するには、より弱いライブロック自由度の保証で十分であり、
+マイクロアーキテクチャのスタイルによっては、より簡単に提供することができます。
 \end{commentary}
 
 \section{Atomic Memory Operations}
