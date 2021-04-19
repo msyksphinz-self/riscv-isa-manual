@@ -724,7 +724,10 @@ in some microarchitectural styles.
 マイクロアーキテクチャのスタイルによっては、より簡単に提供することができます。
 \end{commentary}
 
+\begin{comment}
 \section{Atomic Memory Operations}
+\end{comment}
+\section{アトミックメモリ操作}
 \label{sec:amo}
 
 \vspace{-0.2in}
@@ -760,6 +763,7 @@ AMOMIN[U].W/D & \multicolumn{2}{c}{ordering} & src & addr & width & dest & AMO  
 \end{tabular}
 \end{center}
 
+\begin{comment}
 \vspace{-0.1in} The atomic memory operation (AMO) instructions perform
 read-modify-write operations for multiprocessor synchronization and
 are encoded with an R-type instruction format.  These AMO instructions
@@ -770,7 +774,17 @@ to the original address in {\em rs1}. AMOs can either operate on 64-bit (RV64
 only) or 32-bit words in memory.  For RV64, 32-bit AMOs always
 sign-extend the value placed in {\em rd}, and ignore the upper 32 bits
 of the original value of {\em rs2}.
+\end{comment}
 
+AMO(Atomic Memory Operation)命令は、マルチプロセッサの同期をとるために、
+リードモディファイ・ライトを行う命令で、Rタイプの命令フォーマットでエンコードされています。 
+これらのAMO命令は、データの値をアドレスからアトミックにロードし、その値をレジスタに入れ、
+ロードした値と元の値にバイナリ演算子を適用して、
+その結果を元のアドレスにストアします。
+AMOは、メモリ上の64ビット(RV64のみ)または32ビットのワードを操作することができます。
+RV64の場合、32ビットのAMOは、常に{\em rd}に置かれた値を符号拡張し、{\em rs2}の元の値の上位32ビットを無視します。
+
+\begin{comment}
 For AMOs, the A extension requires that the address held in {\em rs1}
 be naturally aligned to the size of the operand (i.e., eight-byte
 aligned for 64-bit words and four-byte aligned for 32-bit words).  If
@@ -781,14 +795,31 @@ except for the misalignment, if the misaligned access should not be
 emulated.  The ``Zam'' extension, described in Chapter~\ref{sec:zam},
 relaxes this requirement and specifies the semantics of misaligned
 AMOs.
+\end{comment}
 
+AMOの場合、Aエクステンションでは、{\em rs1}に保持されるアドレスがオペランドのサイズに
+自然にアラインされていることが要求されます(64ビットワードでは8バイトアライン、32ビットワードでは4バイトアラインとなります)。
+アドレスが自然にアラインされていない場合は、アドレスミスアライン例外またはアクセスフォルト例外が発生します。
+アクセスフォルト例外は、ミスアラインアクセスがエミュレートされるべきではない場合に、
+ミスアラインドを除けば完了するはずのメモリ・アクセスに対して発生することができます。
+第~\ref{sec:zam}節に記載されている``Zam''拡張は、この要件を緩和し、
+ミスアラインAMOのセマンティクスを規定しています。
+
+\begin{comment}
 The operations supported are swap, integer add, bitwise AND, bitwise
 OR, bitwise XOR, and signed and unsigned integer maximum and minimum.
 Without ordering constraints, these AMOs can be used to implement
 parallel reduction operations, where typically the return value would
 be discarded by writing to {\tt x0}.
+\end{comment}
+
+対応している演算は、スワップ、整数加算、ビット単位のAND、ビット単位のOR、ビット単位のXOR、
+符号付きおよび符号なしの整数の最大値と最小値です。
+これらのAMOは、順序の制約がなければ、並列の削減演算を実装するために使用することができます。
+通常、戻り値は、{\tt x0}に書き込むことで破棄されます。
 
 \begin{commentary}
+\begin{comment}
 We provided fetch-and-op style atomic primitives as they scale to
 highly parallel systems better than LR/SC or CAS.
 A simple microarchitecture can implement AMOs using the LR/SC primitives,
@@ -796,14 +827,26 @@ provided the implementation can guarantee the AMO eventually completes.
 More complex implementations might also implement AMOs at memory
 controllers, and can optimize away fetching the original value when
 the destination is {\tt x0}.
+\end{comment}
+LR/SCやCASよりも高並列システムへの拡張性が高いfetch-and-opスタイルのアトミックプリミティブを提供しました。
+単純なマイクロアーキテクチャでは、最終的にAMOが完了することを保証できる実装であれば、
+LR/SCプリミティブを用いてAMOを実装することができます。
+より複雑な実装では、メモリコントローラにもAMOを実装し、デスティネーションが{\tt x0}の場合に
+元の値をフェッチしないように最適化することができます。
 
+\begin{comment}
 The set of AMOs was chosen to support the C11/C++11 atomic memory
 operations efficiently, and also to support parallel reductions in
 memory.  Another use of AMOs is to provide atomic updates to
 memory-mapped device registers (e.g., setting, clearing, or toggling
 bits) in the I/O space.
+\end{comment}
+
+AMOのセットは、C11/C++11のアトミックなメモリー操作を効率的にサポートし、さらにメモリーの並列削減をサポートするために選ばれました。
+AMOのもう一つの用途は、I/O空間でメモリマップされたデバイスレジスターのアトミックな更新(ビットの設定、クリア、トグルなど)を行うことです。
 \end{commentary}
 
+\begin{comment}
 To help implement multiprocessor synchronization, the AMOs optionally
 provide release consistency semantics.  If the {\em aq} bit is set,
 then no later memory operations in this RISC-V hart can be observed
@@ -814,21 +857,44 @@ preceding the AMO in this RISC-V hart.  Setting both the {\em aq} and the {\em
 rl} bit on an AMO makes the sequence sequentially consistent, meaning that
 it cannot be reordered with earlier or later memory operations from the same
 hart.
+\end{comment}
+
+マルチプロセッサの同期を実現するために、AMOはオプションでリリースコンシステンシセマンティクスを提供しています。 
+{\em aq}ビットがセットされている場合、このRISC-V hartでは、AMOの前に行われた後のメモリ操作を観測することはできません。
+逆に、{\em rl}ビットがセットされている場合、他のRISC-V hartは、このRISC-V hartにおける
+AMOの前のメモリアクセスの前にAMOを観測することはありません。
+AMOの{\em aq}と{\em rl}の両方のビットを設定すると、シーケンスが一貫したものになり、
+同じhartからの前または後のメモリ操作で順序を変更することができなくなります。
 
 \begin{commentary}
+\begin{comment}
 The AMOs were designed to implement the C11 and C++11 memory models
 efficiently.  Although the FENCE R, RW instruction suffices to
 implement the {\em acquire} operation and FENCE RW, W suffices to
 implement {\em release}, both imply additional unnecessary ordering as
 compared to AMOs with the corresponding {\em aq} or {\em rl} bit set.
+\end{comment}
+
+AMOはC11およびC++11のメモリモデルを効率的に実装するために設計されました。
+FENCE R, RW命令は、{\em acquire}操作を実行するのに十分であり、
+FENCE RW, W命令は {\em release}実行するのに十分ですが、{\em aq}や{\em rl}に
+対応するビットが設定されているAMOと比較して、不要な順序付けが行われてしまいます。
+
 \end{commentary}
 
+\begin{comment}
 An example code sequence for a critical section guarded by a
 test-and-test-and-set spinlock is shown in Figure~\ref{critical}.  Note the
 first AMO is marked {\em aq} to order the lock acquisition before the
 critical section, and the second AMO is marked {\em rl} to order
 the critical section before the lock relinquishment.
+\end{comment}
 
+テストアンドテストアンドセットのスピンロックでガードされたクリティカルセクションのコードシーケンスの例を 図~\ref{critical} に示します。
+最初のAMOには、クリティカルセクションの前にロックの獲得を指示する{\em aq}が、2番目のAMOには、
+ロックの放棄の前にクリティカルセクションを指示する{\em rl}が記されています。
+
+\begin{comment}
 \begin{figure}[h!]
 \begin{center}
 \begin{verbatim}
@@ -847,15 +913,47 @@ the critical section before the lock relinquishment.
 \caption{Sample code for mutual exclusion.  {\tt a0} contains the address of the lock.}
 \label{critical}
 \end{figure}
+\end{comment}
+
+\begin{figure}[h!]
+\begin{center}
+\begin{verbatim}
+        li           t0, 1        # スワップ値の初期化
+    again:
+        lw           t1, (a0)     # ロックを獲得しているかのチェック
+        bnez         t1, again    # ロックをすでに誰かが獲得できていれば再試行
+        amoswap.w.aq t1, t0, (a0) # ロックの取得試行
+        bnez         t1, again    # ロックが獲得できなければ再試行
+        # ...
+        # クリティカルセクション
+        # ...
+        amoswap.w.rl x0, x0, (a0) # 0をストアすることでロック開放
+\end{verbatim}
+\end{center}
+\caption{排他制御のサンプルコード。 {\tt a0}はロックのアドレスを保持している}
+\label{critical}
+\end{figure}
 
 \begin{commentary}
+\begin{comment}
 We recommend the use of the AMO Swap idiom shown above for both lock
 acquire and release to simplify the implementation of speculative lock
 elision~\cite{Rajwar:2001:SLE}.
+\end{comment}
+
+投機的Lock Elision~\cite{Rajwar:2001:SLE}の実装を簡略化するために、
+ロックの獲得と解放の両方に上記のAMO Swapイディオムを使用することをお勧めします。
 \end{commentary}
 
+\begin{comment}
 The instructions in the ``A'' extension can also be used to provide
 sequentially consistent loads and stores.  A sequentially consistent load can
 be implemented as an LR with both {\em aq} and {\em rl} set. A sequentially
 consistent store can be implemented as an AMOSWAP that writes the old value to
 x0 and has both {\em aq} and {\em rl} set.
+\end{comment}
+
+``A''拡張の命令は、シーケンシャルコンシステンシのロードとストアを実現するためにも使用できます。
+シーケンシャルコンシステンシのロードは、LRとして実装することができ、{\em aq}と{\em rl}の両方が設定されます。
+シーケンシャルコンシステンシのストアは、古い値をx0に書き込むAMOSWAPとして実装することができ、
+その際には、{\em aq}と{\em rl}の両方が設定されます。
