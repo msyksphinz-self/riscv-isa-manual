@@ -1,27 +1,54 @@
+\begin{comment}
 \chapter{``Zicsr'', Control and Status Register (CSR) Instructions, Version 2.0}
+\end{comment}
+\chapter{``Zicsr'', 制御ステータスレジスタ(CSR)命令, Version 2.0}
 \label{csrinsts}
 
+\begin{comment}
 RISC-V defines a separate address space of 4096 Control and Status
 registers associated with each hart.  This chapter defines the full
 set of CSR instructions that operate on these CSRs.
+\end{comment}
+
+RISC-Vでは、各hartに関連した4096個の制御レジスタとステータスレジスタの独立したアドレス空間が定義されています。
+本章では、これらのCSRを操作するCSR命令の全容を定義します。
 
 \begin{commentary}
+\begin{comment}
   While CSRs are primarily used by the privileged architecture, there
   are several uses in unprivileged code including for counters and
   timers, and for floating-point status.
+\end{comment}
 
+CSRは主に特権アーキテクチャで使用されますが、非特権なコードでもカウンターやタイマー、
+浮動小数点のステータスなどいくつかの用途があります。
+
+\begin{comment}
   The counters and timers are no longer considered mandatory parts of
   the standard base ISAs, and so the CSR instructions required to
   access them have been moved out of the base ISA chapter into this
   separate chapter.
+\end{comment}
+
+カウンタとタイマは標準ベースISAの必須部分ではなくなったため、
+これらにアクセスするためのCSR命令はベースISAの章からこの別の章に移されました。
 \end{commentary}
 
+\begin{comment}
 \section{CSR Instructions}
+\end{comment}
+\section{CSR命令}
 
+\begin{comment}
 All CSR instructions atomically read-modify-write a single CSR, whose
 CSR specifier is encoded in the 12-bit {\em csr} field of the
 instruction held in bits 31--20.  The immediate forms use a 5-bit
 zero-extended immediate encoded in the {\em rs1} field.
+\end{comment}
+
+すべてのCSR命令は、単一のCSRをアトミックにリード・モディファイ・ライトします。
+CSR指定子は、31～20ビットで保持される命令の12ビットの{\em csr}フィールドにエンコードされます。
+即値形式では、0拡張された5ビットの即値が使用されます。
 
 \vspace{-0.2in}
 \begin{center}
@@ -49,6 +76,7 @@ source/dest  & uimm[4:0]   & CSRRCI & dest & SYSTEM \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values
 in the CSRs and integer registers. CSRRW reads the old value of the
 CSR, zero-extends the value to XLEN bits, then writes it to integer
@@ -56,7 +84,14 @@ register {\em rd}.  The initial value in {\em rs1} is written to the
 CSR.  If {\em rd}={\tt x0}, then the instruction shall not read the CSR
 and shall not cause any of the side effects that might occur on a CSR
 read.
+\end{comment}
 
+CSRRW(Atomic Read/Write CSR)命令は、CSRと整数レジスタの値をアトミックに入れ替えます。
+CSRRWは、CSRの古い値を読み出し、その値をXLENビットにゼロ拡張してから、整数レジスタ{\em rd}に書き込みます。
+CSRにはRS1の置き換え前の値が書き込まれます。
+もし{\em rd}={\tt x0}の場合、命令はCSRを読み込み行わず、CSRを読み込むことによって発生する副作用も発生しません。
+
+\begin{comment}
 The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the
 value of the CSR, zero-extends the value to XLEN bits, and writes it
 to integer register {\em rd}.  The initial value in integer register
@@ -64,7 +99,15 @@ to integer register {\em rd}.  The initial value in integer register
 set in the CSR.  Any bit that is high in {\em rs1} will cause the
 corresponding bit to be set in the CSR, if that CSR bit is writable.
 Other bits in the CSR are not explicitly written.
+\end{comment}
 
+CSRRS(Atomic Read and Set Bits in CSR)命令は、CSRの値を読み出し、
+その値をXLENビットにゼロ拡張して、整数レジスタ{\em rd}に書き込みます。
+整数レジスタは、CSRにセットされるビット位置を指定するビットマスクとして扱われます。
+CSRのビットが書き込み可能であれば、CSRのどのビットもHighになり、対応するビットがセットされます。
+CSRの他のビットは明示的に書き込まれません。
+
+\begin{comment}
 The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the
 value of the CSR, zero-extends the value to XLEN bits, and writes it
 to integer register {\em rd}.  The initial value in integer register
@@ -72,7 +115,15 @@ to integer register {\em rd}.  The initial value in integer register
 cleared in the CSR.  Any bit that is high in {\em rs1} will cause the
 corresponding bit to be cleared in the CSR, if that CSR bit is writable.
 Other bits in the CSR are not explicitly written.
+\end{comment}
 
+CSRRC(Atomic Read and Clear Bits in CSR)命令は、CSRの値を読み出し、
+その値をXLENビットにゼロ拡張して、整数レジスタ{\em rd}に書き込みます。
+整数レジスタは、CSRでクリアされるビット位置を指定するビットマスクとして扱われます。
+CSRのビットが書き込み可能であれば、CSRのどのビットもHighとなり、対応するビットがクリアされます。
+CSRの他のビットは明示的に書き込まれません。
+
+\begin{comment}
 For both CSRRS and CSRRC, if {\em rs1}={\tt x0}, then the instruction
 will not write to the CSR at all, and so shall not cause any of the
 side effects that might otherwise occur on a CSR write, nor
@@ -84,7 +135,17 @@ if {\em rs1} specifies a register holding a zero value other than {\tt
 value back to the CSR and will cause any attendant side effects.  A
 CSRRW with {\em rs1}={\tt x0} will attempt to write zero to the
 destination CSR.
+\end{comment}
 
+CSRRSとCSRRCの両方において、もしも{\em rs1}={\em x0}であれば、
+その命令はCSRへの書き込みを行わないため、CSRへの書き込み時に発生する可能性のある副作用は発生せず、
+読み取り専用のCSRへのアクセス時に不正命令の例外を発生させることもありません。
+CSRRSとCSRRCの両方とも、アドレスで指定されたCSRを常に読み取り、{\em rs1}と{\em rd}フィールドに関係なく、
+あらゆる読み取り副作用を引き起こします。
+なお、ゼロの値を保持するレジスタが指定されていても、CSRに変更されていない値を書き戻そうとするため、
+副作用が発生します。 CSRRWで{\tt x0}を指定した場合、CSRにゼロを書き込もうとします。
+
+\begin{comment}
 The CSRRWI, CSRRSI, and CSRRCI variants are similar to CSRRW, CSRRS,
 and CSRRC respectively, except they update the CSR using an XLEN-bit
 value obtained by zero-extending a 5-bit unsigned immediate (uimm[4:0]) field
@@ -97,6 +158,15 @@ For CSRRWI, if {\em rd}={\tt x0}, then the instruction shall not read the
 CSR and shall not cause any of the side effects that might occur on a
 CSR read.  Both CSRRSI and CSRRCI will always read the CSR and cause
 any read side effects regardless of {\em rd} and {\em rs1} fields.
+\end{comment}
+
+CSRRWI、CSRRSI、CSRRCIは、それぞれCSRRW、CSRRS、CSRRCと似ていますが、
+整数レジスタからの値ではなく、{\em rs1}フィールドにエンコードされた5ビットの符号なし即値(uimm[4:0])をゼロ拡張して得られるXLENビット値を使用してCSRを更新します。
+CSRRSIおよびCSRRCIでは、uimm[4:0]フィールドがゼロの場合、これらの命令はCSRへの書き込みを行わず、
+CSRの書き込み時に発生する可能性のある副作用を引き起こしたり、読み取り専用のCSRへのアクセス時に不正命令の例外を発生させたりしてはなりません。
+また、CSRRWIでは、もし、{\em rd}={\em x0}であれば、その命令はCSRの読み取りを行わず、
+CSRの読み取り時に発生する可能性のある副作用を発生させないものとします。
+CSRRSIとCSRRCIは、フィールドが何であれ、常にCSRを読み取り、あらゆる読み取り副作用を引き起こします。
 
 \begin{table}
   \centering
@@ -125,21 +195,35 @@ any read side effects regardless of {\em rd} and {\em rs1} fields.
     CSRRSI/CSRRCI & --  & No  & Yes & Yes \\
     \hline
   \end{tabular}
+\begin{comment}
   \caption{Conditions determining whether a CSR instruction reads or writes
     the specified CSR.}
+\end{comment}
+  \caption{指定されたCSRに対して読み書きを行う条件}
   \label{tab:csrsideeffects}
 \end{table}
 
+\begin{comment}
 Table~\ref{tab:csrsideeffects} summarizes the behavior of the CSR
 instructions with respect to whether they read and/or write the CSR.
+\end{comment}
 
+表~\ref{tab:csrsideeffects}は、CSR命令がCSRを読み書きするかどうかについての動作をまとめたものです。
+
+\begin{comment}
 For any event or consequence that occurs due to a CSR having a particular
 value, if a write to the CSR gives it that value, the resulting event or
 consequence is said to be an \emph{indirect effect} of the write.
 Indirect effects of a CSR write are not considered by the RISC-V ISA to
 be side effects of that write.
+\end{comment}
+
+CSRが特定の値を持つことで発生するイベントや結果について、CSRへの書き込みによってその値が与えられた場合、
+その結果発生するイベントや結果は、書き込みの\emph{間接効果}と言われます。
+CSRの書き込みによる間接効果は、RISC-V ISAでは書き込みの副作用とはみなされません。
 
 \begin{commentary}
+\begin{comment}
   An example of side effects for CSR accesses would be if reading from a
   specific CSR causes a light bulb to turn on, while writing an odd value
   to the same CSR causes the light to turn off.
@@ -152,24 +236,50 @@ be side effects of that write.
   causes the light to turn off again.
   Hence, on the last write, it is not a change in the CSR value that
   turns off the light.)
+\end{comment}
 
+CSRアクセスの副作用の例としては、特定のCSRから読み出すと電球が点灯し、
+同じCSRに奇数の値を書き込むと電球が消灯する場合があります。
+偶数の値を書いても影響はないとします。
+この場合、CSRの値だけでは判断できないため、読み出しと書き込みの両方に、
+電球が点灯するかどうかを制御する副作用があります。
+(なお、CSRに奇数の値を書き込んで消灯し、読み出して点灯した後、
+再び同じ奇数の値を書き込むと、再び消灯してしまいます。
+つまり、最後の書き込みでは、CSRの値の変化ではなく、消灯してしまうのです)
+
+\begin{comment}
   On the other hand, if a bulb is rigged to light whenever the value
   of a particular CSR is odd, then turning the light on and off is not
   considered a side effect of writing to the CSR but merely an indirect
   effect of such writes.
+\end{comment}
 
+一方、特定のCSRの値が奇数になると電球が点灯するように仕組まれている場合、電球の点灯・消灯は、CSRへの書き込みによる副作用ではなく、単なる間接効果と考えられます。
+
+\begin{comment}
   More concretely, the RISC-V privileged architecture defined in
   Volume~II specifies that certain combinations of CSR values cause a
   trap to occur.
   When an explicit write to a CSR creates the conditions that trigger the
   trap, the trap is not considered a side effect of the write but merely
   an indirect effect.
+\end{comment}
 
+具体的には、第2巻のRISC-V特権アーキテクチャでは、CSRの値の組み合わせによってトラップが発生することが規定されています。
+CSRへの明示的な書き込みによってトラップが発生する条件が整った場合、
+トラップは書き込みの副作用ではなく、単なる間接効果とみなされます。
+
+\begin{comment}
   The CSRs defined so far in this volume
   do not have any architectural side effects on reads or writes.
   Custom extensions might add CSRs for which accesses have side effects.
+\end{comment}
+
+本編でこれまでに定義されたCSRは、読み書きに対してアーキテクチャ上の副作用はありません。
+カスタム拡張では、アクセスに副作用のあるCSRを追加することができます。
 \end{commentary}
 
+\begin{comment}
 Some CSRs, such as the instructions-retired counter, {\tt instret},
 may be modified as side effects of instruction execution.  In these
 cases, if a CSR access instruction reads a CSR, it reads the value
@@ -177,16 +287,34 @@ prior to the execution of the instruction.  If a CSR access
 instruction writes such a CSR, the write is done instead of the
 increment.  In particular, a value written to {\tt instret} by one
 instruction will be the value read by the following instruction.
+\end{comment}
 
+CSRの中には、命令実行の副作用で変更されてしまうものがあります(例：命令リタイアカウンタ, {\tt instret})。
+このような場合、CSRアクセス命令がCSRを読み込む場合は、命令の実行前に値を読み込みます。
+また、CSRアクセス命令がこのようなCSRを書き込む場合、
+インクリメントの代わりに書き込みが行われます。
+具体的には、ある命令で書き込まれた値は、次の命令で読み込まれた値となります。
+
+\begin{comment}
 The assembler pseudoinstruction to read a CSR, CSRR {\em rd, csr}, is
 encoded as CSRRS {\em rd, csr, x0}.  The assembler pseudoinstruction
 to write a CSR, CSRW {\em csr, rs1}, is encoded as CSRRW {\em x0, csr,
   rs1}, while CSRWI {\em csr, uimm}, is encoded as CSRRWI {\em x0,
   csr, uimm}.
+\end{comment}
 
+CSRを読み出すアセンブラの疑似命令 CSRR {\em rd, csr} は CSRRS {\em rd, csr, x0} としてエンコードされます。
+CSRW {\em csr, rs1}を書き込むアセンブラの擬似命令は、CSRRW {\em x0, csr, rs1}とエンコードされ、
+CSRWI {\em csr, uimm}は、CSRRWI {\em x0, csr, uimm}とエンコードされます。
+
+\begin{comment}
 Further assembler pseudoinstructions are defined to set and clear
 bits in the CSR when the old value is not required: CSRS/CSRC {\em
   csr, rs1}; CSRSI/CSRCI {\em csr, uimm}.
+\end{comment}
+
+さらに、古い値が不要な場合にCSRのビットをセットしたりクリアしたりするアセンブラ擬似命令が定義されています:
+CSRS/CSRC {\em csr, rs1}、CSRSI/CSRCI {\em csr, uimm} です。
 
 
 \subsection*{CSR Access Ordering}
