@@ -317,8 +317,11 @@ bits in the CSR when the old value is not required: CSRS/CSRC {\em
 CSRS/CSRC {\em csr, rs1}、CSRSI/CSRCI {\em csr, uimm} です。
 
 
+\begin{comment}
 \subsection*{CSR Access Ordering}
+\end{comment}
 
+\begin{comment}
 Each RISC-V hart normally observes its own CSR accesses, including its
 implicit CSR accesses, as performed in program order.
 In particular, unless specified otherwise, a CSR access is performed
@@ -330,7 +333,17 @@ Furthermore, an explicit CSR read returns the
 CSR state before the execution of the instruction, while an
 explict CSR write suppresses and overrides any implicit writes or
 modifications to the same CSR by the same instruction.
+\end{comment}
 
+各RISC-V hartは、プログラム順に実行される暗黙のCSRアクセスを含め、
+通常、自身のCSRアクセスを遵守します。
+特に指定のない限り、CSRアクセスは、プログラム順に、全て先行命令の実行後にCSRレジスタを修正するか、
+CSRアクセス命令の実行後に、後続命令が実行されます。
+さらに、明示的なCSRの読み出しは、その命令の実行前にCSRの状態を返し、
+一方、明示的なCSRの書き込みは、
+同じ命令による同じCSRへの暗黙の書き込みや変更を抑制し、上書きします。
+
+\begin{comment}
 Likewise, any side effects from an explicit CSR access are normally
 observed to occur synchronously in program order.
 Unless specified otherwise, the full consequences of any such side
@@ -338,7 +351,16 @@ effects are observable by the very next instruction, and no consequences
 may be observed out-of-order by preceding instructions.
 (Note the distinction made earlier between side effects and indirect
 effects of CSR writes.)
+\end{comment}
 
+同様に、明示的なCSRアクセスによる副作用は、
+通常、プログラム順に同期して発生します。
+特に指定のない限り、そのような副作用の完全な結果は、まさに次の命令によって観察可能であり、
+先行する命令によって順序外の結果が観察されることはありません。
+(前述のCSR書き込みの副作用と間接効果の区別に注意してください。)
+
+
+\begin{comment}
 For the RVWMO memory consistency model (Chapter~\ref{ch:memorymodel}),
 CSR accesses are weakly ordered by default,
 so other harts or devices may observe CSR accesses in an order
@@ -352,14 +374,35 @@ ordering in all other cases, software should execute a FENCE instruction
 between the relevant accesses. For the purposes of the FENCE instruction, CSR
 read accesses are classified as device input (I), and CSR write accesses are
 classified as device output (O).
+\end{comment}
+
+RVWMOのメモリ一貫性モデル(第~\ref{ch:memorymodel}章)では、
+CSRアクセスはデフォルトでWeakly順序になっていますので、
+他のhartやデバイスがプログラムの順序とは異なる順序でCSRアクセスを観測する可能性があります。
+また、CSR アクセスが明示的なメモリアクセスを実行する命令の実行動作を変更する場合や、
+CSR アクセスと明示的なメモリアクセスが、メモリモデルで定義された構文上の依存関係や、
+本マニュアル第 2巻の「メモリ順序付け PMA」セクションで定義された順序付け要件の
+いずれかによって順序付けられている場合を除き、CSR アクセスは明示的なメモリアクセスに対して順序付けられません。
+それ以外のケースで順序付けを行うために、ソフトウェアは関連するアクセスの間にFENCE命令を実行する必要があります。
+FENCE命令の目的上、CSRのリード・アクセスはデバイス・インプット(I)に分類され、
+CSRのライト・アクセスはデバイス・アウトプット(O)に分類されます。
+
 
 \begin{commentary}
+\begin{comment}
 Informally, the CSR space acts as a weakly ordered memory-mapped I/O region, as
 defined by the Memory-Ordering PMAs section in Volume II of this manual. As a
 result, the order of CSR accesses with respect to all other accesses is
 constrained by the same mechanisms that constrain the order of memory-mapped
 I/O accesses to such a region.
+\end{comment}
 
+非公式ながら、CSR空間は、本マニュアル第2巻の「メモリ順序付けPMA」のセクションで定義されているように、
+弱く順序付けられたメモリマップドI/O領域として機能します。
+その結果、他のすべてのアクセスに対するCSRアクセスの順序は、
+そのような領域へのメモリマップドI/Oアクセスの順序を制約するのと同じメカニズムによって制約されます。
+
+\begin{comment}
 These CSR-ordering constraints are imposed primarily to support ordering main
 memory and memory-mapped I/O accesses with respect to reads of the {\tt time}
 CSR.  With the exception of the {\tt time}, {\tt cycle}, and {\tt mcycle} CSRs,
@@ -369,16 +412,39 @@ to other harts or devices.  Thus, accesses to CSRs other than the
 aforementioned three can be freely reordered in the global memory order
 with respect to FENCE instructions
 without violating this specification.
+\end{comment}
+
+これらのCSR順序制約は、主に、メインメモリおよびメモリマップドI/Oアクセスを、
+CSRのリードに関する順序付けをサポートするために課されます。
+CSR  ただし、第1巻と第2巻で定義されたCSRのうち、
+{\\ time}、{\\ cycle}、{\t mcycle}の3つは例外です。
+本仕様書の第1巻および第2巻でこれまでに定義されたCSRは、
+他のハードウェアやデバイスから直接アクセスされることはなく、
+他のハードウェアやデバイスから見える副作用も発生しません。 
+したがって、前述の3つのCSR以外のCSRへのアクセスは、
+本仕様に違反することなく、FENCE命令に対するグローバルメモリの順序を自由に変更することができます。
 \end{commentary}
 
+\begin{comment}
 The hardware platform may define that accesses to certain CSRs are
 strongly ordered, as defined by the Memory-Ordering PMAs section in Volume II
 of this manual. Accesses to strongly ordered CSRs have stronger ordering
 constraints with respect to accesses to both weakly ordered CSRs and accesses
 to memory-mapped I/O regions.
+\end{comment}
+
+ハードウェアプラットフォームでは、本マニュアル第2巻の「メモリ順序付けPMA」のセクションで定義されているように、
+特定のCSRへのアクセスが強く順序付けられていることがあります。
+強い順序のCSRへのアクセスは、弱い順序のCSRへのアクセスや、
+メモリマップされたI/O領域へのアクセスと比較して、より強い順序制約を持ちます。
 
 \begin{commentary}
+\begin{comment}
 The rules for the reordering of CSR accesses in the global memory order
 should probably be moved to Chapter~\ref{ch:memorymodel} concerning the
 RVWMO memory consistency model.
+\end{comment}
+
+CSRアクセスのグローバルメモリ内での順序変更に関するルールは、
+RVWMOのメモリ一貫性モデルに関する第~\ref{ch:memorymodel}章に移すべきでしょう。
 \end{commentary}
