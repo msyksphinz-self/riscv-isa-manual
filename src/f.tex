@@ -1,16 +1,29 @@
+\begin{comment}
 \chapter{``F'' Standard Extension for Single-Precision Floating-Point,
 Version 2.2}
+\end{comment}
+\chapter{単精度浮動小数点のための``F'' 標準拡張}
 \label{sec:single-float}
 
+\begin{comment}
 This chapter describes the standard instruction-set extension for
 single-precision floating-point, which is named ``F'' and adds
 single-precision floating-point computational instructions compliant
 with the IEEE 754-2008 arithmetic standard~\cite{ieee754-2008}.
 The F extension depends on the ``Zicsr'' extension for control
 and status register access.
+\end{comment}
 
+本章では，単精度浮動小数点用の標準的な命令セット拡張について説明します。
+この拡張は，IEEE 754-2008 算術規格に準拠した単精度浮動小数点演算命令を追加するもので、``F''と名付けられています。
+F拡張は、制御およびステータス・レジスタ・アクセスのために``Zicsr''拡張に依存しています。
+
+\begin{comment}
 \section{F Register State}
+\end{comment}
+\section{Fレジスタステート}
 
+\begin{comment}
 The F extension adds 32 floating-point registers, {\tt f0}--{\tt f31},
 each 32 bits wide, and a floating-point control and status register
 {\tt fcsr}, which contains the operating mode and exception status of the
@@ -22,6 +35,16 @@ instructions operate on values in the floating-point register file.
 Floating-point load and store instructions transfer floating-point
 values between registers and memory.  Instructions to transfer values
 to and from the integer register file are also provided.
+\end{comment}
+
+F拡張では、32ビット幅の浮動小数点レジスタ{\tt f0}--{\tt f31}と、
+浮動小数点ユニットの動作モードや例外処理の状態を示す浮動小数点コントロール・ステータス・レジスタ{\tt fcsr}が追加されます。
+この追加ステートは図~\ref{fprs}に示されています。 
+ここでは、RISC-V ISAの浮動小数点レジスタの幅を表すためにFLENという用語を使用し、
+F単精度浮動小数点拡張の場合はFLEN=32としています。 
+ほとんどの浮動小数点命令は、浮動小数点レジスタ・ファイルの値を操作します。
+浮動小数点のロードおよびストア命令は、レジスタとメモリの間で浮動小数点値を転送します。
+また、整数レジスタ・ファイルとの間で値を転送する命令も用意されています。
 
 \begin{figure}[htbp]
 {\footnotesize
@@ -68,11 +91,15 @@ to and from the integer register file are also provided.
 \end{tabular}
 \end{center}
 }
+\begin{comment}
 \caption{RISC-V standard F extension single-precision floating-point state.}
+\end{comment}
+\caption{RISC-V 標準F拡張単精度浮動小数点ステート}
 \label{fprs}
 \end{figure}
 
 \begin{commentary}
+\begin{comment}
 We considered a unified register file for both integer and
 floating-point values as this simplifies software register allocation
 and calling conventions, and reduces total user state.  However, a
@@ -84,16 +111,34 @@ floating-point encoding techniques.  Compiler support and calling
 conventions for split register file architectures are well understood,
 and using dirty bits on floating-point register file state can reduce
 context-switch overhead.
+\end{comment}
+我々は、整数値と浮動小数点値の両方に対応する統一されたレジスタファイルを検討しました。
+これは、ソフトウェア・レジスタの割り当てと呼び出し規則を簡素化し、ユーザー・ステートの総数を減らすことができるからです。 
+しかし、分割された構成の場合には、所定の命令幅でアクセス可能なレジスタの総数が増え、
+スーパースカラの広い問題に対して十分なレジスタファイルポートを提供することが容易になり、
+非結合浮動小数点ユニット・アーキテクチャをサポートし、内部浮動小数点エンコーディング技術の使用が容易になります。 
+分割レジスタファイル・アーキテクチャに対するコンパイラのサポートと呼び出し規約はよく理解されており、
+浮動小数点レジスタファイルの状態にダーティビットを使用することで、
+コンテキストスイッチのオーバーヘッドを削減することができます。
 \end{commentary}
 
 \clearpage
 
+\begin{comment}
 \section{Floating-Point Control and Status Register}
+\end{comment}
+\section{浮動小数点 制御・ステータスレジスタ}
 
+\begin{comment}
 The floating-point control and status register, {\tt fcsr}, is a RISC-V
 control and status register (CSR).  It is a 32-bit read/write register that
 selects the dynamic rounding mode for floating-point arithmetic operations and
 holds the accrued exception flags, as shown in Figure~\ref{fcsr}.
+\end{comment}
+
+浮動小数点制御・ステータスレジスタ{\tt fcsr}は、RISC-Vの制御・ステータスレジスタ(CSR)です。 
+32ビットのリード/ライトレジスタで、図~\ref{fcsr}のように、浮動小数点演算の動的丸め込みモードの選択や、
+発生した例外フラグを保持します。
 
 \begin{figure*}[h]
 {\footnotesize
@@ -124,10 +169,14 @@ holds the accrued exception flags, as shown in Figure~\ref{fcsr}.
 \end{center}
 }
 \vspace{-0.1in}
+\begin{comment}
 \caption{Floating-point control and status register.}
+\end{comment}
+\caption{浮動小数点制御・ステータスレジスタ}
 \label{fcsr}
 \end{figure*}
 
+\begin{comment}
 The {\tt fcsr} register can be read and written with the FRCSR and
 FSCSR instructions, which are assembler pseudoinstructions built on the
 underlying CSR access instructions.  FRCSR reads {\tt fcsr} by copying
@@ -135,7 +184,15 @@ it into integer register {\em rd}.  FSCSR swaps the value in {\tt
   fcsr} by copying the original value into integer register {\em rd},
 and then writing a new value obtained from integer register {\em rs1}
 into {\tt fcsr}.
+\end{comment}
 
+FRCSR、FSCSRは、CSRアクセス命令をベースにしたアセンブラの擬似命令で、
+レジスタの読み書きが可能です。 
+FRCSRは{\tt fcsr}を読みだして、整数レジスタ{\em rd}にコピーします。
+FSCSRは、{\tt fcsr}の値を、元の値を整数レジスタ{\em rd}にコピーし、
+整数レジスタ{\tt rs1}から得た新しい値を{\tt fcsr}に書き込むことでスワップします。
+
+\begin{comment}
 The fields within the {\tt fcsr} can also be accessed individually
 through different CSR addresses, and separate assembler pseudoinstructions are
 defined for these accesses.  The FRRM instruction reads the Rounding
@@ -146,13 +203,30 @@ integer register {\em rd}, and then writing a new value obtained from
 the three least-significant bits of integer register {\em rs1} into
 {\tt frm}.  FRFLAGS and FSFLAGS are defined analogously for the
 Accrued Exception Flags field {\tt fflags}.
+\end{comment}
 
+{\tt fcsr}内のフィールドは、それぞれ別のCSRアドレスでアクセスすることも可能で、
+そのためのアセンブラ疑似命令も別途定義されています。
+FRRM命令は、丸めモードフィールドの値を整数レジスタ{\tt frm}の最下位3ビットにコピーし、それ以外のビットは0にします。 
+FSRMは、{\tt frm}の値を整数レジスタ{\em rd}にコピーした後、
+整数レジスタ{\em rs1}の下位3ビットから得られる新しい値を{\tt frm}に書き込むことで、
+frmの値を交換します。 
+FRFLAGSとFSFLAGSは、同様に未処理の例外フラグフィールド{\tt fflags}に定義されています。
+
+\begin{comment}
 Bits 31--8 of the {\tt fcsr} are reserved for other standard extensions,
 including the ``L'' standard extension for decimal floating-point.  If
 these extensions are not present, implementations shall ignore writes to
 these bits and supply a zero value when read.  Standard software should
 preserve the contents of these bits.
+\end{comment}
 
+{\tt fcsr}の31--8ビットは、10進法の浮動小数点の拡張機能である``L''を含む、その他の標準的な拡張機能のために予約されています。 
+これらの拡張機能が存在しない場合、実装はこれらのビットへの書き込みを無視し、
+読み出し時にはゼロの値を提供しなければなりません。 
+標準的なソフトウェアでは、これらのビットの内容を保持する必要があります。
+
+\begin{comment}
 Floating-point operations use either a static rounding mode encoded in
 the instruction, or a dynamic rounding mode held in {\tt frm}.
 Rounding modes are encoded as shown in Table~\ref{rm}.  A value of 111
@@ -166,6 +240,17 @@ mathematically unaffected by the rounding mode; software should set their
 {\em rm} field to RNE (000) but implementations must treat the {\em rm}
 field as usual (in particular, with regard to decoding legal vs. reserved
 encodings).
+\end{comment}
+
+浮動小数点演算では、命令にエンコードされているスタティックな丸め込みモードと、
+{\tt frm}に保持されている動的な丸め込みモードのいずれかを使用します。
+丸めモードは、表~\ref{rm}に示すようにエンコードされます。 
+111を指定すると、動的丸め込みモードになります。 
+丸めモードに依存する浮動小数点演算命令が予約丸めモードで実行された場合の動作は、
+静的予約丸めモード(101--110)と動的予約丸めモード(101--111)の両方を含めて、
+{\em 予約済み}となります。 
+ソフトウェアはそれらのフィールドを RNE(000)に設定する必要がありますが、
+実装では通常どおり(特に、合法なエンコーディングと予約エンコーディングのデコードに関して)に扱わなければなりません。
 
 \begin{table}[htp]
 \begin{small}
@@ -214,7 +299,10 @@ encodings).
 \end{tabular}
 \end{center}
 \end{small}
+\begin{comment}
 \caption{Rounding mode encoding.}
+\end{comment}
+\caption{丸めモードのエンコーディング}
 \label{rm}
 \end{table}
 
