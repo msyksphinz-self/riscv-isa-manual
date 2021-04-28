@@ -1,28 +1,53 @@
+\begin{comment}
 \chapter{``D'' Standard Extension for Double-Precision Floating-Point,
 Version 2.2}
+\end{comment}
+\chapter{倍精度浮動小数点のための``D''拡張}
 
+\begin{comment}
 This chapter describes the standard double-precision floating-point
 instruction-set extension, which is named ``D'' and adds
 double-precision floating-point computational instructions compliant
 with the IEEE 754-2008 arithmetic standard.  The D extension depends on
 the base single-precision instruction subset F.
+\end{comment}
 
+本章では、標準倍精度浮動小数点演算命令セットの拡張機能について説明します。
+拡張機能は、IEEE 754-2008算術標準に準拠した倍精度浮動小数点演算命令を追加するもので、``D''と名付けられています。 
+D拡張は、ベースとなる単精度命令サブセットFに依存します。
+
+\begin{comment}
 \section{D Register State}
+\end{comment}
+\section{Dレジスタステート}
 
+\begin{comment}
 The D extension widens the 32 floating-point registers, {\tt f0}--{\tt
   f31}, to 64 bits (FLEN=64 in Figure~\ref{fprs}).  The {\tt f}
 registers can now hold either 32-bit or 64-bit floating-point values
 as described below in Section~\ref{nanboxing}.
+\end{comment}
+
+D拡張機能は、32本の浮動小数点レジスタ{\tt f0}--{\tt f31}を64ビットに拡張するものです(図~\ref{fprs}のFLEN=64)。 
+{\tt f}レジスタは以下の~\ref{nanboxing}節で説明する方式に基づいて32ビットまたは64ビットの浮動小数点値を保持することができます。
 
 \begin{commentary}
+\begin{comment}
 FLEN can be 32, 64, or 128 depending on which of the F, D, and Q
 extensions are supported.  There can be up to four different
 floating-point precisions supported, including H, F, D, and Q.
+\end{comment}
+FLENは、F、D、Qのどの拡張子がサポートされているかによって、32、64、128のいずれかになります。
+また、H、F、D、Qなど、最大4種類の浮動小数点精度がサポートされています。
 \end{commentary}
 
+\begin{comment}
 \section{NaN Boxing of Narrower Values}
+\end{comment}
+\section{小さな値のためのNan Boxing}
 \label{nanboxing}
 
+\begin{comment}
 When multiple floating-point precisions are supported, then valid
 values of narrower $n$-bit types, \mbox{$n<$ FLEN}, are represented in
 the lower $n$ bits of an FLEN-bit NaN value, in a process termed
@@ -32,8 +57,17 @@ Valid NaN-boxed $n$-bit values therefore appear as negative quiet NaNs
   FLEN}.  Any operation that writes a narrower result to an {\tt f}
 register must write all 1s to the uppermost FLEN$-n$ bits to yield a
 legal NaN-boxed value.
+\end{comment}
+
+複数の浮動小数点精度がサポートされている場合、より狭い$n$ビット・型の有効な値(\mbox{$n<$ FLEN})は、
+NaN-boxingと呼ばれる処理により、FLENビットのNaN値の下位$n$ビットで表現されます。 
+有効なNaNボックス化された値の上位ビットはすべて1でなければなりません。
+そのため、NaNボックス化された$n$ビットの有効な値は、より広い$m$ビットの値として見ると、負のquiet NaN(qNaN)として表示されます。 
+狭い範囲の結果をレジスタに書き込む操作では、最上位のFLEN$-n$ビットにすべて1を書き込まなければ、
+正当なNaNボックス化された値にはなりません。
 
 \begin{commentary}
+\begin{comment}
 Software might not know the current type of data stored in a
 floating-point register but has to be able to save and restore the
 register values, hence the result of using wider operations to
@@ -41,8 +75,15 @@ transfer narrower values has to be defined.  A common case is for
 callee-saved registers, but a standard convention is also desirable for
 features including varargs, user-level threading libraries, virtual
 machine migration, and debugging.
+\end{comment}
+ソフトウェアは、浮動小数点レジスタに保存されているデータの現在の型を知らないかもしれませんが、
+レジスタの値を保存および復元できなければなりません。
+したがって、狭い値を転送するために広い範囲の操作を使用した結果を定義する必要があります。 
+一般的なケースとしては、callee-savedレジスタが挙げられますが、varargs、ユーザ・レベルのスレッド・ライブラリ、
+仮想マシン・マイグレーション、デバッグなどの機能についても、標準的な規約が望まれます。
 \end{commentary}
 
+\begin{comment}
 Floating-point $n$-bit transfer operations move external values held
 in IEEE standard formats into and out of the {\tt f} registers, and
 comprise floating-point loads and stores (FL$n$/FS$n$) and
@@ -51,15 +92,29 @@ $n$-bit transfer, \mbox{$n<$ FLEN}, into the {\tt f} registers will create a
 valid NaN-boxed value.  A narrower $n$-bit transfer out of
 the floating-point registers will transfer the lower $n$ bits of the
 register ignoring the upper FLEN$-n$ bits.
+\end{comment}
 
+浮動小数点の$n$ビット転送は、IEEE規格のフォーマットで保持されている外部の値を{\tt f}レジスタに出し入れするもので、
+浮動小数点ロード・ストア(FL$n$/FS$n$)や浮動小数点移動命令(FMV.$n$.X/FMV.X.$n$)などがあります。 
+狭い範囲の$n$ビットを{\tt f}レジスタに転送すると、有効なNaNボックス化された値が生成されます。 
+また、浮動小数点レジスタからの転送では、下位$n$ビットが転送され上位FLEN$-n$ビットを無視されます。
+
+\begin{comment}
 Apart from transfer operations described in the previous paragraph,
 all other floating-point operations on narrower $n$-bit operations,
 \mbox{$n<$ FLEN}, check if the input operands are correctly NaN-boxed,
 i.e., all upper FLEN$-n$ bits are 1.  If so, the $n$ least-significant
 bits of the input are used as the input value, otherwise the input
 value is treated as an $n$-bit canonical NaN.
+\end{comment}
+
+前項の転送演算を除き、$n$ビットの狭義の浮動小数点演算である\mbox{$n<$ FLEN}では、
+入力オペランドが正しくNaNボックス化されているかどうか、つまりFLEN$-n$の上位ビットがすべて1であるかどうかによってチェックされます。
+そうであれば、入力の$n$ビットの最下位ビットが入力値として使用され、
+そうでなければ、入力値は$n$ビットのCanonical NaNとして扱われます。
 
 \begin{commentary}
+\begin{comment}
 Earlier versions of this document did not define the behavior of
 feeding the results of narrower or wider operands into an operation,
 except to require that wider saves and restores would preserve the
@@ -68,14 +123,31 @@ implementation-specific behavior, while still accommodating both
 non-recoded and recoded implementations of the floating-point unit.
 The new definition also helps catch software errors by propagating
 NaNs if values are used incorrectly.
+\end{comment}
 
+このドキュメントの以前のバージョンでは、幅の狭いオペランドまたは幅の広いオペランドの結果を演算に入力する動作は定義されていませんでしたが、
+幅の広い保存や復元では幅の狭いオペランドの値を保持することが求められていました。 
+新しい定義では、このような実装固有の動作が削除されていますが、
+浮動小数点演算ユニットの非コード化およびコード化された実装の両方に対応しています。
+また、新しい定義では、値が間違って使用された場合にNaNを伝播させることで、
+ソフトウェア・エラーを検出することができます。
+
+\begin{comment}
 Non-recoded implementations unpack and pack the operands to IEEE
 standard format on the input and output of every floating-point
 operation.  The NaN-boxing cost to a non-recoded implementation is
 primarily in checking if the upper bits of a narrower operation
 represent a legal NaN-boxed value, and in writing all 1s to the upper
 bits of a result.
+\end{comment}
 
+再コード化を行わない実装では、すべての浮動小数点演算の入力および出力において、
+オペランドをIEEE標準フォーマットにアンパックおよびパックします。 
+再コード化しない実装におけるNaNボックス化のコストは、
+主に、狭義の演算の上位ビットが合法的なNaNボックス化された値を表しているかどうかをチェックすることと、
+結果の上位ビットにすべての1を書き込むことにあります。
+
+\begin{comment}
 Recoded implementations use a more convenient internal format to
 represent floating-point values, with an added exponent bit to allow
 all values to be held normalized.  The cost to the recoded
@@ -89,6 +161,16 @@ subnormal values for wide operands in any case, and extracting the
 NaN-boxed value is a similar process to normalization except for
 skipping over leading-1 bits instead of skipping over leading-0 bits,
 allowing the datapath muxing to be shared.
+\end{comment}
+
+再コード化された実装では、浮動小数点値を表現するために、
+より便利な内部フォーマットを使用し、すべての値を正規化して保持できるように指数ビットを追加しています。 
+再コード化された実装にかかるコストは、主に内部の型と符号ビットを追跡するために必要な追加のタグ付けですが、
+これは指数フィールドでNaNを内部的に再コード化することで、新たなステートビットを追加することなく行うことができます。 
+再コード化されたフォーマットとの間で値を転送するためのパイプラインに若干の変更が必要ですが、
+データパスとレイテンシーのコストは最小限に抑えられます。 
+また、NaNボックス化された値の抽出は、先頭の0ビットをスキップする代わりに先頭の1ビットをスキップすることを除けば、
+正規化と同様のプロセスであり、データパスの多重化を共有することができます。
 \end{commentary}
 
 \section{Double-Precision Load and Store Instructions}
