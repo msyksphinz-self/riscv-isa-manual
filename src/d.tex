@@ -173,14 +173,26 @@ allowing the datapath muxing to be shared.
 正規化と同様のプロセスであり、データパスの多重化を共有することができます。
 \end{commentary}
 
+\begin{comment}
 \section{Double-Precision Load and Store Instructions}
+\end{comment}
+\section{倍精度ロードストア命令}
 \label{fld_fsd}
 
+\begin{comment}
 The FLD instruction loads a double-precision floating-point value from
 memory into floating-point register {\em rd}.  FSD stores a double-precision
 value from the floating-point registers to memory.
+\end{comment}
+
+FLD命令は，倍精度の浮動小数点値をメモリから浮動小数点レジスタにロードします。 
+FSD命令は、倍精度の値を浮動小数点レジスタからメモリに格納します。
+
 \begin{commentary}
+\begin{comment}
 The double-precision value may be a NaN-boxed single-precision value.
+\end{comment}
+倍精度の値はNaNボックス化された単精度の値になることがあります。
 \end{commentary}
 
 \vspace{-0.2in}
@@ -227,17 +239,31 @@ offset[11:5] & src & base & D & offset[4:0] & STORE-FP \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 FLD and FSD are only guaranteed to execute atomically if the effective address
 is naturally aligned and XLEN$\geq$64.
+\end{comment}
+FLDとFSD命令は実行アドレスがXLEN$\geq$64に自然にアラインされている場合にのみアトミックに実行されることが保証されています。
 
+\begin{comment}
 FLD and FSD do not modify the bits being transferred; in particular, the
 payloads of non-canonical NaNs are preserved.
+\end{comment}
+FLDとFSD命令は転送されるビットを変更しません; 特に、非CanonicalなNaNのペイロードは保持されます。
 
+\begin{comment}
 \section{Double-Precision Floating-Point Computational Instructions}
+\end{comment}
+\section{倍精度浮動小数点算術命令}
 
+\begin{comment}
 The double-precision floating-point computational instructions are
 defined analogously to their single-precision counterparts, but operate on
 double-precision operands and produce double-precision results.
+\end{comment}
+倍精度浮動小数点算術命令は単精度浮動小数点のものと同様に定義されていますが、
+倍精度のオペランドを操作し倍精度の結果を生成します。
+
 \vspace{-0.2in}
 \begin{center}
 \begin{tabular}{R@{}F@{}R@{}R@{}F@{}R@{}O}
@@ -291,8 +317,12 @@ src3 & D & src2 & src1 & RM  & dest & F[N]MADD/F[N]MSUB  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 \section{Double-Precision Floating-Point Conversion and Move Instructions}
+\end{comment}
+\section{倍精度浮動小数点変換・データ移動命令}
 
+\begin{comment}
 Floating-point-to-integer and integer-to-floating-point conversion
 instructions are encoded in the OP-FP major opcode space.
 FCVT.W.D or FCVT.L.D converts a double-precision floating-point number
@@ -308,10 +338,26 @@ For RV64, FCVT.W[U].D sign-extends the 32-bit result.
 FCVT.L[U].D and FCVT.D.L[U] are RV64-only instructions.
 The range of valid inputs for FCVT.{\em int}.D and
 the behavior for invalid inputs are the same as for FCVT.{\em int}.S.
+\end{comment}
+浮動小数点から整数、整数から浮動小数点への返還命令はOP-FPメジャーオペコード空間にエンコードされています。
+FCVT.W.DもしくはFCVT.L.Dは浮動小数点レジスタ{\em rs1}の倍精度浮動小数点値を
+符号付き32ビットまたは64ビットの整数に変換し、整数レジスタ{\em rd}に格納します。
+FCVT.D.WまたはFCVT.D.L命令は整数レジスタ{\em rs1}内の32ビットまたは64ビットの符号付き整数を
+倍精度の浮動小数点値に変換し{\em rd}に格納します。
+FCVT.WU.D、FCVT.LU.D, FCVT.D.WU, FCVT.D.LUのバリエーションは符号なし整数の値との
+変換を行います。
+RV64では、FCVT.W[U].D命令は32ビットの結果を符号拡張します。
+FCVT.L[U].DとFCVT.D.L[U]はRV64専用の命令です。
+FCVT.{\em int}.Dの有効な入力値の範囲と、無効な値を入力した場合の動作はFCVT.{\em int}.Sと同様です。
 
+\begin{comment}
 All floating-point to integer and integer to floating-point conversion
 instructions round according to the {\em rm} field.  Note FCVT.D.W[U] always
 produces an exact result and is unaffected by rounding mode.
+\end{comment}
+すべての浮動小数点数から整数への変換、整数から浮動小数点への変換命令は{\em rm}フィールドの値に
+基づいて丸めを行います。
+FCVT.D.W[U]は常に正確な変換を行い、結果は丸めモードに影響を受けないことに注意です。
 
 \vspace{-0.2in}
 \begin{center}
@@ -339,6 +385,7 @@ FCVT.D.{\em int} & D & W[U]/L[U] & src & RM  & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The double-precision to single-precision and single-precision to
 double-precision conversion instructions, FCVT.S.D and FCVT.D.S, are
 encoded in the OP-FP major opcode space and both the source and
@@ -346,6 +393,12 @@ destination are floating-point registers.  The {\em rs2} field
 encodes the datatype of the source, and the {\em fmt} field encodes
 the datatype of the destination.  FCVT.S.D rounds according to the
 RM field; FCVT.D.S will never round.
+\end{comment}
+倍精度から単精度、単精度から倍精度への変換命令であるFCVT.S.DとFCVT.D.S命令はOP-FPメジャーオペコード空間にエンコードされており、
+ソースレジスタと書き込みレジスタの両方が浮動小数点レジスタです。
+{\em rs2}フィールドはソースレジスタの型をエンコードしており、{\em fmt}フィールドは書き込みレジスタの
+型をエンコードしています。
+FCVT.S.DはRMフィールドに基づいて丸めを行います; FCVT.D.Sは丸め込みを行いません。
 
 \vspace{-0.2in}
 \begin{center}
@@ -373,9 +426,13 @@ FCVT.D.S & D & S & src & RM  & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Floating-point to floating-point sign-injection instructions, FSGNJ.D,
 FSGNJN.D, and FSGNJX.D are defined analogously to the single-precision
 sign-injection instruction.
+\end{comment}
+浮動小数点から浮動小数点への符号注入命令 FSGNJ.D、 FSGNJN.D, FSGNJX.D 命令は
+単精度の符号注入命令と同様に定義されています。
 
 \vspace{-0.2in}
 \begin{center}
@@ -402,6 +459,7 @@ FSGNJ & D & src2 & src1 & J[N]/JX & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 For XLEN$\geq$64 only, instructions are provided to move bit patterns
 between the floating-point and integer registers.  FMV.X.D moves the
 double-precision value in floating-point register {\em rs1} to a
@@ -409,9 +467,20 @@ representation in IEEE 754-2008 standard encoding in integer register
 {\em rd}.  FMV.D.X moves the double-precision value encoded in IEEE
 754-2008 standard encoding from the integer register {\em rs1} to the
 floating-point register {\em rd}.
+\end{comment}
 
+浮動小数点レジスタと整数レジスタのデータ転送命令では、XLEN$\geq$64専用命令が定義されています。
+FMV.X.DはIEEE 754-2008標準エンコーディングの浮動小数点レジスタ{\em rs1}の倍精度値を
+整数レジスタ{\em rd}に転送します。
+FMV.D.Xは整数レジスタ{\em rs1}のIEEE 754-2008標準エンコーディング形式の値を
+倍精度浮動小数点レジスタ{\em rd}に転送します。
+
+\begin{comment}
 FMV.X.D and FMV.D.X do not modify the bits being transferred; in particular, the
 payloads of non-canonical NaNs are preserved.
+\end{comment}
+
+FMV.X.DとFMV.D.Xはデータ転送中にビットを変更しません; 特に、非Canonical NaNのペイロードは保持されます。
 
 \vspace{-0.2in}
 \begin{center}
@@ -440,6 +509,7 @@ FMV.D.X & D & 0    & src  & 000  & dest & OP-FP  \\
 \end{center}
 
 \begin{commentary}
+\begin{comment}
   Early versions of the RISC-V ISA had additional instructions to
   allow RV32 systems to transfer between the upper and lower portions
   of a 64-bit floating-point register and an integer register.
@@ -452,20 +522,48 @@ FMV.D.X & D & 0    & src  & 000  & dest & OP-FP  \\
   int-float register moves, by having conversions and comparisons
   write results to the appropriate register file, so we expect the
   benefit of these instructions to be lower than for other ISAs.
+\end{comment}
 
+RISC-V ISAの初期バージョンでは、
+RV32システムが64ビット浮動小数点レジスタと整数レジスタの上部と下部の間で転送できるように、
+追加の命令がありました。
+しかし、これらの命令は、レジスタの一部を書き込むことができる唯一の命令であり、
+再コード化された浮動小数点やレジスタの名前を変更する実装では、
+パイプラインのリード・モディファイ・ライトのシーケンスが必要になり、複雑になります。 
+また、RV32やRV64で4倍精度を扱うようにスケールアップした場合も、
+このパターンを踏襲すると追加の命令が必要になります。 
+ISAは、変換や比較の結果を適切なレジスタファイルに書き込むことで、
+整数と浮動小数点の明示的なレジスタ移動の回数を減らすように定義されているため、
+これらの命令のメリットは他のISAに比べて低いと予想されます。
+
+\begin{comment}
   We note that for systems that implement a 64-bit floating-point unit
   including fused multiply-add support and 64-bit floating-point loads
   and stores, the marginal hardware cost of moving from a 32-bit to
   a 64-bit integer datapath is low, and a software ABI supporting 32-bit
   wide address-space and pointers can be used to avoid growth of
   static data and dynamic memory traffic.
+\end{comment}
+融合型乗算・加算のサポートや64ビット浮動小数点のロード・ストアを
+含む64ビット浮動小数点ユニットを実装したシステムでは、
+32ビットから64ビットの整数データパスに移行する際のハードウェアのマージンコストは低いことに留意し、
+また、32 ビット幅のアドレス空間とポインターをサポートするソフトウェアABI を使用することで、
+スタティック・データやダイナミック・メモリ・トラフィックの増加を防ぐことができます。
 \end{commentary}
 
+\begin{comment}
 \section{Double-Precision Floating-Point Compare Instructions}
+\end{comment}
+\section{倍精度浮動小数点比較命令}
 
+\begin{comment}
 The double-precision floating-point compare instructions are
 defined analogously to their single-precision counterparts, but operate on
 double-precision operands.
+\end{comment}
+
+倍精度浮動小数点比較命令は単精度浮動小数点のものと同様に定義されていますが、
+倍精度オペランドに対して実行されるところが異なります。
 
 \vspace{-0.2in}
 \begin{center}
@@ -492,11 +590,19 @@ FCMP & D & src2 & src1 & EQ/LT/LE & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 \section{Double-Precision Floating-Point Classify Instruction}
+\end{comment}
+\section{倍精度浮動小数点分類命令}
 
+\begin{comment}
 The double-precision floating-point classify instruction, FCLASS.D, is
 defined analogously to its single-precision counterpart, but operates on
 double-precision operands.
+\end{comment}
+
+倍精度浮動小数点分類命令 FCLASS.D は単精度浮動小数点の命令て同様に定義されていますが、
+倍精度オペランドに対して実行されるところが異なります。
 
 \vspace{-0.2in}
 \begin{center}
