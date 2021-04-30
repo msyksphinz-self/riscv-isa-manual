@@ -1,6 +1,10 @@
+\begin{comment}
 \chapter{``Q'' Standard Extension for Quad-Precision Floating-Point,
   Version 2.2}
+\end{comment}
+\chapter{4倍精度浮動小数点のための``Q''標準拡張, Version 2.2}
 
+\begin{comment}
 This chapter describes the Q standard extension for 128-bit quad-precision binary
 floating-point instructions compliant with the IEEE 754-2008
 arithmetic standard. The quad-precision binary
@@ -12,11 +16,25 @@ The NaN-boxing scheme described in Section~\ref{nanboxing} is now
 extended recursively to allow a single-precision value to be NaN-boxed
 inside a double-precision value which is itself NaN-boxed inside a
 quad-precision value.
+\end{comment}
 
+この章では，IEEE 754-2008 算術標準に準拠した128ビットの4倍精度バイナリ浮動小数点命令のQ規格拡張について説明します。
+浮動小数点レジスタは、単精度、倍精度、または4倍精度浮動小数点値(FLEN=128)のいずれかを保持できるように拡張されました。
+第~\ref{nanboxing}節で説明した NaN-boxing スキームが再帰的に拡張され、
+単精度値が倍精度値の中にNaNボックス化されるようになり、
+それが4倍精度値の中にNaNボックス化されるようになりました。
+
+\begin{comment}
 \section{Quad-Precision Load and Store Instructions}
+\end{comment}
+\section{4倍精度ロードストア命令}
 
+\begin{comment}
 New 128-bit variants of LOAD-FP and STORE-FP instructions are added,
 encoded with a new value for the funct3 width field.
+\end{comment}
+新しいLOAD-OFとSTORE-FP命令の128ビット向けのバリエーションが追加され、
+funct3 widthフィールドのための新しい値がエンコードされました。
 
 \vspace{-0.2in}
 \begin{center}
@@ -62,16 +80,28 @@ offset[11:5] & src & base & Q & offset[4:0] & STORE-FP \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 FLQ and FSQ are only guaranteed to execute atomically if the effective address
 is naturally aligned and XLEN=128.
+\end{comment}
+FLQとFSQは実行アドレスがXLEN=128に自然にアラインされている場合のみアトミックに実行されることが保証されます。
 
+\begin{comment}
 FLQ and FSQ do not modify the bits being transferred; in particular, the
 payloads of non-canonical NaNs are preserved.
+\end{comment}
+FLQとFSQ命令は転送されるデータを変更しません; 特に、ペイロードの非Canonical NaNは保持されます。
 
+\begin{comment}
 \section{Quad-Precision Computational Instructions}
+\end{comment}
+\section{4倍精度計算命令}
 
+\begin{comment}
 A new supported format is added to the format field of most
 instructions, as shown in Table~\ref{tab:fpextfmt}.
+\end{comment}
+殆どの命令について、表~\ref{tab:fpextfmt}に示すようなフォーマットフィールドが追加されました。
 
 \begin{table}[htp]
 \begin{center}
@@ -92,9 +122,13 @@ Meaning \\
 \label{tab:fpextfmt}
 \end{table}
 
+\begin{comment}
 The quad-precision floating-point computational instructions are
 defined analogously to their double-precision counterparts, but operate on
 quad-precision operands and produce quad-precision results.
+\end{comment}
+4倍精度の浮動小数点算術命令は倍精度浮動小数点算術命令と同様に定義されていますが、
+4倍精度のオペランドを取り、4倍精度の結果を出力するところが異なります。
 
 \vspace{-0.2in}
 \begin{center}
@@ -149,8 +183,12 @@ src3 & Q & src2 & src1 & RM  & dest & F[N]MADD/F[N]MSUB  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 \section{Quad-Precision Convert and Move Instructions}
+\end{comment}
+\section{4倍精度変換・データ移動命令}
 
+\begin{comment}
 New floating-point-to-integer and integer-to-floating-point conversion
 instructions are added.  These instructions are defined analogously to the
 double-precision-to-integer and integer-to-double-precision conversion
@@ -160,6 +198,13 @@ FCVT.Q.L converts a 32-bit or 64-bit signed integer, respectively, into a
 quad-precision floating-point number. FCVT.WU.Q, FCVT.LU.Q, FCVT.Q.WU, and
 FCVT.Q.LU variants convert to or from unsigned integer values.  FCVT.L[U].Q and
 FCVT.Q.L[U] are RV64-only instructions.
+\end{comment}
+浮動小数点から整数、整数から浮動小数点への変換命令が追加されています。
+これらの命令は倍精度浮動小数点から整数、整数から倍精度浮動小数点数への変換命令と同様に定義されています。
+FCVT.W.QとFCVT.L.Qは4倍精度浮動小数点数を32ビットもしくは64ビットの整数にそれぞれ変換します。
+FCVT.Q.WとFCVT.Q.L命令は32ビット、64ビットの符号付き整数を4倍精度浮動小数点数に変換します。
+FCVT.WU.Q, FCVT.LU.Q, FCVT.Q.WU, FCVT.Q.LUのバリエーションはそれぞれ符号なし整数を対象として変換を行います。
+FCVT.L[U].QとFCVT.Q.L[U]はRV64の専用命令です。
 
 \vspace{-0.2in}
 \begin{center}
@@ -187,6 +232,7 @@ FCVT.Q.{\em int} & Q & W[U]/L[U] & src & RM  & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 New floating-point-to-floating-point conversion instructions are added.  These
 instructions are defined analogously to the double-precision floating-point-to-floating-point
 conversion instructions.  FCVT.S.Q or FCVT.Q.S converts a quad-precision
@@ -194,6 +240,11 @@ floating-point number to a single-precision floating-point number, or
 vice-versa, respectively.  FCVT.D.Q or FCVT.Q.D converts a quad-precision
 floating-point number to a double-precision floating-point number, or
 vice-versa, respectively.
+\end{comment}
+新たな浮動小数点数同士の変換命令が定義されています。
+これらの命令は倍精度浮動小数点と単精度浮動小数点同士の変換命令と同様に定義されています。
+FCVT.S.QとFCVT.Q.S命令はそれぞれ4倍精度浮動小数点数を単精度浮動小数点数への変換命令と、その逆です。
+FCVT.D.QとFCVT.Q.Dは4倍精度浮動小数点数を倍精度浮動小数点数への変換命令と、その逆です。
 
 \vspace{-0.2in}
 \begin{center}
@@ -223,9 +274,13 @@ FCVT.Q.D & Q & D & src & RM  & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Floating-point to floating-point sign-injection instructions, FSGNJ.Q,
 FSGNJN.Q, and FSGNJX.Q are defined analogously to the double-precision
 sign-injection instruction.
+\end{comment}
+浮動小数点から浮動小数点への符号注入命令 FSGNJ.Q, FSGNJN.Q, FSGNJX.Q命令は、
+倍精度の符号注入命令と同様に定義されています。
 
 \vspace{-0.2in}
 \begin{center}
@@ -252,19 +307,33 @@ FSGNJ & Q & src2 & src1 & J[N]/JX & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 FMV.X.Q and FMV.Q.X instructions are not provided in RV32 or RV64, so
 quad-precision bit patterns must be moved to the integer registers via
 memory.
+\end{comment}
+FMV.X.QとFMV.Q.X命令はRV32、RV64では提供されていません。
+したがって4倍精度のビットパタンはメモリを介して整数レジスタに移動する必要があります。
 
 \begin{commentary}
+\begin{comment}
 RV128 will support FMV.X.Q and FMV.Q.X in the Q extension.
+\end{comment}
+RV128ではFMV.X.QとFMV.Q.X命令をQ拡張にてサポートする予定です。
 \end{commentary}
 
+\begin{comment}
 \section{Quad-Precision Floating-Point Compare Instructions}
+\end{comment}
+\section{4倍精度浮動小数点比較命令}
 
+\begin{comment}
 The quad-precision floating-point compare instructions are
 defined analogously to their double-precision counterparts, but operate on
 quad-precision operands.
+\end{comment}
+4倍精度浮動小数点比較命令は倍精度の命令と同様に定義されていますが、
+オペランドが4倍精度であることが異なります。
 
 \vspace{-0.2in}
 \begin{center}
@@ -291,11 +360,18 @@ FCMP & Q & src2 & src1 & EQ/LT/LE & dest & OP-FP  \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 \section{Quad-Precision Floating-Point Classify Instruction}
+\end{comment}
+\section{4倍精度浮動小数点分類命令}
 
+\begin{comment}
 The quad-precision floating-point classify instruction, FCLASS.Q, is
 defined analogously to its double-precision counterpart, but operates on
 quad-precision operands.
+\end{comment}
+4倍精度浮動小数点分類命令 FCLASS.Qは倍精度の命令と同様に定義されていますが、
+オペランドが4倍精度であることが異なります。
 
 \vspace{-0.2in}
 \begin{center}
