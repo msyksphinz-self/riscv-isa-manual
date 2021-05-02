@@ -222,15 +222,40 @@ RVWMOモデル自体は、将来の拡張でISAに上記のいずれかまたは
 前方互換性があるように設計されています。
 \end{commentary}
 
+
+\begin{comment}
 \subsection*{Syntactic Dependencies}
+\end{comment}
+\subsection*{文法的依存}
+\begin{commentary}
+訳者注：文法学者ではないのでこの翻訳には自信がない。見直しの必要がある。
+\end{commentary}
 \label{sec:memorymodel:dependencies}
+
+\begin{comment}
 The definition of the RVWMO memory model depends in part on the notion of a syntactic dependency, defined as follows.
+\end{comment}
 
+RVWMOのメモリモデルの定義は、次のように定義される文法上の依存関係の概念に一部依存しています。
+
+\begin{comment}
 In the context of defining dependencies, a ``register'' refers either to an entire general-purpose register, some portion of a CSR, or an entire CSR.  The granularity at which dependencies are tracked through CSRs is specific to each CSR and is defined in Section~\ref{sec:csr-granularity}.
+\end{comment}
 
+依存関係を定義する上で、``レジスタ''とは、汎用レジスタ全体、CSRの一部、またはCSR全体を指します。 
+CSRを通じて依存関係を追跡する粒度は、各CSR に固有のものであり、
+第~\ref{sec:csr-granularity}節で定義されています。
+
+\begin{comment}
 Syntactic dependencies are defined in terms of instructions' {\em source registers}, instructions' {\em destination registers}, and the way instructions {\em carry a dependency} from their source registers to their destination registers.
 This section provides a general definition of all of these terms; however, Section~\ref{sec:source-dest-regs} provides a complete listing of the specifics for each instruction.
+\end{comment}	う
+文法依存性は、命令のソースレジスタ、書き込みレジスタ、
+およびソースレジスタから書き込みレジスタへの依存関係の伝達方法の観点から定義されます。
+この節では、これらの用語の一般的な定義を示していますが、
+各命令の詳細については、~\ref{sec:source-dest-regs}節に記載されています。
 
+\begin{comment}
 In general, a register $r$ other than {\tt x0} is a {\em source register} for an instruction $i$ if any of the following hold:
 \begin{itemize}
   \item In the opcode of $i$, {\em rs1}, {\em rs2}, or {\em rs3} is set to $r$
@@ -239,7 +264,19 @@ In general, a register $r$ other than {\tt x0} is a {\em source register} for an
   \item $r$ is a CSR that aliases with another source register for $i$
 \end{itemize}
 Memory instructions also further specify which source registers are {\em address source registers} and which are {\em data source registers}.
+\end{comment}
 
+一般的には、以下のいずれかが成立する場合、$r$のうち{\tt x0}以外のレジスタは、$i$の命令のための{\em ソースレジスタ}となります。
+\begin{itemize}
+  \item $i$のオペコードにおいて、{\em rs1}、{\em rs2}または{\em rs3}が$r$に設定されている
+  \item $i$がCSRRWまたはCSRRWIであり、かつ、{\em rd}が{\tt x0}である場合を除く
+  \item $r$はCSRであり、かつ、~\ref{sec:source-dest-regs}節で定義された$i$の暗黙のソースレジスタとなっている。
+  \item $r$は、$i$の別のソースレジスタをエイリアスするCSRの場合
+\end{itemize}
+また、メモリ命令では、どのソースレジスタが{\em アドレスソースレジスタ}であり、どのソースレジスタが{\em データソースレジスタ}であるかを指定します。
+
+
+\begin{comment}
 In general, a register $r$ other than {\tt x0} is a {\em destination register} for an instruction $i$ if any of the following hold:
 \begin{itemize}
   \item In the opcode of $i$, {\em rd} is set to $r$
@@ -247,10 +284,25 @@ In general, a register $r$ other than {\tt x0} is a {\em destination register} f
   \item $r$ is a CSR and an implicit destination register for $i$, as defined in Section~\ref{sec:source-dest-regs}
   \item $r$ is a CSR that aliases with another destination register for $i$
 \end{itemize}
+\end{comment}
 
+一般に、次のいずれかが成立する場合、$r$のうち、{\tt x0}以外のレジスタは、命令$i$の{\em 書き込みレジスタ}となります。
+\begin{itemize}
+  \item $i$のオペコードで、{\em rd}に$r$に設定されている場合
+  \item $i$がCSR命令でかつ$i$の{\em csr}が$r$に設定されている場合、CSRRSまたはCSRRCである場合。ただし$i$がCSRRSもしくはCSRRCであり{\em rs1}に{\tt x0}が設定されているか、$i$がCSRRSIもしくはCSRRCIでありuimm[4:0]にゼロが設定されている場合はその限りではない
+  \item $r$はCSRであり、\ref{sec:source-dest-regs}節に定義するように$i$の暗黙の書き込みレジスタであることを示している場合
+  \item $r$はCSRであり、$i$の別書き込みレジスタとエイリアスとなっている場合
+\end{itemize}
+
+\begin{comment}
 Most non-memory instructions {\em carry a dependency} from each of their source registers to each of their destination registers.
 However, there are exceptions to this rule; see Section~\ref{sec:source-dest-regs}
+\end{comment}
 
+ほとんどの非メモリ命令は、ソースレジスタから書き込みレジスタへの依存関係を持っています。
+ただし、このルールには例外があり、~\ref{sec:source-dest-regs}節を参照してください。
+
+\begin{comment}
 Instruction $j$ has a {\em syntactic dependency} on instruction $i$ via destination register $s$ of $i$ and source register $r$ of $j$ if either of the following hold:
 \begin{itemize}
   \item $s$ is the same as $r$, and no instruction program-ordered between $i$ and $j$ has $r$ as a destination register
@@ -261,17 +313,52 @@ Instruction $j$ has a {\em syntactic dependency} on instruction $i$ via destinat
       \item $m$ carries a dependency from $p$ to $q$
     \end{enumerate}
 \end{itemize}
+\end{comment}
 
+命令$j$は、$i$書き込みレジスタ$s$と$j$のソースレジスター$r$を介して、命令$i$との間に以下のいずれかの条件が成立する場合には、$i$との間に{\em 文法依存関係}があるとなります。
+\begin{itemize}
+  \item $s$と$r$が同じで、$i$と$j$の間に$r$を書き込みレジスタとする命令がプログラム順に配置されていない
+  \item $i$と$j$の間にプログラムオーダーされた$m$命令があり、以下のすべてが成立する
+  \begin{enumerate}
+    \item $j$は、$m$に対して、書き込みレジスタ$q$とソースレジスタ$r$を介して、文法上の依存関係を持つ
+    \item $m$は、$i$に対して、書き込みレジスタ$s$、ソースレジスタ$p$を介して、文法上の依存関係を持つ
+    \item $m$は、$p$から$q$への依存関係を有する
+  \end{enumerate}
+\end{itemize}
+
+\begin{comment}
 Finally, in the definitions that follow, let $a$ and $b$ be two memory operations, and let $i$ and $j$ be the instructions that generate $a$ and $b$, respectively.
+\end{comment}
 
+最後に、以下の定義において、$a$と$b$を2つのメモリ操作とし、$i$と$j$をそれぞれ$a$と$b$を生成する命令とします。
+
+\begin{comment}
 $b$ has a {\em syntactic address dependency} on $a$ if $r$ is an address source register for $j$ and $j$ has a syntactic dependency on $i$ via source register $r$
+\end{comment}
 
+$b$は、$r$が$j$のアドレスソースレジスタであり、$j$がソースレジスタ$r$を介して$i$に文法上依存性を持つ場合、$a$に対して{em 文法上アドレス依存性}を持つ。
+
+\begin{comment}
 $b$ has a {\em syntactic data dependency} on $a$ if $b$ is a store operation, $r$ is a data source register for $j$, and $j$ has a syntactic dependency on $i$ via source register $r$
+\end{comment}
 
+$b$がストア操作であり、$r$が$j$のデータソースレジスタであり、$j$がソースレジスタ$r$を介して$i$に文法上依存関係を持つ場合、$b$は$a$に対して{\em 文法上データ依存性}を持つことになります。
+
+\begin{comment}
 $b$ has a {\em syntactic control dependency} on $a$ if there is an instruction $m$ program-ordered between $i$ and $j$ such that $m$ is a branch or indirect jump and $m$ has a syntactic dependency on $i$.
+\end{comment}
+
+$b$は、$i$と$j$の間に、$m$が分岐または間接ジャンプであり、$m$が$i$に構文上の依存性を持つようなプログラム順序の命令$m$がある場合、$a$に{\em 文法上制御依存}を持つ。
 
 \begin{commentary}
+\begin{comment}
   Generally speaking, non-AMO load instructions do not have data source registers, and unconditional non-AMO store instructions do not have destination registers.  However, a successful SC instruction is considered to have the register specified in {\em rd} as a destination register, and hence it is possible for an instruction to have a syntactic dependency on a successful SC instruction that precedes it in program order.
+\end{comment}
+
+  一般的に、AMOではないロード命令はデータソースレジスタを持たず、
+無条件のAMOではないストア命令はデスティネーションレジスタを持ちません。 
+しかし、成功したSC命令は、{\em rd}で指定されたレジスタを書き込みレジスタとして持っているとみなされるため、
+ある命令が、プログラム順に先行する成功したSC命令に構文上の依存性を持つことは可能です。
 \end{commentary}
 
 \subsection*{Preserved Program Order}
