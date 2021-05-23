@@ -48,9 +48,9 @@ The appendices to this specification provide both axiomatic and operational form
 \begin{comment}
   This chapter defines the memory model for regular main memory operations.  The interaction of the memory model with I/O memory, instruction fetches, FENCE.I, page table walks, and SFENCE.VMA is not (yet) formalized.  Some or all of the above may be formalized in a future revision of this specification.  The RV128 base ISA and future ISA extensions such as the ``V'' vector, ``T'' transactional memory, and ``J'' JIT extensions will need to be incorporated into a future revision as well.
 \end{comment}
-  この章では、通常のメインメモリ操作のためのメモリモデルを定義します。 
-メモリモデルとI/Oメモリ、命令フェッチ、FENCE.I、ページテーブルウォーク、SFENCE.VMAとの相互作用は(まだ)公式化されていません。 
-この仕様の将来の改訂では、上記の一部またはすべてが正式に定義されるかもしれません。 
+  この章では、通常のメインメモリ操作のためのメモリモデルを定義します。
+メモリモデルとI/Oメモリ、命令フェッチ、FENCE.I、ページテーブルウォーク、SFENCE.VMAとの相互作用は(まだ)公式化されていません。
+この仕様の将来の改訂では、上記の一部またはすべてが正式に定義されるかもしれません。
 RV128の基本ISAと、将来のISA拡張である``V''ベクトル、``T''トランザクションメモリ、``J''JIT拡張を組み込む必要があります。
 JITエクステンションなど、将来のISA拡張機能についても、将来の改訂版に盛り込む必要があります。
 
@@ -58,7 +58,7 @@ JITエクステンションなど、将来のISA拡張機能についても、�
   Memory consistency models supporting overlapping memory accesses of different widths simultaneously remain an active area of academic research and are not yet fully understood.  The specifics of how memory accesses of different sizes interact under RVWMO are specified to the best of our current abilities, but they are subject to revision should new issues be uncovered.
 \end{comment}
   異なる幅のメモリアクセスが同時にオーバーラップすることをサポートするメモリコンシステンシモデルは、
-学術的にも活発な研究分野であり、まだ完全には解明されていません。 
+学術的にも活発な研究分野であり、まだ完全には解明されていません。
 ここでは、RVWMOの下で異なるサイズのメモリアクセスがどのように相互作用するかについて、
 現時点で可能な限り具体的に説明していますが、
 新たな問題が明らかになった場合には修正することがあります。
@@ -134,7 +134,7 @@ RV32GCとRV64GCの命令のうち、各アラインドメモリ命令は、2つ�
   Instructions in the RV128 base instruction set and in future ISA extensions such as V (vector) and P (SIMD) may give rise to multiple memory operations.  However, the memory model for these extensions has not yet been formalized.
 \end{comment}
   RV128の基本命令セットに含まれる命令や、V(ベクトル)やP(SIMD)といった将来のISA拡張に含まれる命令は、
-複数のメモリ操作を引き起こす可能性があります。 
+複数のメモリ操作を引き起こす可能性があります。
 しかし、これらの拡張のためのメモリモデルはまだ正式なものではありません。
 \end{commentary}
 
@@ -215,7 +215,7 @@ Preserved Program Order rules\ref{ppo:acquire}--\ref{ppo:rcsc}によって簡潔
   ``RCpc'' annotations are currently only used when implicitly assigned to every memory access per the standard extension ``Ztso'' (Chapter~\ref{sec:ztso}).  Furthermore, although the ISA does not currently contain native load-acquire or store-release instructions, nor RCpc variants thereof, the RVWMO model itself is designed to be forwards-compatible with the potential addition of any or all of the above into the ISA in a future extension.
 \end{comment}
   現在、``RCpc''アノテーションは、標準的な拡張機能である''Ztso''(第~\ref{sec:ztso})により、
-すべてのメモリアクセスに暗黙的に割り当てられた場合にのみ使用されます。 
+すべてのメモリアクセスに暗黙的に割り当てられた場合にのみ使用されます。
 さらに、ISAには現在、ネイティブのロード・アクワイア命令やストア・リリース命令、
 およびそれらのRCpcバリエーションは含まれていませんが、
 RVWMOモデル自体は、将来の拡張でISAに上記のいずれかまたはすべての命令が追加される可能性があることを考慮して、
@@ -242,7 +242,7 @@ RVWMOのメモリモデルの定義は、次のように定義される文法上
 In the context of defining dependencies, a ``register'' refers either to an entire general-purpose register, some portion of a CSR, or an entire CSR.  The granularity at which dependencies are tracked through CSRs is specific to each CSR and is defined in Section~\ref{sec:csr-granularity}.
 \end{comment}
 
-依存関係を定義する上で、``レジスタ''とは、汎用レジスタ全体、CSRの一部、またはCSR全体を指します。 
+依存関係を定義する上で、``レジスタ''とは、汎用レジスタ全体、CSRの一部、またはCSR全体を指します。
 CSRを通じて依存関係を追跡する粒度は、各CSR に固有のものであり、
 第~\ref{sec:csr-granularity}節で定義されています。
 
@@ -356,15 +356,24 @@ $b$は、$i$と$j$の間に、$m$が分岐または間接ジャンプであり�
 \end{comment}
 
   一般的に、AMOではないロード命令はデータソースレジスタを持たず、
-無条件のAMOではないストア命令はデスティネーションレジスタを持ちません。 
+無条件のAMOではないストア命令はデスティネーションレジスタを持ちません。
 しかし、成功したSC命令は、{\em rd}で指定されたレジスタを書き込みレジスタとして持っているとみなされるため、
 ある命令が、プログラム順に先行する成功したSC命令に構文上の依存性を持つことは可能です。
 \end{commentary}
 
+\begin{comment}
 \subsection*{Preserved Program Order}
+\end{comment}
+\subsection*{保持されるプログラム順序}
+\begin{comment}
 The global memory order for any given execution of a program respects some but not all of each hart's program order.
 The subset of program order that must be respected by the global memory order is known as {\em preserved program order}.
+\end{comment}
 
+プログラムの任意の実行に対するグローバルメモリアクセスの順序は、各hartのプログラム順序の一部を尊重しますが、すべてを尊重するわけではありません。
+このように、グローバルメモリ順序が尊重しなければならないプログラム順序のサブセットを{\em 保持されるプログラム順序}と呼びます。
+
+\begin{comment}
 \newcommand{\ppost}{$b$ is a store, and $a$ and $b$ access overlapping memory addresses}
 \newcommand{\ppofence}{There is a FENCE instruction that orders $a$ before $b$}
 \newcommand{\ppoacquire}{$a$ has an acquire annotation}
@@ -380,9 +389,31 @@ The subset of program order that must be respected by the global memory order is
 \newcommand{\ppoaddrpo}{$b$ is a store, and there exists some instruction $m$ between $a$ and $b$ in program order such that $m$ has an address dependency on $a$}
 %\newcommand{\ppoctrlcfence}{$a$ and $b$ are loads, $b$ has a syntactic control dependency on $a$, and there exists a {\tt fence.i} between the branch used to form the control dependency and $b$ in program order}
 %\newcommand{\ppoaddrpocfence}{$a$ is a load, there exists an instruction $m$ which has a syntactic address dependency on $a$, and there exists a {\tt fence.i} between $m$ and $b$ in program order}
+\end{comment}
 
+\newcommand{\ppost}{$b$がストアで$a$と$b$のアクセスメモリアドレスがオーバーラップしている場合}
+\newcommand{\ppofence}{$a$のプログラムの順序づけるためのFENCE命令が$b$の前に置かれている場合}
+\newcommand{\ppoacquire}{$a$にacquireアノテーションがついている場合}
+\newcommand{\pporelease}{$b$にreleaseアノテーションがついている場合}
+\newcommand{\pporcsc}{$a$と$b$のどちらにもRCscアノテーションがついている場合}
+\newcommand{\ppoamoforward}{$a$はAMOもしくはSCにより生成されたものであり、$b$がロードの場合、$b$は$a$によって書き込まれたものが読み込まれる}
+\newcommand{\ppoaddr}{$b$は$a$に対して文法的依存性がある場合}
+\newcommand{\ppodata}{$b$は$a$に対して文法的データ依存性がある場合}
+\newcommand{\ppoctrl}{$b$はストアで、$b$は$a$に対して文法的制御依存性がある場合}
+\newcommand{\ppopair}{$a$は$b$とペアである}
+\newcommand{\ppordw}{$a$と$b$がロードであり、$x$は$a$と$b$の両方のバイトを読み、$x$と$a$と$b$のプログラム順の間にストアが存在せず、$a$と$b$は異なるメモリ操作の値$x$を読み出す}
+\newcommand{\ppoaddrdatarfi}{$b$はロードであり、プログラム順に$a$と$b$の間に、$m$が$a$にアドレスまたはデータを依存依存性が存在し、$b$が$m$によって書き込まれた値を返すようなストア$m$が存在する。}
+\newcommand{\ppoaddrpo}{$b$はストアであり、プログラム順に$a$と$b$の間に$m$という命令が存在し、$m$が$a$にアドレス依存性が存在している。}
+%\newcommand{\ppoctrlcfence}{$a$ and $b$ are loads, $b$ has a syntactic control dependency on $a$, and there exists a {\tt fence.i} between the branch used to form the control dependency and $b$ in program order}
+%\newcommand{\ppoaddrpocfence}{$a$ is a load, there exists an instruction $m$ which has a syntactic address dependency on $a$, and there exists a {\tt fence.i} between $m$ and $b$ in program order}
+
+\begin{comment}
 The complete definition of preserved program order is as follows (and note that AMOs are simultaneously both loads and stores):
 memory operation $a$ precedes memory operation $b$ in preserved program order (and hence also in the global memory order) if $a$ precedes $b$ in program order, $a$ and $b$ both access regular main memory (rather than I/O regions), and any of the following hold:
+\end{comment}
+保持されるプログラム順序の完全な定義は以下のとおりである(なお、AMOはロードとストアの両方を同時に行うものであることに注意):
+$a$が$b$に先行し、$a$と$b$がともに(I/O領域ではなく)通常のメインメモリにアクセスし、かつ以下のいずれかが成立する場合、
+保存されたプログラム順序（したがってグローバルメモリ順序）では、メモリ操作$a$がメモリ操作$b$に先行する。
 
 \begin{itemize}
   \item Overlapping-Address Orderings:
@@ -414,10 +445,18 @@ memory operation $a$ precedes memory operation $b$ in preserved program order (a
     \end{enumerate}
 \end{itemize}
 
+\begin{comment}
 \subsection*{Memory Model Axioms}
-
+\end{comment}
+\subsection*{メモリモデルの公理}
+\begin{comment}
 An execution of a RISC-V program obeys the RVWMO memory consistency model only if there exists a global memory order conforming to preserved program order and satisfying the {\em load value axiom}, the {\em atomicity axiom}, and the {\em progress axiom}.
+\end{comment}
+RISC-Vプログラムの実行がRVWMOのメモリコンシステンシモデルに準拠するのは、保持されたプログラムの順序に適合し、
+かつ、RVWMOのメモリ順序のうち、{\em ロード値の公理}、{\em アトミック性の公理}、{\em プログレスの公理} を
+満足するグローバルなメモリ順序が存在する場合に限られます。
 
+\begin{comment}
 \newcommand{\loadvalueaxiom}{
   Each byte of each load $i$ returns the value written to that byte by the store that is the latest in global memory order among the following stores:
   \begin{enumerate}
@@ -425,24 +464,41 @@ An execution of a RISC-V program obeys the RVWMO memory consistency model only i
     \item Stores that write that byte and that precede $i$ in program order
   \end{enumerate}
 }
+\end{comment}
+\newcommand{\loadvalueaxiom}{
+  各ロード$i$の各バイトは、以下のストアの中でグローバルメモリの順序が最も新しいストアがそのバイトに書き込んだ値を返します。
+  \begin{enumerate}
+    \item そのバイトを書き込んだストアで、グローバルメモリの順番で$i$より前のストア
+    \item そのバイトを書き込んだストアと$i$より先にプログラム順に書き込んだストア
+  \end{enumerate}
+}
 
+\begin{comment}
 \newcommand{\atomicityaxiom}{If $r$ and $w$ are paired load and store operations generated by aligned LR and SC instructions in a hart $h$, $s$ is a store to byte $x$, and $r$ returns a value written by $s$, then $s$ must precede $w$ in the global memory order, and there can be no store from a hart other than $h$ to byte $x$ following $s$ and preceding $w$ in the global memory order.}
+\end{comment}
+\newcommand{\atomicityaxiom}{$r$と$w$がhart$h$内のアラインドLR命令とSC命令によって生成されるペアのロード・ストア演算で、$s$がバイト$x$へのストアで、$r$が$s$によって書き込まれた値を返す場合、グローバルメモリの順序では$s$が$w$に先行しなければならず、$h$以外のハートから、グローバルメモリの順序で$s$に続いて$w$に先行するバイト$x$へのストアはありえません。}
 
+\begin{comment}
 \newcommand{\progressaxiom}{No memory operation may be preceded in the global memory order by an infinite sequence of other memory operations.}
+\end{comment}
+\newcommand{\progressaxiom}{いかなるメモリ操作も、グローバルなメモリ順序において、他のメモリ操作の無限のシーケンスに先行することはできません。}
 
-\paragraph{Load Value Axiom}
+\paragraph{ロード値の公理}
 \label{rvwmo:ax:load}
 \loadvalueaxiom
 
-\paragraph{Atomicity Axiom}
+\paragraph{アトミック性の公理}
 \label{rvwmo:ax:atom}
 \atomicityaxiom
 
 \begin{commentary}
+  \begin{comment}
   The \nameref{rvwmo:ax:atom} theoretically supports LR/SC pairs of different widths and to mismatched addresses, since implementations are permitted to allow SC operations to succeed in such cases.  However, in practice, we expect such patterns to be rare, and their use is discouraged.
+  \end{comment}
+  理論的には、データ幅の異なるLR/SCペアやアドレス不一致のLR/SCペアをサポートしており、そのような場合でもSC演算が成功するように実装することが認められています。 しかし、実際にはそのようなパターンは少ないと思われるので、その使用は推奨されません。
 \end{commentary}
 
-\paragraph{Progress Axiom}
+\paragraph{プログレスの公理}
 \label{rvwmo:ax:prog}
 \progressaxiom
 
