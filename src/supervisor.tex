@@ -278,7 +278,7 @@ vector mode (MODE).
 \instbitrange{SXLEN-1}{2} &
 \instbitrange{1}{0} \\
 \hline
-\multicolumn{1}{|c|}{BASE[SXLEN-1:2] (\warl)} & 
+\multicolumn{1}{|c|}{BASE[SXLEN-1:2] (\warl)} &
 \multicolumn{1}{c|}{MODE (\warl)} \\
 \hline
 SXLEN-2 & 2 \\
@@ -300,7 +300,7 @@ impose additional alignment constraints on the value in the BASE field.
 \begin{tabular}{|r|c|l|}
 \hline
 Value & Name & Description \\
-\hline	 
+\hline
 0      & Direct   & All exceptions set {\tt pc} to BASE. \\
 1      & Vectored & Asynchronous interrupts set {\tt pc} to BASE+4$\times$cause. \\
 $\ge$2 & --- & {\em Reserved} \\
@@ -679,7 +679,7 @@ it is only guaranteed to hold supported exception codes.
 
   \hline
   Interrupt & Exception Code  & Description \\
-  \hline	 
+  \hline
   1         & 0               & {\em Reserved} \\
   1         & 1               & Supervisor software interrupt \\
   1         & 2--4            & {\em Reserved} \\
@@ -690,7 +690,7 @@ it is only guaranteed to hold supported exception codes.
   1         & $\ge$16         & {\em Designated for platform use} \\ \hline
   0         & 0               & Instruction address misaligned \\
   0         & 1               & Instruction access fault \\
-  0         & 2               & Illegal instruction \\   
+  0         & 2               & Illegal instruction \\
   0         & 3               & Breakpoint \\
   0         & 4               & Load address misaligned \\
   0         & 5               & Load access fault \\
@@ -915,7 +915,7 @@ Value  & Name & Description \\
 \multicolumn{3}{|c|}{RV64} \\
 \hline
 Value  & Name & Description \\
-\hline  
+\hline
 0       & Bare  & No translation or protection. \\
 1--7    & ---   & {\em Reserved for standard use} \\
 8       & Sv39  & Page-based 39-bit virtual addressing (see Section~\ref{sec:sv39}). \\
@@ -967,13 +967,22 @@ upon {\tt satp} writes reduces the cost of context switches, provided
 a sufficiently large ASID space.
 \end{commentary}
 
+\begin{comment}
 \section{Supervisor Instructions}
+\end{comment}
+\section{スーパバイザ命令}
 
+\begin{comment}
 In addition to the SRET instruction defined in
 Section~\ref{otherpriv}, one new supervisor-level instruction is
 provided.
+\end{comment}
+~\ref{otherpriv}節で定義したSRET命令に加えて、新しいスーパバイザレベルの命令を提供する。
 
+\begin{comment}
 \subsection{Supervisor Memory-Management Fence Instruction}
+\end{comment}
+\subsection{スーパバイザメモリ管理フェンス命令}
 \label{sec:sfence.vma}
 
 \vspace{-0.2in}
@@ -999,6 +1008,7 @@ SFENCE.VMA & asid & vaddr & PRIV & 0 & SYSTEM \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 The supervisor memory-management fence instruction SFENCE.VMA is used to
 synchronize updates to in-memory memory-management data structures with
 current execution.  Instruction execution causes implicit reads and writes to
@@ -1009,8 +1019,18 @@ to the current RISC-V hart are ordered before all subsequent implicit references
 from that hart to the memory-management data structures.
 Further details on the behavior of this instruction are
 described in Section~\ref{virt-control} and Section~\ref{pmp-vmem}.
+\end{comment}
+
+スーパバイザメモリ管理フェンス命令SFENCE.VMAは、
+メモリ内のメモリ管理データ構造の更新を現在の実行と同期させるために使用されます。
+SFENCE.VMA命令を実行すると、これらのデータ構造に対する暗黙のリード/ライトが発生しますが、
+これらの暗黙の参照は、通常、明示的なロード/ストア命令に対して順序付けられません。
+SFENCE.VMA命令を実行すると、現在のRISC-V hartに既に実行されているストア命令が、
+そのhartからメモリ管理データ構造への後続の暗黙の参照の前に順序付けられることが保証されます。
+この命令の動作の詳細は、~\ref{virt-control}項および~\ref{pmp-vmem}項に記載されています。
 
 \begin{commentary}
+\begin{comment}
 The SFENCE.VMA is used to flush any local hardware caches related to
 address translation.  It is specified as a fence rather than a TLB
 flush to provide cleaner semantics with respect to which instructions
@@ -1018,12 +1038,24 @@ are affected by the flush operation and to support a wider variety of
 dynamic caching structures and memory-management schemes.  SFENCE.VMA
 is also used by higher privilege levels to synchronize page table
 writes and the address translation hardware.
+\end{comment}
+SFENCE.VMAは、アドレス変換に関連するすべてのローカルハードウェアキャッシュをフラッシュするために使用されます。
+TLBのフラッシュではなく、フェンスとして仕様化されているのは、
+フラッシュ操作によってどの命令が影響を受けるかについて、よりクリーンなセマンティクスを提供し、
+より多様なダイナミックキャッシング構造やメモリ管理スキームをサポートするためです。
+また、SFENCE.VMAは、ページテーブルの書き込みとアドレス変換ハードウェアの同期をとるために、
+より高い権限レベルで使用されます。
 \end{commentary}
 
+\begin{comment}
 SFENCE.VMA orders only the local hart's implicit references to the
 memory-management data structures.
+\end{comment}
+
+SFENCE.VMAは、ローカルハートのメモリ管理データ構造への暗黙の参照のみを順序付けます。
 
 \begin{commentary}
+\begin{comment}
 Consequently, other harts must be notified separately when the
 memory-management data structures have been modified.
 One approach is to use 1)
@@ -1032,8 +1064,16 @@ a local data fence to ensure local writes are visible globally, then
 SFENCE.VMA in the interrupt handler of the remote thread, and finally
 4) signal back to originating thread that operation is complete.  This
 is, of course, the RISC-V analog to a TLB shootdown.
+\end{comment}
+そのため、メモリ管理データ構造が変更された場合、他のhartには別途通知する必要があります。
+1) ローカルデータをフェンスしてローカルの書き込みがグローバルに見えるようにし、
+2) 他のスレッドにプロセッサ間割り込みをかけ、
+3) リモートスレッドの割り込みハンドラでローカルの SFENCE.VMA を実行し、最後に
+4) 操作が完了したことを発信元のスレッドにシグナルバックする、という方法があります。
+これはもちろん、RISC-VのTLBシュートダウンと同じです。
 \end{commentary}
 
+\begin{comment}
 For the common case that the translation data structures have only been
 modified for a single address mapping (i.e., one page or superpage), {\em rs1}
 can specify a virtual address within that mapping to effect a translation
@@ -1041,7 +1081,16 @@ fence for that mapping only.  Furthermore, for the common case that the
 translation data structures have only been modified for a single address-space
 identifier, {\em rs2} can specify the address space.  The behavior of
 SFENCE.VMA depends on {\em rs1} and {\em rs2} as follows:
+\end{comment}
 
+変換データ構造が1つのアドレスマッピング(1ページまたはスーパーページ)に対してのみ変更されている場合、
+{\em rs1}はそのマッピング内の仮想アドレスを指定して、
+そのマッピングに対してのみ変換フェンスを作用させることができます。
+さらに、変換データ構造が単一のアドレス空間IDに対してのみ変更されている一般的なケースでは、{\em rs2}がそのアドレス空間を指定できます。
+SFENCE.VMA の動作は{\em rs1} と {\em rs2} によって以下のように異なります。
+
+
+\begin{comment}
 \begin{itemize}
 \item If {\em rs1}={\tt x0} and {\em rs2}={\tt x0}, the fence orders all
       reads and writes made to any level of the page tables, for all
@@ -1060,18 +1109,46 @@ SFENCE.VMA depends on {\em rs1} and {\em rs2} as follows:
       space identified by integer register {\em rs2}.
       Accesses to global mappings are not ordered.
 \end{itemize}
+\end{comment}
 
+\begin{itemize}
+\item {\em rs1}={\tt x0} かつ {\em rs2}={\em x0} の場合、フェンスはすべてのアドレス空間について、
+  ページテーブルのどのレベルに対しても、すべてのリードとライトを順序付けます。
+\item {\em rs1}={\tt x0} および{\em rs2} $\neq$ {\tt x0} の場合、
+  フェンスはページテーブルのどのレベルに対してもすべてのリードとライトを順序づけますが、
+  整数レジスタ{\em rs2} によって識別されたアドレス空間に対しての順序付けます。
+  グローバルマッピング(~\ref{sec:translations}を参照)へのアクセスは命令されません。
+\item {\em rs1}$\neq${\tt x0} かつ {\em rs2}={\tt x0}の場合、フェンスはすべてのアドレス空間について、
+  {\em rs1}の仮想アドレスに関連するリーフページテーブルエントリへのリードとライトのみを順序付けします。
+\item {\em rs1}$\neq${\tt x0} かつ {\em rs2}$\neq$ {\tt x0}の場合、フェンスは、
+  整数レジスタ{\em rs2} で特定されるアドレス空間について、
+  {\em rs1}の仮想アドレスに相関するリーフページテーブルエントリへの読み取りと書き込みのみを命令します。
+  グローバル・マッピングへのアクセスは命令されません。
+\end{itemize}
+
+\begin{comment}
 When {\em rs2}$\neq${\tt x0}, bits SXLEN-1:ASIDMAX of the value held in {\em
 rs2} are reserved for future use and should be zeroed by software and ignored
 by current implementations.  Furthermore, if ASIDLEN~$<$~ASIDMAX, the
 implementation shall ignore bits ASIDMAX-1:ASIDLEN of the value held in {\em
 rs2}.
+\end{comment}
+
+{\em rs2}$\neq{\tt x0} のとき、{\em rs2} に保持されている値のビットSXLEN-1:ASIDMAXは将来の使用のために予約されており、
+ソフトウェアによってゼロにされ、現在の実装では無視されるべきです。
+さらに、ASIDLEN ~$<$~ASIDMAX の場合、実装では{\em rs2} に保持されている
+値のビットASIDMAX-1:ASIDLENを無視しなければならない。
 
 \begin{commentary}
+\begin{comment}
 Simpler implementations can ignore the virtual address in {\em rs1} and
 the ASID value in {\em rs2} and always perform a global fence.
+\end{comment}
+より単純な実装では、{\em rs1}の仮想アドレスと{\em rs2}のASID値を無視して、
+常にグローバルフェンスを実行することができます。
 \end{commentary}
 
+\begin{comment}
 Implementations may perform implicit reads of the translation data structures
 pointed to by the current {\tt satp} register arbitrarily early and
 speculatively.  The results of these reads may be held in an incoherent cache
@@ -1083,8 +1160,18 @@ entries.  Changes in the {\tt satp} register do not necessarily flush any such
 translation caches.  To ensure the implicit reads observe writes to the same
 memory locations, an SFENCE.VMA instruction must be executed after the writes
 to flush the relevant cached translations.
+\end{comment}
+実装では、現在の{\tt satp}レジスタが指す変換データ構造の暗黙的な読み取りを、任意の時期に投機的に行うことができます。
+これらの読み取りの結果は、インコヒーレント・キャッシュに保持されるかもしれませんが、他のhartとは共有されません。
+キャッシュ・エントリは、{\tt satp}レジスタに現在読み込まれているASIDに対してのみ、またはグローバル・エントリに対してのみ確立することができます。
+キャッシュは、{\tt satp} に現在読み込まれている ASID に対して確立されたエントリ、またはグローバルエントリに対してのみ、
+暗黙のリードを満たすことができます。
+{\tt satp}レジスタの変更は、そのような変換キャッシュを必ずしもフラッシュしません。
+暗黙のリードが同じメモリロケーションへのライトを確実に守るためには、ライトの後にSFENCE.VMA命令を実行して、
+関連するキャッシュされた変換をフラッシュしなければなりません。
 
 \begin{commentary}
+\begin{comment}
 A consequence of this specification is that an implementation may use any
 translation for an address that was valid at any time since the most recent
 SFENCE.VMA that subsumes that address.
@@ -1092,7 +1179,13 @@ In particular, if a leaf PTE is modified but a subsuming SFENCE.VMA is not
 executed, either the old translation or the new translation will be used, but
 the choice is unpredictable.
 The behavior is otherwise well-defined.
+\end{comment}
+この仕様の結果、実装は、そのアドレスを包含する最新のSFENCE.VMA以降の任意の時点で有効だったアドレスの変換に使用することができます。
+特に、リーフPTEが変更されても、それを包含するSFENCE.VMAが実行されない場合、
+古い変換と新しい変換のどちらかが使用されますが、その選択は予測できません。
+それ以外の動作は明確に定義されています。
 
+\begin{comment}
 In a conventional TLB design, it is possible for multiple entries to match a
 single address if, for example, a page is upgraded to a superpage without first
 clearing the original non-leaf PTE's valid bit and executing an SFENCE.VMA with
@@ -1100,36 +1193,64 @@ clearing the original non-leaf PTE's valid bit and executing an SFENCE.VMA with
 In this case, a similar remark applies: it is unpredictable whether the old
 non-leaf PTE or the new leaf PTE is used, but the behavior is otherwise well
 defined.
+\end{comment}
+従来のTLB設計では、例えば、元の非リーフPTEのvalidビットをクリアせずに、
+SFENCE.VMAを{\tt rs1}={\tt x0}で実行して、ページをスーパーページにアップグレードした場合、
+複数のエントリが1つのアドレスに一致することがあります。
+この場合、古いノンリーフPTEと新しいリーフPTEのどちらが使用されるかは予測できませんが、
+それ以外の動作はよく定義されています。
 \end{commentary}
 
 \begin{commentary}
+\begin{comment}
 This specification permits the caching of PTEs whose V (Valid) bit is clear.
 Operating systems must be written to cope with this possibility, but implementers
 are reminded that eagerly caching invalid PTEs will reduce performance by causing
 additional page faults.
+\end{comment}
+この仕様では、V(Valid)ビットがクリアされているPTEのキャッシュを許可しています。
+オペレーティングシステムはこの可能性に対処するように書かれていなければなりませんが、
+実装者は、無効なPTEを熱心にキャッシュすると、追加のページフォールトが発生してパフォーマンスが低下することに注意してください。
 \end{commentary}
 
+\begin{comment}
 Implementations must only perform implicit reads of the translation
 data structures pointed to by the current contents of the {\tt satp}
 register or a subsequent valid (V=1) translation data structure entry,
 and must only raise exceptions for implicit accesses that are
 generated as a result of instruction execution, not those that are
 performed speculatively.
+\end{comment}
+実装では、現在の {\tt satp} レジスタの内容、またはそれに続く有効な (V=1) 変換データ構造エントリが
+指す変換データ構造の暗黙的な読み取りのみを実行しなければならず、
+暗黙的なアクセスについては、投機的に実行するのではなく、
+命令実行の結果として生成されたものについてのみ例外を発生させなければなりません。
 
+\begin{comment}
 Changes to the {\tt sstatus} fields SUM and MXR take effect immediately,
 without the need to execute an SFENCE.VMA instruction.
 Changing {\tt satp}.MODE from Bare to other modes and vice versa also
 takes effect immediately, without the need to execute an SFENCE.VMA
 instruction.
 Likewise, changes to {\tt satp}.ASID take effect immediately.
+\end{comment}
+
+{\tt sstatus}のフィールドSUMとMXRの変更は、SFENCE.VMA命令を実行しなくても、
+すぐに反映されます。
+また、MODE を Bare から他のモードに変更した場合も、
+SFENCE.VMA 命令を実行することなく、直ちに反映されます。同様に、{\tt satp.ASID} の変更も即時反映されます。
 
 \begin{commentary}
+\begin{comment}
 The following common situations typically require executing an
 SFENCE.VMA instruction:
+\end{comment}
+SFENCE.VMA命令を実行する必要があるのは、次のような状況です。
 
 \vspace{-0.1in}
 \begin{itemize}
 
+\begin{comment}
 \item When software recycles an ASID (i.e., reassociates it with a different
 page table), it should {\em first} change {\tt satp} to point to the new page
 table using the recycled ASID, {\em then} execute SFENCE.VMA with {\em
@@ -1137,40 +1258,77 @@ rs1}={\tt x0} and {\em rs2} set to the recycled ASID.  Alternatively, software
 can execute the same SFENCE.VMA instruction while a different ASID is loaded
 into {\tt satp}, provided the next time {\tt satp} is loaded with the recycled
 ASID, it is simultaneously loaded with the new page table.
+\end{comment}
 
+\item ASIDをリサイクル(別のページテーブルに再結合)する場合は、
+  リサイクルされたASIDを使用して新しいページテーブルを指すように変更し、
+  リサイクルされたASIDを設定した上でSFENCE.VMAを実行します。
+  ただし、次にリサイクルされたASIDがロードされるときに、
+  同時に新しいページテーブルがロードされることを条件とします。
+
+\begin{comment}
 \item If the implementation does not provide ASIDs, or software chooses to
 always use ASID 0, then after every {\tt satp} write, software should execute
 SFENCE.VMA with {\em rs1}={\tt x0}.  In the common case that no global
 translations have been modified, {\em rs2} should be set to a register other than
 {\tt x0} but which contains the value zero, so that global translations are
 not flushed.
+\end{comment}
 
+\item ASIDが実装されていない場合や、常にASID 0を使用することを選択した場合は、
+  毎回の書き込み後にSFENCE.VMAを実行し、{\em rs1}={\tt x0}とする必要があります。
+  なお、グローバル変換が変更されていない場合は、ゼロを含むレジスタを設定することで、
+  グローバル変換がフラッシュされないようにします。
+
+\begin{comment}
 \item If software modifies a non-leaf PTE, it should execute SFENCE.VMA with
 {\em rs1}={\tt x0}.  If any PTE along the traversal path had its G bit set,
 {\em rs2} must be {\tt x0}; otherwise, {\em rs2} should be set to the ASID for
 which the translation is being modified.
+\end{comment}
+\item 非リーフPTEを変更する場合は、SFENCE.VMAを実行する際に、{\em rs1}={\tt x0}に設定する必要があります。
+  トラバーサルパス上のPTEにGビットが設定されていた場合は、{\em rs2}を{\tt x0}とし、
+  そうでない場合は、{\em rs2}に翻訳の修正を行うASIDを設定します。
 
+\begin{comment}
 \item If software modifies a leaf PTE, it should execute SFENCE.VMA with {\em
 rs1} set to a virtual address within the page.  If any PTE along the traversal
 path had its G bit set, {\em rs2} must be {\tt x0}; otherwise, {\em rs2}
 should be set to the ASID for which the translation is being modified.
+\end{comment}
+\item リーフPTEを変更する場合は、SFENCE.VMAを実行し、ページ内の仮想アドレスを設定します。
+  トラバーサルパス上のPTEにGビットが設定されていた場合はGビットを、
+  それ以外の場合はASIDを設定してください(ASIDは変換変更対象となります)。
 
+\begin{comment}
 \item For the special cases of increasing the permissions on a leaf PTE and
 changing an invalid PTE to a valid leaf, software may choose to execute
 the SFENCE.VMA lazily.  After modifying the PTE but before executing
 SFENCE.VMA, either the new or old permissions will be used.  In the latter
 case, a page-fault exception might occur, at which point software should
 execute SFENCE.VMA in accordance with the previous bullet point.
-
+\end{comment}
+\item リーフPTEのパーミッションを増やしたり、無効なPTEを有効なリーフに変更したりする特殊なケースでは、
+  ソフトウェアはSFENCE.VMAをレイジーに実行することを選択できます。
+  PTE を変更した後、SFENCE.VMA を実行する前に、
+  新しいパーミッションまたは古いパーミッションのいずれかが使用されます。
+  後者の場合、ページフォルト例外が発生する可能性があり、
+  その時、ソフトウェアは前の箇条書きに従ってSFENCE.VMAを実行する必要があります。
 \end{itemize}
 \end{commentary}
 
+\begin{comment}
 If a hart employs an address-translation cache, that cache must appear to be
 private to that hart.
 In particular, the meaning of an ASID is local to a hart; software may choose
 to use the same ASID to refer to different address spaces on different harts.
+\end{comment}
+hart がアドレス変換キャッシュを使用する場合、そのキャッシュはその hart にとってプライベートなものでなければなりません。
+特に、ASID の意味は hart にとってローカルなものであり、ソフトウェアは同じ ASID を使って異なる
+hart の異なるアドレス空間を参照することができます。
 
 \begin{commentary}
+\begin{comment}
 A future extension could redefine ASIDs to be global across the SEE, enabling
 such options as shared translation caches and hardware support for broadcast
 TLB shootdown.
@@ -1178,6 +1336,12 @@ However, as OSes have evolved to significantly reduce the scope of TLB
 shootdowns using novel ASID-management techniques, we expect the local-ASID
 scheme to remain attractive for its simplicity and possibly better
 scalability.
+\end{comment}
+将来的には、ASIDをSEE全体でグローバルなものとして再定義することで、
+共有変換キャッシュやブロードキャストTLBシュートダウンのハードウェアサポートなどのオプションが可能になります。
+しかし、OSが進化して、新しいASID管理技術を使ってTLBシュートダウンの範囲を大幅に縮小するようになっても、
+ローカルASID方式は、そのシンプルさと、より優れたスケーラビリティのために、
+今後も魅力的であり続けると考えています。
 \end{commentary}
 
 \section{Sv32: Page-Based 32-bit Virtual-Memory Systems}
@@ -1411,7 +1575,7 @@ All harts in a system must employ the same PTE-update scheme as each other.
 Mandating that the PTE updates to be exact, atomic, and in program order
 simplifies the specification, and makes the feature more useful for system
 software.  Simple implementations may instead generate page-fault exceptions.
-  
+
 The A and D bits are never cleared by the implementation.  If the
 supervisor software does not rely on accessed and/or dirty bits,
 e.g. if it does not swap memory pages to secondary storage or if the
