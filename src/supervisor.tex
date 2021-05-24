@@ -1134,7 +1134,7 @@ implementation shall ignore bits ASIDMAX-1:ASIDLEN of the value held in {\em
 rs2}.
 \end{comment}
 
-{\em rs2}$\neq{\tt x0} のとき、{\em rs2} に保持されている値のビットSXLEN-1:ASIDMAXは将来の使用のために予約されており、
+{\em rs2}$\neq${\tt x0} のとき、{\em rs2} に保持されている値のビットSXLEN-1:ASIDMAXは将来の使用のために予約されており、
 ソフトウェアによってゼロにされ、現在の実装では無視されるべきです。
 さらに、ASIDLEN ~$<$~ASIDMAX の場合、実装では{\em rs2} に保持されている
 値のビットASIDMAX-1:ASIDLENを無視しなければならない。
