@@ -1,20 +1,45 @@
+\begin{comment}
 \chapter{``L'' Standard Extension for Decimal Floating-Point, Version 0.0}
+\end{comment}
 
+\chapter{``L'' 10進浮動小数点標準拡張, Version 0.0}
+
+\begin{comment}
 {\bf This chapter is a draft proposal that has not been ratified by
   the Foundation.}
+\end{comment}
+{\bf 本章は、Foundationで批准されていないドラフト案です。}
 
+\begin{comment}
 This chapter is a placeholder for the specification of a standard
 extension named ``L'' designed to support decimal floating-point
 arithmetic as defined in the IEEE 754-2008 standard.
+\end{comment}
 
+この章では、IEEE 754-2008規格で定義された10進浮動小数点演算をサポートするために設計された、
+``L''と名付けられた標準拡張機能の仕様を示すプレースホルダーです。
+
+\begin{comment}
 \section{Decimal Floating-Point Registers}
+\end{comment}
 
+\section{10進数浮動小数点レジスタ}
+
+\begin{comment}
 Existing floating-point registers are used to hold 64-bit and 128-bit
 decimal floating-point values, and the existing floating-point load
 and store instructions are used to move values to and from memory.
+\end{comment}
+
+64 ビットおよび 128 ビットの 10 進浮動小数点値を保持するために既存の浮動小数点レジスタが使用され、
+メモリとの間で値を移動するために既存の浮動小数点ロード命令とストア命令が使用されます。
 
 \begin{commentary}
+\begin{comment}
 Due to the large opcode space required by the fused multiply-add
 instructions, the decimal floating-point instruction extension will
 require five 25-bit major opcodes in a 30-bit encoding space.
+\end{comment}
+複合乗算加算命令が大きなオペコード・スペースを必要とするため、
+10進浮動小数点命令の拡張では、30ビットのエンコーディング・スペースに5つの25ビットのメジャー・オペコードが必要になります。
 \end{commentary}
