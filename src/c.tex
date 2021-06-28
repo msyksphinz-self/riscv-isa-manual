@@ -1,7 +1,11 @@
+\begin{comment}
 \chapter{``C'' Standard Extension for Compressed Instructions, Version
 2.0}
+\end{comment}
+\chapter{圧縮命令のための``C''標準拡張, Version 2.0}
 \label{compressed}
 
+\begin{comment}
 This chapter describes the current proposal for the RISC-V
 standard compressed instruction-set extension, named ``C'', which
 reduces static and dynamic code size by adding short 16-bit
@@ -10,9 +14,21 @@ added to any of the base ISAs (RV32, RV64, RV128), and we use the
 generic term ``RVC'' to cover any of these.  Typically, 50\%--60\% of
 the RISC-V instructions in a program can be replaced with RVC
 instructions, resulting in a 25\%--30\% code-size reduction.
+\end{comment}
 
+本章では、RISC-V標準の圧縮命令セット拡張の現在の提案について説明します。
+この拡張は、``C''と名付けられており、一般的な操作に対して短い16ビットの命令エンコーディングを追加することで、
+スタティックおよびダイナミックなコードサイズを削減します。
+C拡張は、基本ISA(RV32, RV64, RV128)のいずれにも追加することができ、これらを総称して``RVC''と呼んでいます。
+一般的に、プログラム中のRISC-V命令の50\%～60\%をRVC命令に置き換えることで、
+コードサイズを25\%～30\%削減することができます。
+
+\begin{comment}
 \section{Overview}
+\end{comment}
+\section{概要}
 
+\begin{comment}
 RVC uses a simple compression scheme that offers shorter 16-bit
 versions of common 32-bit RISC-V instructions when:
 \begin{tightlist}
@@ -21,22 +37,43 @@ versions of common 32-bit RISC-V instructions when:
       ABI link register ({\tt x1}), or the ABI stack pointer ({\tt
         x2}), or
 	\item the destination register and the first source register are
-      identical, or   
-	\item the registers used are the 8 most popular ones. 
+      identical, or
+	\item the registers used are the 8 most popular ones.
+\end{tightlist}
+\end{comment}
+
+RVCは、一般的な32ビットRISC-V命令を16ビットに短縮して提供するシンプルな圧縮方式を採用しています:
+\begin{tightlist}
+\item 即値もしくはアドレスオフセットが短い、もしくは
+\item いずれかのレジスタが、ゼロレジスタ({\tt x0}), ABI リンクレジスタ({\tt x1}), ABI スタックポインタ({\tt x2}) のいずれかである場合、もしくは
+\item 書き込みレジスタと最初のソースレジスタが同一である、または
+\item 使用されているレジスタが8つの最も一般的なものである
 \end{tightlist}
 
+\begin{comment}
 The C extension is compatible with all other standard instruction
 extensions.  The C extension allows 16-bit instructions to be freely
 intermixed with 32-bit instructions, with the latter now able to start
 on any 16-bit boundary, i.e., IALIGN=16.  With the addition of the C
 extension, no instructions can raise instruction-address-misaligned
 exceptions.
+\end{comment}
+
+C拡張は、他のすべての標準的な命令拡張と互換性があります。
+C拡張により、16ビット命令と32ビット命令を自由に混在させることができるようになり、
+32ビット命令は任意の16ビット境界で開始できるようになりました(IALIGN=16)。
+C拡張の追加により、命令-アドレス-ミスアラインドの例外を発生させることができる命令はなくなりました。
 
 \begin{commentary}
+\begin{comment}
 Removing the 32-bit alignment constraint on the original 32-bit
 instructions allows significantly greater code density.
+\end{comment}
+オリジナルの32ビット命令の32ビットアライメント制約を取り除くことで、
+コード密度を大幅に向上させることができます。
 \end{commentary}
 
+\begin{comment}
 The compressed instruction encodings are mostly common across RV32C,
 RV64C, and RV128C, but as shown in Table~\ref{rvcopcodemap}, a few
 opcodes are used for different purposes depending on base ISA width.
@@ -53,6 +90,18 @@ standard floating-point extension (F and/or D) is also implemented.
 In addition, RV32C includes a compressed jump and link instruction to
 compress short-range subroutine calls, where the same opcode is used
 to compress ADDIW for RV64C and RV128C.
+\end{comment}
+
+圧縮命令のエンコーディングは、RV32C、RV64C、RV128Cでほぼ共通ですが、
+表~\ref{rvcopcodemap}に示すように、いくつかのオペコードはベースISA幅に応じて異なる目的で使用されます。
+例えば、アドレス空間の広いRV64CとRV128Cでは、64ビット整数値のロード/ストアを圧縮するために追加のオペコードが必要ですが、
+RV32Cでは、単精度浮動小数点値のロード/ストアを圧縮するために同じオペコードを使用します。
+同様に、RV128Cでは128ビット整数値のロードとストアをキャプチャするために追加のオペコードが必要ですが、
+RV32CとRV64Cでは倍精度浮動小数点値のロードとストアに同じオペコードが使用されます。
+C 拡張機能が実装されている場合、関連する標準浮動小数点拡張機能 (F または D) が実装されている場合は、
+適切な圧縮浮動小数点ロード/ストア命令を提供する必要があります。
+さらに、RV32Cには、短距離のサブルーチン呼び出しを圧縮するための圧縮されたジャンプとリンク命令が含まれており、
+RV64CとRV128CのADDIWを圧縮するために同じオペコードが使用されています。
 
 \begin{commentary}
 Double-precision loads and stores are a significant fraction of static
