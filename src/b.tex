@@ -1,12 +1,21 @@
+\begin{comment}
 \chapter{``B'' Standard Extension for Bit Manipulation, Version 0.0}
+\end{comment}
+\chapter{ビット操作のための``B''標準拡張, Version 0.0}
 \label{sec:bits}
 
+\begin{comment}
 This chapter is a placeholder for a future standard extension to
 provide bit manipulation instructions, including instructions to
 insert, extract, and test bit fields, and for rotations, funnel
 shifts, and bit and byte permutations.
+\end{comment}
+この章は、ビットフィールドの挿入、抽出、テスト、回転、ファンネルシフト、
+ビットやバイトの組み合わせなどのビット操作命令を提供するための、将来の規格拡張のためのプレースホルダーです。
+
 
 \begin{commentary}
+\begin{comment}
 Although bit manipulation instructions are very effective in some
 application domains, particularly when dealing with externally packed
 data structures, we excluded them from the base ISA as they are not
@@ -15,5 +24,11 @@ formats to supply all needed operands.
 
 We anticipate the B extension will be a brownfield encoding within the
 base 30-bit instruction space.
+\end{comment}
+ビット操作命令は、一部のアプリケーション領域、特に外部からパックされたデータ構造を扱う際に非常に有効ですが、
+すべての領域で有効なわけではなく、必要なオペランドをすべて供給するために複雑さや命令フォーマットが追加される可能性があるため、
+基本ISAからは除外しました。
+
+B拡張は、ベースとなる30ビットの命令空間内のブラウンフィールド・エンコーディングになると予想しています。
 \end{commentary}
 
