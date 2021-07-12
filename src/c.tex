@@ -104,10 +104,16 @@ C 拡張機能が実装されている場合、関連する標準浮動小数点
 RV64CとRV128CのADDIWを圧縮するために同じオペコードが使用されています。
 
 \begin{commentary}
+\begin{comment}
 Double-precision loads and stores are a significant fraction of static
 and dynamic instructions, hence the motivation to include them in the
 RV32C and RV64C encoding.
+\end{comment}
 
+倍精度のロードとストアは、静的命令と動的命令の中でかなりの割合を占めているため、
+RV32CとRV64Cのエンコーディングに含める動機となりました。
+
+\begin{comment}
 Although single-precision loads and stores are not a significant
 source of static or dynamic compression for benchmarks compiled for
 the currently supported ABIs, for microcontrollers that only provide
@@ -117,45 +123,90 @@ single-precision loads and stores will be used at least as frequently
 as double-precision loads and stores in the measured benchmarks.
 Hence, the motivation to provide compressed support for these in
 RV32C.
+\end{comment}
 
+単精度のロード・ストアは、現在サポートされてい る ABI でコンパイルされたベンチマークでは、
+静的および動的な圧縮の重要な原因とは なりませんが、ハードウェアに単精度浮動小数点ユニッ トしか備えておらず、
+単精度浮動小数点数のみをサポートす る ABI を持つマイクロコントローラでは、
+測定されたベ ンチマークにおいて、単精度のロード・ストアは、少なくとも 倍精度のロード・ストアと同じ頻度で使用されます。
+そのため、RV32Cではこれらを圧縮してサポートすることになりました。
+
+\begin{comment}
 Short-range subroutine calls are more likely in small binaries for
 microcontrollers, hence the motivation to include these in RV32C.
+\end{comment}
 
+短距離のサブルーチンコールは、マイクロコントローラ用の小さなバイナリでは、
+より頻繁に使用されるため、RV32Cにこれらを含めることが動機となっています。
+
+\begin{comment}
 Although reusing opcodes for different purposes for different base
 register widths adds some complexity to documentation, the impact on
 implementation complexity is small even for designs that support
 multiple base ISA register widths.  The compressed floating-point load
 and store variants use the same instruction format with the same
 register specifiers as the wider integer loads and stores.
+\end{comment}
+
+ベース・レジスタ幅が異なる目的でオペコードを再利用すると、ドキュメントが多少複雑になりますが、
+複数のベースISAレジスタ幅をサポートするデザインでも、実装の複雑さに与える影響は小さいです。
+圧縮された浮動小数点のロード／ストア・バリアントは、
+幅の広い整数のロード／ストアと同じレジスタ指定子を持つ同じ命令フォーマットを使用します。
 \end{commentary}
 
+\begin{comment}
 RVC was designed under the constraint that each RVC instruction
 expands into a single 32-bit instruction in either the base ISA
 (RV32I/E, RV64I, or RV128I) or the F and D standard extensions where
 present.  Adopting this constraint has two main benefits:
+\end{comment}
+
+RVCは、ベースISA(RV32I/E、RV64I、RV128I)またはFとDの標準的な拡張機能(存在する場合)において、
+各RVC命令が1つの32ビット命令に拡張されるという制約の下で設計されました。
+この制約を採用することで、主に2つのメリットがあります。
 
 \begin{tightlist}
+  \begin{comment}
 \item Hardware designs can simply expand RVC instructions during
   decode, simplifying verification and minimizing modifications to
   existing microarchitectures.
+  \end{comment}
+\item ハードウェア設計では、デコード時にRVC命令を拡張するだけで、
+  検証が容易になり、既存のマイクロアーキテクチャの変更を最小限に抑えることができます。
+  \begin{comment}
 \item Compilers can be unaware of the RVC extension and leave code
   compression to the assembler and linker, although a
   compression-aware compiler will generally be able to produce better
   results.
+  \end{comment}
+\item コンパイラは RVC 拡張を意識せず、コードの圧縮をアセンブラやリンカに任せることができますが、
+  圧縮を意識したコンパイラの方が一般的に良い結果を得ることができます。
 \end{tightlist}
 
 \begin{commentary}
+\begin{comment}
 We felt the multiple complexity reductions of a simple one-one mapping
 between C and base IFD instructions far outweighed the potential gains
 of a slightly denser encoding that added additional instructions only
 supported in the C extension, or that allowed encoding of multiple IFD
 instructions in one C instruction.
+\end{comment}
+C言語とベースのIFD命令を1対1で対応させることで、複数の複雑さを軽減することができましたが、
+C言語の拡張機能でしかサポートされていない命令を追加したり、
+1つのC言語命令で複数のIFD命令をエンコードできるようにするなど、
+多少高密度なエンコーディングを行うことで得られる潜在的な利益をはるかに上回ると考えました。
 \end{commentary}
 
+\begin{comment}
 It is important to note that the C extension is not designed to be a
 stand-alone ISA, and is meant to be used alongside a base ISA.
+\end{comment}
+
+C拡張は単独のISAとして設計されているわけではなく、
+ベースとなるISAと一緒に使用することを前提としていることに注意してください。
 
 \begin{commentary}
+\begin{comment}
 Variable-length instruction sets have long been used to improve code
 density.  For example, the IBM Stretch~\cite{stretch}, developed in
 the late 1950s, had an ISA with 32-bit and 64-bit instructions, where
@@ -167,13 +218,29 @@ refer to one of the index registers.  The later IBM 360
 architecture~\cite{ibm360} supported a simple variable-length
 instruction encoding with 16-bit, 32-bit, or 48-bit instruction
 formats.
+\end{comment}
 
+コード密度を向上させるために、可変長の命令セットが使われてきました。
+例えば、1950年代後半に開発されたIBMのStretchは、32ビットと64ビットの命令を持つISAを持ち、
+32ビットの命令の一部は64ビットの完全な命令を圧縮したものでした。
+Stretchでは、短い命令形式の中でアドレス可能なレジスタを限定するというコンセプトを採用し、
+インデックスレジスタのいずれかを参照するだけの短い分岐命令も用意されていました。
+後期のIBM 360アーキテクチャ~\cite{ibm360}では、16ビット、32ビット、48ビットの3種類の命令形式で、
+シンプルな可変長の命令エンコーディングをサポートしていました。
+
+\begin{comment}
 In 1963, CDC introduced the Cray-designed CDC 6600~\cite{cdc6600}, a
 precursor to RISC architectures, that introduced a register-rich
 load-store architecture with instructions of two lengths, 15-bits and
 30-bits.  The later Cray-1 design used a very similar instruction
 format, with 16-bit and 32-bit instruction lengths.
+\end{comment}
 
+1963年、CDC社はRISCアーキテクチャの先駆けとなるCray設計のCDC6600~\cite{cdc6600}を発表し、
+15ビットと30ビットの2種類の長さの命令を持つレジスタリッチロードストアアーキテクチャを導入しました。
+後のCray-1では、16ビットと32ビットの2種類の命令長を持つ、よく似た命令形式が採用されました。
+
+\begin{comment}
 The initial RISC ISAs from the 1980s all picked performance over code
 size, which was reasonable for a workstation environment, but not for
 embedded systems. Hence, both ARM and MIPS subsequently made versions
@@ -184,7 +251,16 @@ their starting points by about 25--30\%, yielding code that was
 significantly \emph{smaller} than 80x86.  This result surprised some,
 as their intuition was that the variable-length CISC ISA should be
 smaller than RISC ISAs that offered only 16-bit and 32-bit formats.
+\end{comment}
 
+1980年代に登場した初期のRISC ISAは、いずれもコードサイズよりも性能を重視しており、
+これはワークステーション環境では合理的でしたが、組み込みシステムには適していませんでした。
+そこで、ARM社とMIPS社は、標準的な32ビット幅の命令セットの代わりに、
+16ビット幅の命令セットを提供することで、コードサイズを小さくしたバージョンのISAを開発しました。
+圧縮されたRISC ISAでは、コードサイズが約25～30\%削減され、80x86よりも大幅に小さいコードが得られました。
+可変長のCISC ISAは、16ビットと32ビットしかないRISC ISAよりも小さいはずだと思っていたので、この結果には驚きました。
+
+\begin{comment}
 Since the original RISC ISAs did not leave sufficient opcode space
 free to include these unplanned compressed instructions, they were
 instead developed as complete new ISAs.  This meant compilers needed
@@ -201,7 +277,19 @@ significant code size savings.  Unfortunately, these different
 generations of compressed ISAs are incompatible with each other and
 with the original uncompressed ISA, leading to significant complexity
 in documentation, implementations, and software tools support.
+\end{comment}
 
+当初のRISC ISAでは、このような予定外の圧縮命令を組み込むための十分なオペコードスペースが確保されていなかったため、
+まったく新しいISAとして開発されました。
+そのため、コンパイラにはそれぞれの圧縮ISAに対応したコードジェネレータが必要となりました。
+最初の圧縮RISC ISA拡張(ARM ThumbやMIPS16など)は、固定の16ビット命令サイズのみを使用していたため、
+静的なコードサイズの削減には成功しましたが、動的な命令数の増加を招き、元の固定幅32ビット命令サイズに比べて性能が低下してしまいました。
+このため、16ビットと32ビットの命令長を混在させた第2世代の圧縮RISC ISAデザイン(ARM Thumb2、microMIPS、PowerPC VLEなど)が開発され、
+純粋な32ビット命令と同等の性能を持ちながら、コードサイズを大幅に削減することができるようになりました。
+残念ながら、これらの異なる世代の圧縮ISAは、相互に、そしてオリジナルの非圧縮ISAとの互換性がないため、
+ドキュメント、実装、ソフトウェアツールのサポートが非常に複雑になっています。
+
+\begin{comment}
 Of the commonly used 64-bit ISAs, only PowerPC and microMIPS currently
 supports a compressed instruction format.  It is surprising that the
 most popular 64-bit ISA for mobile platforms (ARM v8) does not include
@@ -211,7 +299,15 @@ static code size is not a major concern in larger systems, instruction
 fetch bandwidth can be a major bottleneck in servers running
 commercial workloads, which often have a large instruction working
 set.
+\end{comment}
 
+一般的に使用されている64ビットISAのうち、現在、圧縮命令フォーマットをサポートしているのはPowerPCとmicroMIPSのみです。
+静的コードサイズと動的命令フェッチ帯域幅が重要な指標であるにもかかわらず、モバイルプラットフォームで最も普及している
+64ビットISA(ARM v8)に圧縮命令フォーマットが含まれていないのは驚くべきことです。
+大規模なシステムでは、静的なコードサイズはあまり気になりませんが、大きな命令ワークセットを持つことが多い商用ワークロードを
+実行しているサーバーでは、命令フェッチ帯域幅が大きなボトルネックになることがあります。
+
+\begin{comment}
 Benefiting from 25 years of hindsight, RISC-V was designed to support
 compressed instructions from the outset, leaving enough opcode
 space for RVC to be added as a simple extension on top of the base ISA
@@ -222,11 +318,22 @@ misses in the instruction cache. Waterman shows that RVC fetches
 25\%-30\% fewer instruction bits, which reduces instruction cache
 misses by 20\%-25\%, or roughly the same performance impact as
 doubling the instruction cache size~\cite{waterman-ms}.
+\end{comment}
+
+25年の時を経て、RISC-Vは当初から圧縮命令をサポートするように設計されており、
+ベースISAの上に単純な拡張機能としてRVCを追加できるだけの十分なオペコードスペースを残しています(他の多くの拡張機能とともに)。
+RVCの目的は、組み込みアプリケーションのコードサイズを縮小し、命令キャッシュのミスを減らすことで、
+すべてのアプリケーションのパフォーマンスとエネルギー効率を向上させることにあります。
+Watermanは、RVCがフェッチする命令ビット数を25\%～30\%削減することで、
+命令キャッシュのミスを20\%～25\%削減することができたと発表しています。
 \end{commentary}
 
-
+\begin{comment}
 \section{Compressed Instruction Formats}
+\end{comment}
+\section{圧縮命令フォーマット}
 
+\begin{comment}
 Table~\ref{rvc-formats} shows the nine compressed instruction
 formats. CR, CI, and CSS can use any of the 32 RVI registers, but CIW,
 CL, CS, CA, and CB are limited to just 8 of them. Table~\ref{registers}
@@ -237,26 +344,50 @@ pointer as the base address register, since saving to and restoring
 from the stack are so prevalent, and that they use the CI and CSS
 formats to allow access to all 32 data registers. CIW supplies an
 8-bit immediate for the ADDI4SPN instruction.
+\end{comment}
+
+表~\ref{rvc-formats}には、9つの圧縮命令フォーマットが示されています。
+CR、CI、CSSは32本のRVIレジスタのうち、どのレジスタでも使用できますが、
+CIW、CL、CS、CA、CBは8本に限られます。
+表~\ref{registers}には、これらの一般的なレジスターがリストアップされており、これらはレジスター{\tt x8}から{\tt x15}に対応しています。
+スタックへの保存やスタックからの復元が非常に多いため、スタックポインタをベースアドレスレジスタとして使用するロード命令とストア命令には別バージョンがあり、
+32本のデータレジスタすべてにアクセスできるようにCIとCSSのフォーマットを使用していることに注意してください。
+CIWはADDI4SPN命令に8ビットの即値を供給します。
 
 \begin{commentary}
+\begin{comment}
 The RISC-V ABI was changed to make the frequently used registers map
 to registers {\tt x8}--{\tt x15}.  This simplifies the decompression
 decoder by having a contiguous naturally aligned set of register
 numbers, and is also compatible with the RV32E base ISA,
 which only has 16 integer registers.
+\end{comment}
+RISC-VのABIが変更され、頻繁に使用されるレジスタがレジスタ{\tt x8}--{\tt x15}にマッピングされるようになりました。
+これにより、自然にアラインされた連続したレジスタ番号を持つことになり、命令デコーダが簡素化されます。
+また、16本の整数レジスタしか持たないRV32EベースISAとの互換性もあります。
 \end{commentary}
 
+\begin{comment}
 Compressed register-based floating-point loads and stores also use the
 CL and CS formats respectively, with the eight registers mapping to
 {\tt f8} to {\tt f15}.
+\end{comment}
+
+圧縮レジスタベースの浮動小数点ロード/ストアも、それぞれCLとCSフォーマットを採用しており、
+8つのレジスタは、{\tt f8}～{\tt f15}にマッピングされています。
 
 \begin{commentary}
+\begin{comment}
 The standard RISC-V calling convention maps the most frequently used
 floating-point registers to registers {\tt f8} to {\tt f15}, which
 allows the same register decompression decoding as for integer
 register numbers.
+\end{comment}
+標準的なRISC-Vの呼び出し規則では、最も頻繁に使用される浮動小数点レジスタをレジスタ{\tt f8}～{\tt f15}にマッピングし、
+整数レジスタ番号の場合と同様のレジスタ展開デコードを可能にしています。
 \end{commentary}
 
+\begin{comment}
 The formats were designed to keep bits for the two register source
 specifiers in the same place in all instructions, while the
 destination register field can move.  When the full 5-bit destination
@@ -265,8 +396,15 @@ register specifier is present, it is in the same place as in the
 sign-extended, the sign-extension is always from bit 12.  Immediate
 fields have been scrambled, as in the base specification, to reduce
 the number of immediate muxes required.
+\end{comment}
+このフォーマットは、2つのレジスタソース指定子のビットをすべての命令で同じ場所に保つように設計されていますが、
+一方で書き込みレジスタフィールドは移動可能です。
+完全な5ビットの書き込みレジスタ指定子が存在する場合、それは32ビットRISC-Vエンコーディングと同じ場所にあります。
+即値が符号拡張されている場合、符号拡張は常にビット12から行われます。
+即値フィールドは、基本仕様と同様にスクランブルされており、必要な即値マルチプレクサの数を減らしています。
 
 \begin{commentary}
+\begin{comment}
 The immediate fields are scrambled in the instruction formats instead
 of in sequential order so that as many bits as possible are in the
 same position in every instruction, thereby simplifying
@@ -274,12 +412,24 @@ implementations. For example, immediate bits 17---10 are always sourced from
 the same instruction bit positions.  Five other immediate bits (5, 4,
 3, 1, and 0) have just two source instruction bits, while four (9, 7,
 6, and 2) have three sources and one (8) has four sources.
+\end{comment}
+即値フィールドは、順序ではなく命令形式でスクランブルされており、
+どの命令でも同じ位置にできるだけ多くのビットが配置されるようになっており、実装が容易になっています。
+例えば、即値ビット17--10は、常に同じ命令のビット位置から供給されます。
+他の5つの即値ビット(5, 4, 3, 1, 0)の2つの命令ビットの場所から供給されますが、
+4つの即値ビット(9, 7, 6, 2)は3つ、
+1つの即値ビット(8）は4つのソースを持っています。
 \end{commentary}
 
+\begin{comment}
 For many RVC instructions, zero-valued immediates are disallowed and
 {\tt x0} is not a valid 5-bit register specifier.  These restrictions
 free up encoding space for other instructions requiring fewer operand
 bits.
+\end{comment}
+
+また、多くの RVC 命令では、0 値の即値は認められず、{\tt x0} は 5 ビットのレジスタ指定としては有効ではありません。
+これらの制限により、より少ないオペランドビットを必要とする他の命令のためのエンコーディングスペースが確保されます。
 
 \newcommand{\rdprime}{rd\,$'$}
 \newcommand{\rsoneprime}{rs1\,$'$}
@@ -383,11 +533,14 @@ CJ & Jump &
 \end{center}
 \end{small}
 }
+\begin{comment}
 \caption{Compressed 16-bit RVC instruction formats.}
+\end{comment}
+\caption{圧縮された16ビットのRVC命令フォーマット}
 \label{rvc-formats}
 \end{table}
 
-
+\begin{comment}
 \begin{table}[H]
 {
 \begin{center}
@@ -405,20 +558,56 @@ Floating-Point Register ABI Name    & {\tt fs0}  &  {\tt fs1} &  {\tt fa0} &  {\
 \caption{Registers specified by the three-bit {\em \rsoneprime}, {\em \rstwoprime}, and {\em \rdprime} fields of the CIW, CL, CS, CA, and CB formats.}
 \label{registers}
 \end{table}
+\end{comment}
 
+\begin{table}[H]
+{
+\begin{center}
+\begin{tabular}{l|c|c|c|c|c|c|c|c|}
+\cline{2-9}
+RVCレジスタ番号  & 000 & 001 & 010 & 011 & 100 & 101 & 110 & 111
+\\ \cline{2-9}
+整数レジスタ番号 & {\tt x8} & {\tt x9} & {\tt x10} & {\tt x11} & {\tt x12} & {\tt x13} & {\tt x14}  & {\tt x15} \\ \cline{2-9}
+整数レジスタABI名    & {\tt s0}  &  {\tt s1} &  {\tt a0} &  {\tt a1} &  {\tt a2} &  {\tt a3} & {\tt a4}  & {\tt a5} \\ \cline{2-9}
+浮動小数点レジスタ番号 & {\tt f8} & {\tt f9} & {\tt f10} & {\tt f11} & {\tt f12} & {\tt f13} & {\tt f14}  & {\tt f15} \\ \cline{2-9}
+浮動小数点レジスタABI名    & {\tt fs0}  &  {\tt fs1} &  {\tt fa0} &  {\tt fa1} &  {\tt fa2} &  {\tt fa3} & {\tt fa4}  & {\tt fa5} \\ \cline{2-9}
+\end{tabular}
+\end{center}
+}
+\caption{CIW, CL, CS, CA, CBフォーマットから指定される{\em \rsoneprime}, {\em \rstwoprime}, {\em \rdprime} の3ビットのレジスタ指定子}
+\label{registers}
+\end{table}
+
+\begin{comment}
 \section{Load and Store Instructions}
+\end{comment}
+\section{ロードストア命令}
 
+\begin{comment}
 To increase the reach of 16-bit instructions, data-transfer
 instructions use zero-extended immediates that are scaled by the size
 of the data in bytes: $\times$4 for words, $\times$8 for double words,
 and $\times$16 for quad words.
+\end{comment}
+16ビット命令のアドレス領域を伸ばすために、データ転送命令はデータ転送サイズに応じてスケールした
+ゼロ拡張即値を使用しています: ワード転送の場合は$\times$4、ダブルワード転送の場合は$\times$8、
+4倍ワード転送の場合は$\times$16となっています。
 
+\begin{comment}
 RVC provides two variants of loads and stores.  One uses the ABI stack
 pointer, {\tt x2}, as the base address and can target any data register.  The
 other can reference one of 8 base address registers and one of 8 data
 registers.
+\end{comment}
+RVCは2種類のロードストア命令を用意しています。
+1つはABIのスタックポインタ{\tt x2}をベースアドレスとして任意のデータレジスタを
+ターゲットとするものです。
+もう一つは8つのベースアドレスレジスあtと8つのデータレジスタのみ使用可能なロードストア命令です。
 
+\begin{comment}
 \subsection*{Stack-Pointer-Based Loads and Stores}
+\end{comment}
+\subsection*{スタックポインタベースロードストア命令}
 
 \begin{center}
 \begin{tabular}{S@{}W@{}T@{}T@{}Y}
@@ -443,40 +632,70 @@ C.FLWSP& offset[5] & dest        & offset[4:2$\vert$7:6] & C2 \\
 C.FLDSP& offset[5] & dest        & offset[4:3$\vert$8:6] & C2 \\
 \end{tabular}
 \end{center}
+\begin{comment}
 These instructions use the CI format.
+\end{comment}
+この命令はCIフォーマットを使用しています。
 
+\begin{comment}
 C.LWSP loads a 32-bit value from memory into register {\em rd}.  It computes
 an effective address by adding the {\em zero}-extended offset, scaled by 4, to
 the stack pointer, {\tt x2}.  It expands to {\tt lw rd, offset(x2)}.
 C.LWSP is only valid when $\textit{rd}{\neq}\texttt{x0}$;
 the code points with $\textit{rd}{=}\texttt{x0}$ are reserved.
+\end{comment}
+C.LWSPは32ビットの値をメモリからレジスタ{\em rd}にロードします。
+この命令は{\em ゼロ}拡張したオフセットを4倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
+この命令は{\tt lw rd, offset(x2)}に展開されます。
+C.LWSPは$textit{rd}{neq}\texttt{x0}$のときのみ有効で、$textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
 
-
+\begin{comment}
 C.LDSP is an RV64C/RV128C-only instruction that loads a 64-bit value from memory into
 register {\em rd}.  It computes its effective address by adding the
 zero-extended offset, scaled by 8, to the stack pointer, {\tt x2}.
 It expands to {\tt ld rd, offset(x2)}.
 C.LDSP is only valid when $\textit{rd}{\neq}\texttt{x0}$;
 the code points with $\textit{rd}{=}\texttt{x0}$ are reserved.
+\end{comment}
+C.LDSPはRV64C/RV128C限定の命令で、64ビットの値をメモリからレジスタ{\em rd}にロードします。
+この命令は{\em ゼロ}拡張したオフセットを8倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
+この命令は{\tt ld rd, offset(x2)}に展開されます。
+C.LDSPは$textit{rd}{neq}\texttt{x0}$のときのみ有効で、$textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
 
+\begin{comment}
 C.LQSP is an RV128C-only instruction that loads a 128-bit value from memory
 into register {\em rd}.  It computes its effective address by adding the
 zero-extended offset, scaled by 16, to the stack pointer, {\tt x2}.
 It expands to {\tt lq rd, offset(x2)}.
 C.LQSP is only valid when $\textit{rd}{\neq}\texttt{x0}$;
 the code points with $\textit{rd}{=}\texttt{x0}$ are reserved.
+\end{comment}
+C.LQSPはRV128C限定の命令で、128ビットの値をメモリからレジスタ{\em rd}にロードします。
+この命令はゼロ拡張したオフセットを16倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
+この命令は{\tt lq rd, offset(x2)}に展開されます。
+C.LDSPは$textit{rd}{neq}\texttt{x0}$のときのみ有効で、$textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
 
+\begin{comment}
 C.FLWSP is an RV32FC-only instruction that loads a single-precision
 floating-point value from memory into floating-point register {\em rd}. It
 computes its effective address by adding the {\em zero}-extended offset,
 scaled by 4, to the stack pointer, {\tt x2}.  It expands to {\tt flw rd,
 offset(x2)}.
+\end{comment}
+C.FLWSPはRV32FC限定の命令で、メモリから単精度浮動小数点値を浮動小数点レジスタ{\em rd}にロードします。
+この命令はゼロ拡張したオフセットを4倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
+この命令は{\tt flw rd, offset(x2)}に展開されます。
 
+\begin{comment}
 C.FLDSP is an RV32DC/RV64DC-only instruction that loads a double-precision
 floating-point value from memory into floating-point register {\em rd}. It
 computes its effective address by adding the {\em zero}-extended offset,
 scaled by 8, to the stack pointer, {\tt x2}.  It expands to {\tt fld rd,
 offset(x2)}.
+\end{comment}
+C.FLDSPはRV32DC/RV64DC限定の命令で、メモリから倍精度浮動小数点値を浮動小数点レジスタ{\em rd}にロードします。
+この命令はゼロ拡張したオフセットを8倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
+この命令は{\tt fld rd, offset(x2)}に展開されます。
 
 \begin{center}
 \begin{tabular}{S@{}M@{}T@{}Y}
@@ -499,46 +718,85 @@ C.FSWSP& offset[5:2$\vert$7:6] & src & C2 \\
 C.FSDSP& offset[5:3$\vert$8:6] & src & C2 \\
 \end{tabular}
 \end{center}
+\begin{comment}
 These instructions use the CSS format.
+\end{comment}
+この命令はCSSフォーマットを使用します。
 
+\begin{comment}
 C.SWSP stores a 32-bit value in register {\em rs2} to memory.  It computes
 an effective address by adding the {\em zero}-extended offset, scaled by 4, to
 the stack pointer, {\tt x2}.
 It expands to {\tt sw rs2, offset(x2)}.
+\end{comment}
+C.SWSPは{\em rs2}レジスタに格納されている32ビットの値をメモリにストアします。
+{\em ゼロ}拡張されたオフセットを4倍し、スタックポインタ{\tt x2}と加算して実効アドレスを算出します。
+この命令は{\tt sw rs2, offset(x2)}に展開されます。
 
+\begin{comment}
 C.SDSP is an RV64C/RV128C-only instruction that stores a 64-bit value in register
 {\em rs2} to memory.  It computes an effective address by adding the {\em
 zero}-extended offset, scaled by 8, to the stack pointer, {\tt x2}.
 It expands to {\tt sd rs2, offset(x2)}.
+\end{comment}
+C.SDSPはRV64C/RV128C限定命令で{\em rs2}レジスタに格納されている64ビットの値をメモリにストアします。
+{\em ゼロ}拡張されたオフセットを8倍し、スタックポインタ{\tt x2}と加算して実効アドレスを算出します。
+この命令は{\tt sd rs2, offset(x2)}に展開されます。
 
+\begin{comment}
 C.SQSP is an RV128C-only instruction that stores a 128-bit value in register
 {\em rs2} to memory.  It computes an effective address by adding the {\em
 zero}-extended offset, scaled by 16, to the stack pointer, {\tt x2}.
 It expands to {\tt sq rs2, offset(x2)}.
+\end{comment}
+C.SQSPはRV128C限定命令で{\em rs2}レジスタに格納されている128ビットの値をメモリにストアします。
+{\em ゼロ}拡張されたオフセットを16倍し、スタックポインタ{\tt x2}と加算して実効アドレスを算出します。
+この命令は{\tt sq rs2, offset(x2)}に展開されます。
 
+\begin{comment}
 C.FSWSP is an RV32FC-only instruction that stores a single-precision
 floating-point value in floating-point register {\em rs2} to memory.  It
 computes an effective address by adding the {\em zero}-extended offset, scaled
 by 4, to the stack pointer, {\tt x2}.  It expands to {\tt fsw rs2,
 offset(x2)}.
+\end{comment}
+C.FSWSPは浮動小数点レジスタ{\em rs2}に格納されている32ビット単精度浮動小数点値をメモリにストアします。
+{\em ゼロ}拡張されたオフセットを4倍し、スタックポインタ{\tt x2}と加算して実効アドレスを算出します。
+この命令は{\tt fsw rs2, offset(x2)}に展開されます。
 
+\begin{comment}
 C.FSDSP is an RV32DC/RV64DC-only instruction that stores a double-precision
 floating-point value in floating-point register {\em rs2} to memory.  It
 computes an effective address by adding the {\em zero}-extended offset, scaled
 by 8, to the stack pointer, {\tt x2}.  It expands to {\tt fsd rs2,
 offset(x2)}.
+\end{comment}
+C.FSDSPは浮動小数点レジスタ{\em rs2}に格納されている64ビット倍精度浮動小数点値をメモリにストアします。
+{\em ゼロ}拡張されたオフセットを8倍し、スタックポインタ{\tt x2}と加算して実効アドレスを算出します。
+この命令は{\tt fsd rs2, offset(x2)}に展開されます。
 
 \begin{commentary}
+\begin{comment}
 Register save/restore code at function entry/exit represents a
 significant portion of static code size.  The stack-pointer-based
 compressed loads and stores in RVC are effective at reducing the
 save/restore static code size by a factor of 2 while improving
 performance by reducing dynamic instruction bandwidth.
+\end{comment}
+関数の入出力時に発生するレジスタの保存/復元コードは、静的コードサイズのかなりの部分を占めています。
+RVCのスタックポインタベースの圧縮ロード/ストアは、保存/復元のスタティックコードサイズを2分の1に削減し、
+動的命令のバンド幅を削減することでパフォーマンスを向上させる効果があります。
 
+\begin{comment}
 A common mechanism used in other ISAs to further reduce
 save/restore code size is load-multiple and store-multiple
 instructions.  We considered adopting these for RISC-V but noted the
 following drawbacks to these instructions:
+\end{comment}
+保存/復元のコードサイズをさらに小さくするために、他のISAでよく使われているメカニズムが、複数ロード命令と複数ストア命令です。
+RISC-Vでも採用を検討しましたが、これらの命令には以下のような欠点がありました。
+
+\begin{comment}
 \begin{itemize}
 \item These instructions complicate processor implementations.
 \item For virtual memory systems, some data accesses could be
@@ -557,15 +815,40 @@ following drawbacks to these instructions:
 \item The desire for sequential register allocation might conflict with
       the featured registers selected for the CIW, CL, CS, CA, and CB formats.
 \end{itemize}
+\end{comment}
+\begin{itemize}
+\item これらの命令はプロセッサの実装を複雑にする。
+\item また、仮想メモリシステムでは、物理メモリに常駐するデータアクセスとそうでないデータアクセスがあるため、
+  部分的に実行された命令のリスタート機構が新たに必要になります。
+\item RVCの他の命令とは異なり、複数ロード命令と複数ストア命令に相当するIFDはありません。
+\item RVCの他の命令とは異なり、これらの命令は順次保存/復元されるため、コンパイラはこれらの命令を意識して命令を生成し、
+  保存/復元される可能性が最大になるような順序でレジスタを割り当てる必要があります。
+\item 単純なマイクロアーキテクチャの実装では、
+  複数のロード/ストア命令の周りに他の命令をどのようにスケジューリングするかが制限され、
+  性能が低下する可能性があります。
+\item また、レジスタを順次割り当てたいという要望は、CIW、CL、CS、CA、CBの
+  各フォーマットで選択された機能付きレジスターと相反する可能性があります。
+\end{itemize}
+
+\begin{comment}
 Furthermore, much of the gains can be realized in software by replacing
 prologue and epilogue code with subroutine calls to common
 prologue and epilogue code, a technique described in
 Section 5.6 of~\cite{waterman-phd}.
+\end{comment}
+さらに、プロローグとエピローグのコードを、共通のプロローグとエピローグのコードへのサブルーチンコールに置き換えることで、
+ソフトウェアで多くの利益を実現することができます。
+この技法は~\cite{waterman-phd}の5.6節で説明されています。
 
+\begin{comment}
 While reasonable architects might come to different conclusions, we
 decided to omit load and store multiple and instead use the
 software-only approach of calling save/restore millicode routines to
 attain the greatest code size reduction.
+\end{comment}
+アーキテクトによって結論は異なるかもしれませんが、私たちは複数ロードストアを省き、
+代わりに保存/復元のミリコードルーチンを呼び出すというソフトウェアのみのアプローチを用いて、
+最大のコードサイズ削減を実現することにしました。
 \end{commentary}
 
 \subsection*{Register-Based Loads and Stores}
