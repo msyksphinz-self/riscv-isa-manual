@@ -602,7 +602,7 @@ registers.
 RVCは2種類のロードストア命令を用意しています。
 1つはABIのスタックポインタ{\tt x2}をベースアドレスとして任意のデータレジスタを
 ターゲットとするものです。
-もう一つは8つのベースアドレスレジスあtと8つのデータレジスタのみ使用可能なロードストア命令です。
+もう一つは8つのベースアドレスレジスタと8つのデータレジスタのみ使用可能なロードストア命令です。
 
 \begin{comment}
 \subsection*{Stack-Pointer-Based Loads and Stores}
@@ -647,7 +647,7 @@ the code points with $\textit{rd}{=}\texttt{x0}$ are reserved.
 C.LWSPは32ビットの値をメモリからレジスタ{\em rd}にロードします。
 この命令は{\em ゼロ}拡張したオフセットを4倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
 この命令は{\tt lw rd, offset(x2)}に展開されます。
-C.LWSPは$textit{rd}{neq}\texttt{x0}$のときのみ有効で、$textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
+C.LWSPは$\textit{rd}{neq}\texttt{x0}$のときのみ有効で、$\textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
 
 \begin{comment}
 C.LDSP is an RV64C/RV128C-only instruction that loads a 64-bit value from memory into
@@ -660,7 +660,7 @@ the code points with $\textit{rd}{=}\texttt{x0}$ are reserved.
 C.LDSPはRV64C/RV128C限定の命令で、64ビットの値をメモリからレジスタ{\em rd}にロードします。
 この命令は{\em ゼロ}拡張したオフセットを8倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
 この命令は{\tt ld rd, offset(x2)}に展開されます。
-C.LDSPは$textit{rd}{neq}\texttt{x0}$のときのみ有効で、$textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
+C.LDSPは$\textit{rd}{neq}\texttt{x0}$のときのみ有効で、$\textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
 
 \begin{comment}
 C.LQSP is an RV128C-only instruction that loads a 128-bit value from memory
@@ -673,7 +673,7 @@ the code points with $\textit{rd}{=}\texttt{x0}$ are reserved.
 C.LQSPはRV128C限定の命令で、128ビットの値をメモリからレジスタ{\em rd}にロードします。
 この命令はゼロ拡張したオフセットを16倍し、スタックポインタ{\tt x2}を加算して実効アドレスを算出します。
 この命令は{\tt lq rd, offset(x2)}に展開されます。
-C.LDSPは$textit{rd}{neq}\texttt{x0}$のときのみ有効で、$textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
+C.LDSPは$\textit{rd}{neq}\texttt{x0}$のときのみ有効で、$\textit{rd}{=}texttt{x0}$のコードポイントは予約されています。
 
 \begin{comment}
 C.FLWSP is an RV32FC-only instruction that loads a single-precision
