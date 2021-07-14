@@ -851,7 +851,10 @@ attain the greatest code size reduction.
 最大のコードサイズ削減を実現することにしました。
 \end{commentary}
 
+\begin{comment}
 \subsection*{Register-Based Loads and Stores}
+\end{comment}
+\subsection*{レジスタベースのロード・ストア命令}
 
 \begin{center}
 \begin{tabular}{S@{}S@{}S@{}Y@{}S@{}Y}
@@ -878,36 +881,64 @@ C.FLW& offset[5:3] & base & offset[2$\vert$6] & dest & C0 \\
 C.FLD& offset[5:3] & base & offset[7:6] & dest & C0 \\
 \end{tabular}
 \end{center}
+\begin{comment}
 These instructions use the CL format.
+\end{comment}
+これらの命令はCLフォーマットを使用します。
 
+\begin{comment}
 C.LW loads a 32-bit value from memory into register {\em \rdprime}.  It computes
 an effective address by adding the {\em zero}-extended offset, scaled by 4, to
 the base address in register {\em \rsoneprime}.
 It expands to {\tt lw \rdprime, offset(\rsoneprime)}.
+\end{comment}
+C.LWはメモリから32ビットの値をレジスタにロードして{\em \rdprime}レジスタに格納します。
+レジスタのベースアドレスに、{\em ゼロ拡張}された即値を4倍に拡張されたオフセットを加えて実効アドレスを算出します。
+この命令は{\tt lw \rdprime, offset(\rsoneprime)} に展開されます。
 
+\begin{comment}
 C.LD is an RV64C/RV128C-only instruction that loads a 64-bit value from memory into
 register {\em \rdprime}.  It computes an effective address by adding the {\em
 zero}-extended offset, scaled by 8, to the base address in register {\em
 \rsoneprime}.
 It expands to {\tt ld \rdprime, offset(\rsoneprime)}.
+\end{comment}
+C.LDはRV64C/RV128C限定の命令で、メモリから64ビットの値をレジスタにロードして{\em \rdprime}に格納します。
+レジスタのベースアドレスに、{\em ゼロ拡張}された即値を8倍に拡張されたオフセットを加えて実効アドレスを算出します。
+この命令は{\tt ld \rdprime, offset(\rsoneprime)} に展開されます。
 
+\begin{comment}
 C.LQ is an RV128C-only instruction that loads a 128-bit value from memory into
 register {\em \rdprime}.  It computes an effective address by adding the {\em
 zero}-extended offset, scaled by 16, to the base address in register {\em
 \rsoneprime}.
 It expands to {\tt lq \rdprime, offset(\rsoneprime)}.
+\end{comment}
+C.LQはRV128C限定の命令で、メモリから128ビットの値をレジスタにロードして{\em \rdprime}に格納します。
+レジスタのベースアドレスに、{\em ゼロ拡張}された即値を16倍に拡張されたオフセットを加えて実効アドレスを算出します。
+この命令は{\tt lq \rdprime, offset(\rsoneprime)} に展開されます。
 
+\begin{comment}
 C.FLW is an RV32FC-only instruction that loads a single-precision
 floating-point value from memory into floating-point register {\em \rdprime}.  It
 computes an effective address by adding the {\em zero}-extended offset, scaled
 by 4, to the base address in register {\em \rsoneprime}.  It expands to {\tt flw
 \rdprime, offset(\rsoneprime)}.
+\end{comment}
+C.FLWはRV32FC限定の命令で、メモリから単精度浮動小数点値をロードして浮動小数点レジスタ{\em \rdprime}に格納します。
+レジスタのベースアドレスに、{\em ゼロ拡張}された即値を4倍に拡張されたオフセットを加えて実効アドレスを算出します。
+この命令は{\tt flw \rdprime, offset(\rsoneprime)} に展開されます。
 
+\begin{comment}
 C.FLD is an RV32DC/RV64DC-only instruction that loads a double-precision
 floating-point value from memory into floating-point register {\em \rdprime}.  It
 computes an effective address by adding the {\em zero}-extended offset, scaled
 by 8, to the base address in register {\em \rsoneprime}.  It expands to {\tt fld
 \rdprime, offset(\rsoneprime)}.
+\end{comment}
+C.FLDはRV32DC/RV64DC限定の命令で、メモリから倍精度浮動小数点値をロードして浮動小数点レジスタ{\em \rdprime}に格納します。
+レジスタのベースアドレスに、{\em ゼロ拡張}された即値を8倍に拡張されたオフセットを加えて実効アドレスを算出します。
+これは、{\tt fld \rdprime, offset(\rsoneprime)} に展開されます。
 
 \begin{center}
 \begin{tabular}{S@{}S@{}S@{}Y@{}S@{}Y}
@@ -934,36 +965,64 @@ C.FSW& offset[5:3] & base & offset[2$\vert$6] & src & C0 \\
 C.FSD& offset[5:3] & base & offset[7:6] & src & C0 \\
 \end{tabular}
 \end{center}
+\begin{comment}
 These instructions use the CS format.
+\end{comment}
+これらの命令はCSフォーマットを使用します。
 
+\begin{comment}
 C.SW stores a 32-bit value in register {\em \rstwoprime} to memory.  It computes an
 effective address by adding the {\em zero}-extended offset, scaled by 4, to
 the base address in register {\em \rsoneprime}.
 It expands to {\tt sw \rstwoprime, offset(\rsoneprime)}.
+\end{comment}
+C.SW命令はレジスタ{\em \rstwoprime}の32ビット値をメモリにストアします。
+レジスタのベースアドレス{\em \rsoneprime}に{\em ゼロ拡張}された即値を4倍に拡張されたオフセットを加算して実効アドレスを算出します。
+この命令は{\tt sw \rstwoprime, offset(\rsoneprime)}に展開されます。
 
+\begin{comment}
 C.SD is an RV64C/RV128C-only instruction that stores a 64-bit value in
 register {\em \rstwoprime} to memory.  It computes an effective address by adding
 the {\em zero}-extended offset, scaled by 8, to the base address in register
 {\em \rsoneprime}.
 It expands to {\tt sd \rstwoprime, offset(\rsoneprime)}.
+\end{comment}
+C.SDはRV64C/RV128C限定の命令で、レジスタ{\em \rstwoprime}の64ビット値をメモリにストアします。
+レジスタのベースアドレス{\em \rsoneprime}に{\em ゼロ拡張}された即値を8倍に拡張されたオフセットを加算して実効アドレスを算出します。
+この命令は{\tt sd \rstwoprime, offset(\rsoneprime)}に展開されます。
 
+\begin{comment}
 C.SQ is an RV128C-only instruction that stores a 128-bit value in register
 {\em \rstwoprime} to memory.  It computes an effective address by adding the {\em
 zero}-extended offset, scaled by 16, to the base address in register {\em
 \rsoneprime}.
 It expands to {\tt sq \rstwoprime, offset(\rsoneprime)}.
+\end{comment}
+C.SQはRV128C限定の命令で、レジスタ{\em \rstwoprime}の128ビット値をメモリにストアします。
+レジスタのベースアドレス{\em \rsoneprime}に{\em ゼロ拡張}された即値を16倍に拡張されたオフセットを加算して実効アドレスを算出します。
+この命令は{\tt sq \rstwoprime, offset(\rsoneprime)}に展開されます。
 
+\begin{comment}
 C.FSW is an RV32FC-only instruction that stores a single-precision
 floating-point value in floating-point register {\em \rstwoprime} to memory.  It
 computes an effective address by adding the {\em zero}-extended offset, scaled
 by 4, to the base address in register {\em \rsoneprime}.  It expands to {\tt fsw
 \rstwoprime, offset(\rsoneprime)}.
+\end{comment}
+C.FSWはRV32FC限定の命令で、浮動小数点レジスタ{\em \rstwoprime}の単精度浮動小数点値をメモリにストアします。
+レジスタのベースアドレス{\em \rsoneprime}に{\em ゼロ拡張}された即値を4倍に拡張されたオフセットを加算して実効アドレスを算出します。
+この命令は{\tt fsw \rstwoprime, offset(\rsoneprime)}に展開されます。
 
+\begin{comment}
 C.FSD is an RV32DC/RV64DC-only instruction that stores a double-precision
 floating-point value in floating-point register {\em \rstwoprime} to memory.  It
 computes an effective address by adding the {\em zero}-extended offset, scaled
 by 8, to the base address in register {\em \rsoneprime}.  It expands to {\tt fsd
 \rstwoprime, offset(\rsoneprime)}.
+\end{comment}
+C.FSDはRV32DC/RV64DC限定の命令で、浮動小数点レジスタ{\em \rstwoprime}の倍精度浮動小数点値をメモリにストアします。
+レジスタのベースアドレス{\em \rsoneprime}に{\em ゼロ拡張}された即値を8倍に拡張されたオフセットを加算して実効アドレスを算出します。
+この命令は{\tt fsd \rstwoprime, offset(\rsoneprime)}に展開されます。
 
 \section{Control Transfer Instructions}
 
