@@ -1366,7 +1366,7 @@ to generate pointers to stack-allocated variables, and expands to
 C.ADDI4SPN is only valid when {\em nzuimm}$\neq$0;
 the code points with {\em nzuimm}=0 are reserved.
 \end{comment}
-C.ADDI4SPNはCIWフォーマットの命令で、スタックポインタに4倍に拡張した0でない即値を加え、その結果をC.ADDI4SPNに書き込みます。
+aC.ADDI4SPNはCIWフォーマットの命令で、スタックポインタに4倍に拡張した0でない即値を加え、その結果をC.ADDI4SPNに書き込みます。
 この命令は、スタックに配置された変数へのポインタを生成するために使用され、{\tt addi \rdprime, x2, nzuimm}に展開されます。
 C.ADDI4SPNは、{\em nzuimm}$\neq$0のときのみ有効で、{\em nzuimm}=0のときは予約されています。
 
@@ -1392,18 +1392,30 @@ C.SLLI  & shamt[5] & dest$\neq$0 & shamt[4:0] & C2 \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 C.SLLI is a CI-format instruction that performs a logical left shift
 of the value in register {\em rd} then writes the result to {\em rd}.
 The shift amount is encoded in the {\em shamt} field.
 For RV128C, a shift amount of zero is used to encode a shift of 64.
 C.SLLI expands into {\tt slli rd, rd, shamt}, except for
 RV128C with {\tt shamt=0}, which expands to {\tt slli rd, rd, 64}.
+\end{comment}
+C.SLLIは、レジスタに格納されている値を左に論理シフトし、その結果を{\em Rd}に書き込むCIフォーマットの命令です。
+シフト量はフィールドに格納されます。
+RV128Cの場合、シフト量0で64のシフトがエンコードされます。
+C.SLLIは{\tt slli rd, rd, shamt}と展開されますが、RV128Cの{\tt shamt=0}の場合は{\tt slli rd, rd, 64}と展開されます。
 
+\begin{comment}
 For RV32C, {\em shamt[5]} must be zero; the code points with {\em shamt[5]}=1
 are designated for custom extensions.  For RV32C and RV64C, the shift
 amount must be non-zero; the code points with {\em shamt}=0 are HINTs.  For
 all base ISAs, the code points with {\em rd}={\tt x0} are HINTs, except those
 with {\em shamt[5]}=1 in RV32C.
+\end{comment}
+RV32Cでは、{\tt shamt[5]}は0でなければならず、{\em shamt[5]}=1のコードポイントは、カスタム拡張に指定されています。
+RV32CとRV64Cでは、シフト量は0以外でなければなりません。
+全てのベースISAにおいて、RV32Cでは、{\em shamt[5]}=1のコードポイントを除き、
+{\em rd}={\tt x0}のコードポイントはHINTとなります。
 
 \vspace{-0.4in}
 \begin{center}
@@ -1429,6 +1441,7 @@ C.SRAI  & shamt[5] & C.SRAI & dest & shamt[4:0] & C1 \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 C.SRLI is a CB-format instruction that performs a logical right shift
 of the value in register {\em \rdprime} then writes the result to {\em \rdprime}.
 The shift amount is encoded in the {\em shamt} field.
@@ -1438,16 +1451,32 @@ for RV128C, and so the legal shift amounts are 1--31, 64, and 96--127.
 C.SRLI expands into {\tt srli \rdprime, \rdprime, shamt},
 except for RV128C with {\tt shamt=0}, which expands to
 {\tt srli \rdprime, \rdprime, 64}.
+\end{comment}
+C.SRLIはCBフォーマットの命令で、レジスタの値を右方向に論理シフトし、その結果をレジスタに書き込みます。
+シフト量はフィールドに格納されています。
+RV128Cでは、シフト量が0の場合、64のシフトがエンコードされます。
+さらに、RV128Cではシフト量は符号拡張されているので、合法的なシフト量は1--31、64、96--127となります。
+C.SRLIは、RV128Cの{\tt shamt=0}を除き、{\tt srli \rdprime, \rdprime, shamt}に展開されます。
 
+\begin{comment}
 For RV32C, {\em shamt[5]} must be zero; the code points with {\em shamt[5]}=1
 are designated for custom extensions.  For RV32C and RV64C, the shift
 amount must be non-zero; the code points with {\em shamt}=0 are HINTs.
+\end{comment}
+RV32Cでは、{\em shamt[5]}は0でなければならず、{\em shamt[5]}=1のコードポイントは、カスタム拡張に指定されています。
+RV32C、RV64Cでは、シフト量は0以外でなければならず、0のコードポイントはHINTとなります。
 
+\begin{comment}
 C.SRAI is defined analogously to C.SRLI, but instead performs an arithmetic
 right shift.
 C.SRAI expands to {\tt srai \rdprime, \rdprime, shamt}.
+\end{comment}
+C.SRAIは、C.SRLIと同様に定義されるが、算術右シフトを行います。
+C.SRAIは {\tt srai \rdprime, \rdprime, shamt} に展開されます。
+
 
 \begin{commentary}
+\begin{comment}
 Left shifts are usually more frequent than right shifts, as left
 shifts are frequently used to scale address values.  Right shifts have
 therefore been granted less encoding space and are placed in an
@@ -1459,6 +1488,13 @@ to allow extraction of tags located in the high portions of 128-bit
 address pointers.  We note that RV128C will not be frozen at the same
 point as RV32C and RV64C, to allow evaluation of typical usage of
 128-bit address-space codes.
+\end{comment}
+左シフトはアドレス値のスケーリングに頻繁に使用されるため、通常、右シフトよりも頻繁に使用されます。
+そのため、右シフトの符号化スペースは少なく、他の即値が符号拡張されたエンコーディングクアドラント配置されています。
+RV128では、6ビットのシフト量即時値も符号拡張されることになりました。
+デコードの複雑さを軽減するだけでなく、128ビットのアドレスポインタの上位部分にあるタグを抽出するためには、
+64--95よりも96--127の右シフト量の方が有用であると考えています。
+なお、RV128Cは、RV32CやRV64Cと同じ時点では凍結されず、128ビットアドレス空間コードの典型的な使い方を評価できるようになっています。
 \end{commentary}
 
 \begin{center}
@@ -1483,12 +1519,20 @@ C.ANDI  & imm[5] & C.ANDI & dest & imm[4:0] & C1 \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 C.ANDI is a CB-format instruction that computes the bitwise AND of
 the value in register {\em \rdprime} and the sign-extended 6-bit immediate,
 then writes the result to {\em \rdprime}.
 C.ANDI expands to {\tt andi \rdprime, \rdprime, imm}.
+\end{comment}
+C.ANDIは、レジスタの値と符号拡張された6ビットの即値とのビット毎のANDを計算し、
+その結果をレジスタに書き込むCB形式の命令です。
+C.ANDIは{\tt andi \rdprime, \rdprime, imm}に展開されます。
 
+\begin{comment}
 \subsection*{Integer Register-Register Operations}
+\end{comment}
+\subsection*{整数レジスタ-レジスタ演算}
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{E@{}T@{}T@{}Y}
@@ -1508,28 +1552,49 @@ C.MV & dest$\neq$0 & src$\neq$0 & C2 \\
 C.ADD & dest$\neq$0 & src$\neq$0 & C2 \\
 \end{tabular}
 \end{center}
+\begin{comment}
 These instructions use the CR format.
+\end{comment}
+これらの命令はCRフォーマットを使用します。
 
+\begin{comment}
 C.MV copies the value in register {\em rs2} into register {\em rd}.  C.MV
 expands into {\tt add rd, x0, rs2}.
 C.MV is only valid when $\textit{rs2}{\neq}\texttt{x0}$; the code points
 with $\textit{rs2}{=}\texttt{x0}$ correspond to the C.JR instruction.
 The code points with $\textit{rs2}{\neq}\texttt{x0}$ and
 $\textit{rd}{=}\texttt{x0}$ are HINTs.
+\end{comment}
+C.MV は、レジスタ{\em rs2}の値をレジスタ{\em rd}にコピーします。
+C.MVは、{\tt add rd, x0, rs2}に展開されます。
+C.MVは、$\textit{rs2}{\neq}\texttt{x0}$のときのみ有効で、$\textit{rs2}{=}\texttt{x0}$のコードポイントはC.JR命令に対応します。
+また、$\textit{rs2}{\neq}\texttt{x0}$、$\textit{rd}{=}\texttt{x0}$のコードポイントはHINTです。
 
 \begin{commentary}
+\begin{comment}
 C.MV expands to a different instruction than the canonical MV
 pseudoinstruction, which instead uses ADDI. Implementations that handle MV
 specially, e.g. using register-renaming hardware, may find it more convenient
 to expand C.MV to MV instead of ADD, at slight additional hardware cost.
+\end{comment}
+C.MVは、正規のMV疑似命令とは異なる命令に展開され、ADDI命令に展開されます。
+MVを特別に扱う実装(レジスタリネームハードウェアなど)では、
+C.MVをADDではなくMVに展開した方が便利な場合がありますが、ハードウェアのコストが若干かかります。
 \end{commentary}
 
+\begin{comment}
 C.ADD adds the values in registers {\em rd} and {\em rs2} and writes the
 result to register {\em rd}.  C.ADD expands into {\tt add rd, rd, rs2}.
 C.ADD is only valid when $\textit{rs2}{\neq}\texttt{x0}$; the code points
 with $\textit{rs2}{=}\texttt{x0}$ correspond to the C.JALR and C.EBREAK instructions.
 The code points with $\textit{rs2}{\neq}\texttt{x0}$ and
 $\textit{rd}{=}\texttt{x0}$ are HINTs.
+\end{comment}
+C.ADDは、レジスタの値を加算し、その結果をレジスタに書き込みます。
+C.ADDは、{\tt add rd, rd, rs2}に展開されます。
+C.ADDは，$\textit{rs2}{=}\texttt{x0}$のときのみ有効で、$\textit{rs2}{=}\texttt{x0}$のコードポイントは
+C.JALR命令，C.EBREAK命令に対応します。
+$\textit{rs2}{\neq}\texttt{x0}$ と $\textit{rd}{=}\texttt{x0}$ のコードポイントはHINTとなります。
 
 \vspace{-0.4in}
 \begin{center}
@@ -1557,39 +1622,76 @@ C.SUBW & dest & C.SUBW & src & C1 \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 These instructions use the CA format.
+\end{comment}
+これらの命令はCAフォーマットを使用します。
 
+\begin{comment}
 C.AND computes the bitwise AND of the values in registers {\em \rdprime}
 and {\em \rstwoprime}, then writes the result to register {\em \rdprime}.
 C.AND expands into {\tt and \rdprime, \rdprime, \rstwoprime}.
+\end{comment}
+C.ANDは、レジスタ{\em \rdprime}と{\em \rstwoprime}の値のビットごとのANDを計算し、
+その結果をレジスタ{\em \rdprime}に書き込みます。
+C.ANDは、{\tt and \rdprime, \rdprime, \rstwoprime}に展開されます。
 
+\begin{comment}
 C.OR computes the bitwise OR of the values in registers {\em \rdprime}
 and {\em \rstwoprime}, then writes the result to register {\em \rdprime}.
 C.OR expands into {\tt or \rdprime, \rdprime, \rstwoprime}.
+\end{comment}
+C.ORは、レジスタ{\em \rdprime}と{\em \rstwoprime}の値のビットごとのORを計算し、
+その結果をレジスタ{\em \rdprime}に書き込みます。
+C.ORは、{\tt or \rdprime, \rdprime, \rstwoprime}に展開されます。
 
+\begin{comment}
 C.XOR computes the bitwise XOR of the values in registers {\em \rdprime}
 and {\em \rstwoprime}, then writes the result to register {\em \rdprime}.
 C.XOR expands into {\tt xor \rdprime, \rdprime, \rstwoprime}.
+\end{comment}
+C.XORは、レジスタ{\em \rdprime}と{\em \rstwoprime}の値のビットごとのXORを計算し、
+その結果をレジスタ{\em \rdprime}に書き込みます。
+C.XORは、{\tt xor \rdprime, \rdprime, \rstwoprime}に展開されます。
 
+\begin{comment}
 C.SUB subtracts the value in register {\em \rstwoprime} from the value in
 register {\em \rdprime}, then writes the result to register {\em \rdprime}.
 C.SUB expands into {\tt sub \rdprime, \rdprime, \rstwoprime}.
+\end{comment}
+C.SUBはレジスタ{\em \rdprime}からレジスタ{\em \rstwoprime}の値を減算し、
+その結果をレジスタ{\em \rdprime}書き込みます。
+C.SUBは{\tt sub \rdprime, \rdprime, \rstwoprime}に展開されます。
 
+\begin{comment}
 C.ADDW is an RV64C/RV128C-only instruction that adds the values in
 registers {\em \rdprime} and {\em \rstwoprime}, then sign-extends the lower
 32 bits of the sum before writing the result to register {\em \rdprime}.
 C.ADDW expands into {\tt addw \rdprime, \rdprime, \rstwoprime}.
+\end{comment}
+C.ADDWはRV64C/RV128C限定の命令で、レジスタ{\em \rdprime}とレジスタ{\em \rstwoprime}の値を加算し、
+下位32ビットを符号拡張してレジスタ{\em \rdprime}書き込みます。
+C.ADDWは{\tt addw \rdprime, \rdprime, \rstwoprime}に展開されます。
 
+\begin{comment}
 C.SUBW is an RV64C/RV128C-only instruction that subtracts the value in
 register {\em \rstwoprime} from the value in register {\em \rdprime}, then
 sign-extends the lower 32 bits of the difference before writing the result
 to register {\em \rdprime}. C.SUBW expands into {\tt subw \rdprime, \rdprime, \rstwoprime}.
+\end{comment}
+C.SUBWはRV64C/RV128C限定の命令で、レジスタ{\em \rdprime}から{\em \rstwoprime}の値を減算し、
+下位32ビットを符号拡張してレジスタ{\em \rdprime}書き込みます。
+C.SUBWは{\tt subw \rdprime, \rdprime, \rstwoprime}に展開されます。
 
 \begin{commentary}
+\begin{comment}
 This group of six instructions do not provide large savings
 individually, but do not occupy much encoding space and are
 straightforward to implement, and as a group provide a worthwhile
 improvement in static and dynamic compression.
+\end{comment}
+この6つの命令群は、個々には大きな節約にはならないが、多くの符号化空間を占有せず、
+実装も簡単であり、グループとして静的および動的圧縮において価値のある改善をもたらす。
 \end{commentary}
 
 \subsection*{Defined Illegal Instruction}
