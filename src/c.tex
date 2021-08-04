@@ -1694,7 +1694,10 @@ improvement in static and dynamic compression.
 実装も簡単であり、グループとして静的および動的圧縮において価値のある改善をもたらす。
 \end{commentary}
 
+\begin{comment}
 \subsection*{Defined Illegal Instruction}
+\end{comment}
+\subsection*{定義済み不正命令}
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{SW@{}T@{}T@{}Y}
@@ -1716,9 +1719,13 @@ improvement in static and dynamic compression.
 \end{tabular}
 \end{center}
 
+\begin{comment}
 A 16-bit instruction with all bits zero is permanently reserved as an
 illegal instruction.
+\end{comment}
+全ビットがゼロの16ビット命令は、不正な命令として永久に予約されます。
 \begin{commentary}
+\begin{comment}
 We reserve all-zero instructions to be illegal instructions to help
 trap attempts to execute zero-ed or non-existent portions of the
 memory space.  The all-zero value should not be redefined in any
@@ -1726,9 +1733,17 @@ non-standard extension.  Similarly, we reserve instructions with all
 bits set to 1 (corresponding to very long instructions in the RISC-V
 variable-length encoding scheme) as illegal to capture another common
 value seen in non-existent memory regions.
+\end{comment}
+メモリ空間のゼロになった部分や存在しない部分を実行しようとする試みをトラップするために、すべてゼロの命令を不正な命令として確保します。
+すべてゼロの値は、非標準的な拡張では再定義してはなりません。
+同様に、存在しないメモリ領域で見られるもう一つの一般的な値を捕捉するために、
+すべてのビットが1に設定された命令(RISC-Vの可変長符号化方式における非常に長い命令に対応する)を不正命令とします。
 \end{commentary}
 
+\begin{comment}
 \subsection*{NOP Instruction}
+\end{comment}
+\subsection*{NOP命令}
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{SW@{}T@{}T@{}Y}
@@ -1750,12 +1765,19 @@ C.NOP & 0 & 0 & 0 & C1 \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 C.NOP is a CI-format instruction that does not change any user-visible state,
 except for advancing the {\tt pc} and incrementing any applicable performance
 counters.  C.NOP expands to {\tt nop}.  C.NOP is only valid when {\em imm}=0;
 the code points with {\em imm}$\neq$0 encode HINTs.
-
+\end{comment}
+C.NOPはCI形式の命令で、ユーザーの目に見える状態を一切変更しません。
+ただし、{\tt pc}を進めるのと、パフォーマンスカウンタをインクリメントします。
+C.NOPは{\tt nop}に展開されます。 C.NOPは、{\em imm}=0のときのみ有効で、{\em imm}$\neq$0はHINTとしてエンコードされます。
+\begin{comment}
 \subsection*{Breakpoint Instruction}
+\end{comment}
+\subsection*{ブレークポイント命令}
 \vspace{-0.4in}
 \begin{center}
 \begin{tabular}{E@{}U@{}Y}
@@ -1773,67 +1795,119 @@ C.EBREAK & 0 & C2 \\
 \end{tabular}
 \end{center}
 
+\begin{comment}
 Debuggers can use the C.EBREAK instruction, which expands to {\tt ebreak},
 to cause control to be transferred back to the debugging environment.
 C.EBREAK shares the opcode with the C.ADD instruction, but with {\em
   rd} and {\em rs2} both zero, thus can also use the CR format.
+\end{comment}
+デバッガはC.EBREAK命令を使用することができ、この命令は{\tt ebreak}命令に展開されます。
+この命令はデバッグ環境に制御を渡すために使用します。
+C.EBREAKはC.ADD命令とオペコードを共有していますが、C.ADDとC.EBREAKの{\em rd}と{\em rs2}は共に0であるため、
+CRフォーマットを使用することができます。
 
+\begin{comment}
 \section{Usage of C Instructions in LR/SC Sequences}
+\end{comment}
+\section{LR/SCシーケンスにおけるC命令の使用}
 
+\begin{comment}
 On implementations that support the C extension, compressed forms of the
 I instructions permitted inside constrained LR/SC sequences, as described in
 Section~\ref{sec:lrscseq}, are also permitted inside constrained LR/SC
 sequences.
+\end{comment}
+C拡張をサポートする実装では、~\ref{sec:lrscseq}に記載されているように、
+制約付きLR/SCシーケンス内で許可されるI命令の圧縮形式も許可されています。
+同様に、C拡張の実装もLR/SCシーケンス内で実行を許可されています。
 
 \begin{commentary}
+\begin{comment}
 The implication is that any implementation that claims to support both
 the A and C extensions must ensure that LR/SC sequences containing
 valid C instructions will eventually complete.
+\end{comment}
+A拡張とC拡張の両方をサポートすると主張する実装は、
+有効なC命令を含むLR/SCシーケンスが最終的に完了することを保証しなければならないということを意味します。
 \end{commentary}
 
+\begin{comment}
 \section{HINT Instructions}
+\end{comment}
+\section{HINT命令}
 \label{sec:rvc-hints}
 
+\begin{comment}
 A portion of the RVC encoding space is reserved for microarchitectural HINTs.
 Like the HINTs in the RV32I base ISA (see Section~\ref{sec:rv32i-hints}),
 these instructions do not modify any architectural state, except for advancing
 the {\tt pc} and any applicable performance counters.  HINTs are
 executed as no-ops on implementations that ignore them.
+\end{comment}
+RVCエンコーディングスペースの一部は、マイクロアーキテクチャのHINT用に確保されています。
+これらの命令は、RV32IベースISAのHINT(~\ref{sec:rv32i-hints}節参照)と同様に、
+パフォーマンスカウンタを進める以外は、アーキテクチャの状態を変更することはありません。
+HINT命令は、それを無視する実装では、no-opとして実行されます。
 
+\begin{comment}
 RVC HINTs are encoded as computational instructions that do not modify the
 architectural state, either because {\em rd}={\tt x0}
 (e.g. \mbox{C.ADD {\em x0}, {\em t0}}), or because {\em rd} is overwritten
 with a copy of itself (e.g. \mbox{C.ADDI {\em t0}, 0}).
+\end{comment}
+RVC HINTsは、{\em rd}={\tt x0}のためアーキテクチャの状態を変更しない計算命令としてエンコードされます。
+(例：\mbox{C.ADD {\em x0}, {\em t0}} または、{\em rd}が自分自身のコピーで上書きされる(例：\mbox{C.ADDI {\em t0}, 0}))
 
 \begin{commentary}
+\begin{comment}
 This HINT encoding has been chosen so that simple implementations can ignore
 HINTs altogether, and instead execute a HINT as a regular computational
 instruction that happens not to mutate the architectural state.
+\end{comment}
+このHINTエンコーディングは、シンプルな実装であればHINTを完全に無視することができ、
+代わりにアーキテクチャの状態を変更しない通常の計算命令としてHINTを実行できるように選択されています。
 \end{commentary}
 
+\begin{comment}
 RVC HINTs do not necessarily expand to their RVI HINT counterparts.  For
 example, \mbox{C.ADD {\em x0}, {\em t0}} might not encode the same HINT
 as \mbox{ADD {\em x0}, {\em x0}, {\em t0}}.
+\end{comment}
+RVC HINTは必ずしもRVI HINTに対応するものに展開されるわけではありません。
+例えば、\mbox{C.ADD {\em x0}, {\em t0}}は、\mbox{ADD {\em x0}, {\em t0}}と同じHINTをエンコードするとは限りません。
 
 \begin{commentary}
+\begin{comment}
 The primary reason to not require an RVC HINT to expand to an RVI HINT
 is that HINTs are unlikely to be compressible in the same manner as
 the underlying computational instruction.  Also, decoupling the RVC
 and RVI HINT mappings allows the scarce RVC HINT space to be allocated
 to the most popular HINTs, and in particular, to HINTs that are
 amenable to macro-op fusion.
+\end{comment}
+RVC HINTがRVI HINTに展開することを要求しない主な理由は、HINTが基礎となる計算命令と同じ方法で圧縮可能である可能性が低いからです。
+また、RVCとRVIのHINTマッピングを切り離すことで、希少なRVC HINTスペースを最も人気のあるHINT、
+特にmacro-opフュージョンに適したHINTに割り当てることができます。
 \end{commentary}
 
+\begin{comment}
 Table~\ref{tab:rvc-hints} lists all RVC HINT code points.  For RV32C, 78\% of
 the HINT space is reserved for standard HINTs, but none are presently defined.
 The remainder of the HINT space is designated for custom HINTs; no standard
 HINTs will ever be defined in this subspace.
+\end{comment}
+表~\ref{tab:rvc-hints}には、すべてのRVC HINTコードポイントがリストアップされています。
+RV32Cでは、HINT空間の78\%が標準HINT用に予約されていますが、現在は定義されていません。
+残りのHINTスペースはカスタムHINTに指定されており、このサブスペースに標準HINTが定義されることはありません。
 
 \begin{table}[hbt]
 \centering
 \begin{tabular}{|l|l|r|l|}
   \hline
+\begin{comment}
   Instruction             & Constraints                                 & Code Points & Purpose \\ \hline \hline
+\end{comment}
+  命令                    & 定数                                        & コードポイント & 目的 \\ \hline \hline
   C.NOP                   & {\em nzimm}$\neq$0                          & 63          & \multirow{6}{*}{\em Reserved for future standard use} \\ \cline{1-3}
   C.ADDI                  & {\em rd}$\neq${\tt x0}, {\em nzimm}=0       & 31          & \\ \cline{1-3}
   C.LI                    & {\em rd}={\tt x0}                           & 64          & \\ \cline{1-3}
@@ -1847,14 +1921,21 @@ HINTs will ever be defined in this subspace.
   C.SRLI64                & RV32 and RV64 only                          & 8           & \\ \cline{1-3}
   C.SRAI64                & RV32 and RV64 only                          & 8           & \\ \hline
 \end{tabular}
+\begin{comment}
 \caption{RVC HINT instructions.}
+\end{comment}
+\caption{RVCヒント命令}
 \label{tab:rvc-hints}
 \end{table}
 
 \clearpage
 
+\begin{comment}
 \section{RVC Instruction Set Listings}
+\end{comment}
+\section{RVC命令セット一覧}
 
+\begin{comment}
 Table~\ref{rvcopcodemap} shows a map of the major opcodes for RVC.
 Each row of the table corresponds to one quadrant of the encoding
 space.  The last quadrant, which has the two
@@ -1865,8 +1946,20 @@ either {\em RES} to indicate that the opcode is reserved for future
 standard extensions; {\em Custom} to indicate that the opcode is designated
 for custom extensions; or {\em HINT} to indicate that the opcode
 is reserved for microarchitectural hints (see Section~\ref{sec:rvc-hints}).
+\end{comment}
+表~\ref{rvcopcodemap}には，RVCの主要なオペコードのマップが示されています。
+表の各行は、エンコード空間の1つのクアドラントに対応しています。
+最後のクアドラントは、最下位の2ビットが1に設定されており、ベースISAを含む16ビット以上の命令に対応しています。
+いくつかの命令は、特定のオペランドに対してのみ有効です。
+無効な場合は、そのオペコードが将来の標準的な拡張のために予約されていることを示す{\em RES}、
+カスタム拡張のために指定されていることを示す{\em Custom}、
+マイクロアーキテクチャのヒントのために予約されていることを示す{\em HINT}のいずれかのマークが付けられます(~\ref{sec:rvc-hints}節参照)。
 
 \input{rvc-opcode-map}
 
+\begin{comment}
 Tables~\ref{rvc-instr-table0}--\ref{rvc-instr-table2} list the RVC instructions.
+\end{comment}
+表~\ref{rvc-instr-table0}--\ref{rvc-instr-table2}はRVC命令の一覧です。
+
 \input{rvc-instr-table}
