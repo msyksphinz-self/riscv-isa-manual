@@ -1,14 +1,25 @@
+\begin{comment}
 \chapter{RV32/64G Instruction Set Listings}
+\end{comment}
+\chapter{RV32/64G命令セット一覧}
 
+\begin{comment}
 One goal of the RISC-V project is that it be used as a stable software
 development target.  For this purpose, we define a combination of a
 base ISA (RV32I or RV64I) plus selected standard extensions (IMAFD, Zicsr, Zifencei) as
 a ``general-purpose'' ISA, and we use the abbreviation G for the IMAFDZicsr\_Zifencei
 combination of instruction-set extensions.    This chapter presents
 opcode maps and instruction-set listings for RV32G and RV64G.
+\end{comment}
+
+RISC-Vプロジェクトの目的の一つは、安定したソフトウェア開発の対象として使用されることです。
+この目的のために、基本ISA(RV32IまたはRV64I)と標準拡張(IMAFD、Zicsr、Zifencei)の組み合わせを``汎用ISA''と定義し、
+命令セット拡張のIMAFDZicsr\_Zifenceiの組み合わせにはGという略語を使用しています。
+本章では、RV32GとRV64Gのオペコード・マップと命令セット一覧を紹介します。
 
 \input{opcode-map}
 
+\begin{comment}
 Table~\ref{opcodemap} shows a map of the major opcodes for RVG.  Major
 opcodes with 3 or more lower bits set are reserved for instruction
 lengths greater than 32 bits.  Opcodes marked as {\em reserved} should
@@ -21,14 +32,28 @@ the base 32-bit instruction format.  The opcodes marked {\em
 by RV128, but will otherwise be avoided for standard extensions and so
 can also be used for custom instruction-set extensions in RV32 and
 RV64.
+\end{comment}
+RVGの主要オペコードのマップを~\ref{opcodemap}に示します。
+下位ビットに3以上が設定されているメジャーオペコードは、32ビット以上の命令長に予約されています。
+{\em reserved}と表示されたオペコードは、将来の標準拡張で使用される可能性があるため、カスタム命令セットの拡張には使用しないでください。
+{\em custom-0}{\em custom-1}と記された主要なオペコードは、将来の標準的な拡張機能では使用されないため、
+基本的な32ビット命令フォーマット内のカスタム命令セット拡張機能での使用が推奨されます。
+{\em custom-2/rv128}と{\em custom-3/rv128}と記されたオペコードは、RV128で将来使用するために予約されていますが、
+それ以外の標準拡張では回避されるため、RV32とRV64のカスタム命令セット拡張にも使用できます。
 
+\begin{comment}
 We believe RV32G and RV64G provide simple but complete instruction
 sets for a broad range of general-purpose computing.  The optional
 compressed instruction set described in Chapter~\ref{compressed} can
 be added (forming RV32GC and RV64GC) to improve performance, code
 size, and energy efficiency, though with some additional hardware
 complexity.
+\end{comment}
+RV32GとRV64Gは、シンプルでありながら、幅広い汎用計算機に対応した完全な命令セットであると考えています。
+~\ref{compressed}章に記載されているオプションの圧縮命令セットを追加することで(RV32GCとRV64GCを形成)、性能、コードサイズ、エネルギー効率を向上させることができますが、
+ハードウェアの複雑さが増します。
 
+\begin{comment}
 As we move beyond IMAFDC into further instruction-set extensions, the
 added instructions tend to be more domain-specific and only provide
 benefits to a restricted class of applications, e.g., for multimedia
@@ -37,13 +62,23 @@ clearly separates the base ISA and broadly applicable standard
 extensions from these more specialized additions.
 Chapter~\ref{extensions} has a more extensive discussion of ways to
 add extensions to the RISC-V ISA.
+\end{comment}
+IMAFDCを超えてさらなる命令セットの拡張に進むと、追加される命令はより領域に特化したものになり、
+マルチメディアやセキュリティなど、限られたクラスのアプリケーションにしかメリットをもたらさない傾向があります。
+RISC-VのISA設計では、多くの商用ISAとは異なり、基本となるISAと広く適用できる標準的な拡張機能と、
+これらのより専門的な拡張機能を明確に分けています。
+~\ref{extensions}章では、RISC-V ISAに拡張機能を追加する方法について、より幅広い議論がなされています。
 
 \input{instr-table}
 
 \FloatBarrier
+\begin{comment}
 Table~\ref{rvgcsrnames} lists the CSRs that have
 currently been allocated CSR addresses.  The timers, counters, and
 floating-point CSRs are the only CSRs defined in this specification.
+\end{comment}
+表~\ref{rvgcsrnames}には、現在、CSRアドレスが割り当てられているCSRの一覧が記載されています。
+本仕様書で定義されているCSRは、タイマー、カウンター、浮動小数点CSRのみです。
 
 \begin{table}[htb!]
 \begin{center}
@@ -69,7 +104,9 @@ Register ({\tt frm} + {\tt fflags}). \\
 \hline
 \end{tabular}
 \end{center}
+\begin{comment}
 \caption{RISC-V control and status register (CSR) address map.}
+\end{comment}
+\caption{RISC-V制御情報レジスタ(CSR)アドレスマップ}
 \label{rvgcsrnames}
 \end{table}
-
