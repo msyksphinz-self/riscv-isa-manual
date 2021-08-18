@@ -1,6 +1,10 @@
+\begin{comment}
 \chapter{Extending RISC-V}
+\end{comment}
+\chapter{RISC-Vの拡張}
 \label{extensions}
 
+\begin{comment}
 In addition to supporting standard general-purpose software
 development, another goal of RISC-V is to provide a basis for more
 specialized instruction-set extensions or more customized
@@ -11,20 +15,42 @@ when building more customized processors.  For example, the intent is
 to continue to provide full software support for implementations that
 only use the standard I base, perhaps together with many non-standard
 instruction-set extensions.
+\end{comment}
+RISC-Vは、標準的な汎用ソフトウェアの開発をサポートするだけでなく、
+より専門的な命令セットの拡張やカスタマイズされたアクセラレータの基盤を提供することも目的としています。
+命令エンコーディング空間とオプションの可変長命令エンコーディングは、よりカスタマイズされたプロセッサを構築する際に、
+標準的なISAツールチェーンのソフトウェア開発の労力を容易に活用できるように設計されています。
+例えば、標準的なIベースのみを使用し、おそらく多くの非標準的な命令セット拡張を併用するような実装に対しても、
+ソフトウェアの完全なサポートを継続することを意図しています。
 
+\begin{comment}
 This chapter describes various ways in which the base RISC-V ISA can
 be extended, together with the scheme for managing instruction-set
 extensions developed by independent groups.  This volume only deals
 with the unprivileged ISA, although the same approach and terminology is
 used for supervisor-level extensions described in the second volume.
+\end{comment}
+本章では、ベースとなるRISC-V ISAの様々な拡張方法と、独立したグループによって開発された命令セット拡張を管理するためのスキームについて説明します。
+本編では非特権ISAのみを扱っていますが、第2巻で紹介するスーパーバイザレベルの拡張についても同様のアプローチと用語を使用しています。
 
+\begin{comment}
 \section{Extension Terminology}
+\end{comment}
+\section{拡張に関する用語}
 
+\begin{comment}
 This section defines some standard terminology for describing RISC-V
 extensions.
-\vspace{-0.2in}
-\subsection*{Standard versus Non-Standard Extension}
+\end{comment}
+本節では、RISC-V拡張に関する標準的な用語について定義します。
 
+\vspace{-0.2in}
+\begin{comment}
+\subsection*{Standard versus Non-Standard Extension}
+\end{comment}
+\subsection*{標準拡張と非標準拡張}
+
+\begin{comment}
 Any RISC-V processor implementation must support a base integer ISA
 (RV32I, RV32E, RV64I, or RV128I).  In addition, an implementation may
 support one or more extensions.  We divide extensions into two broad
@@ -40,10 +66,25 @@ categories: {\em standard} versus {\em non-standard}.
   developed over time, with some eventually being promoted to standard
   extensions.
 \end{itemize}
+\end{comment}
+
+RISC-Vプロセッサの実装は、基本整数ISA(RV32I、RV32E、RV64I、RV128I)をサポートする必要があります。
+さらに、1つまたは複数の拡張機能をサポートするでしょう。
+拡張は、大きく2つのカテゴリーに分けられます。{\em 標準拡張}と{\em 非標準拡張}です。
+\begin{itemize}
+\item 標準的な拡張機能とは、一般的に有用で、他の標準的な拡張機能と衝突しないように設計されたものです。
+  現在、このマニュアルの他の章で説明されている ``MAFDQLCBTPV'' は、標準的な拡張機能として完成しているか、計画されています。
+\item 非標準の拡張機能は高度に専門化されたもので、他の標準または非標準の拡張機能と衝突する可能性があります。
+  今後も様々な非標準拡張機能が開発され、最終的には標準拡張機能に昇格するものも出てくることが予想されます。
+\end{itemize}
 
 \vspace{-0.2in}
+\begin{comment}
 \subsection*{Instruction Encoding Spaces and Prefixes}
+\end{comment}
+\subsection*{命令エンコーディング空間とプレフィックス}
 
+\begin{comment}
 An instruction encoding space is some number of instruction bits
 within which a base ISA or ISA extension is encoded.  RISC-V supports
 varying instruction lengths, but even within a single instruction
@@ -51,7 +92,13 @@ length, there are various sizes of encoding space available.  For
 example, the base ISA is defined within a 30-bit encoding space (bits
 31--2 of the 32-bit instruction), while the atomic extension ``A''
 fits within a 25-bit encoding space (bits 31--7).
+\end{comment}
+命令エンコーディング空間とは、ベースISAやISA拡張がエンコードされる命令ビット数のことです。
+RISC-Vは様々な命令長をサポートしていますが、1つの命令長でも、様々なサイズのエンコーディング空間があります。
+例えば、ベースISAは30ビットのエンコード空間(32ビット命令の31ビット～2ビット)で定義され、
+アトミック拡張``A''は25ビットのエンコーディング空間(31--7ビット)に収まるようになっています。
 
+\begin{comment}
 We use the term {\em prefix} to refer to the bits to the {\em right}
 of an instruction encoding space (since instruction fetch in RISC-V is
 little-endian, the
@@ -65,11 +112,23 @@ format is that the 3-bit funct3 field used to encode a minor opcode is
 not contiguous with the major opcode bits in the 32-bit instruction
 format, but is considered part of the prefix for 22-bit instruction
 spaces.
+\end{comment}
+ここでは、命令エンコーディング空間の右隣のビットを{\em プレフィックス}と呼んでいます
+(RISC-Vの命令フェッチはリトルエンディアンなので、右隣のビットは早いメモリアドレスに格納されるため、命令フェッチ順にプレフィックスを形成します)。
+標準的なベースISAエンコーディングのプレフィックスは、32ビットワードの1～0ビットに格納される2ビットの``11''フィールドであり、
+標準的なアトミック拡張``A''のプレフィックスは、AMOメジャーオペコードを表す32ビットワードの6～0ビットに格納される7ビットの``0101111''フィールドです。
+また、マイナーオペコードを表す3ビットのfunct3フィールドは、32ビット命令フォーマットではメジャーオペコードのビットと連続していませんが、
+22ビット命令空間ではプレフィックスの一部として扱われます。
 
+\begin{comment}
 Although an instruction encoding space could be of any size, adopting
 a smaller set of common sizes simplifies packing independently
 developed extensions into a single global encoding.
 Table~\ref{encodingspaces} gives the suggested sizes for RISC-V.
+\end{comment}
+命令エンコーディング空間はどのようなサイズでも構いませんが、共通のサイズを採用することで、
+独自に開発した拡張機能を単一のグローバルエンコーディングにまとめることが容易になります。
+表~\ref{encodingspaces}には、RISC-Vで推奨されるサイズが示されています。
 
 \begin{table}[H]
 \begin{center}
@@ -94,13 +153,20 @@ Table~\ref{encodingspaces} gives the suggested sizes for RISC-V.
 52-bit & Major opcode in 64-bit encoding        &         &         &          &      32\\ \hline
 \end{tabular}
 \end{center}
+\begin{comment}
 \caption{Suggested standard RISC-V instruction encoding space sizes.}
+\end{comment}
+\caption{推奨される標準RISC-V命令エンコーディング空間サイズ}
 \label{encodingspaces}
 \end{table}
 
 \vspace{-0.2in}
+\begin{comment}
 \subsection*{Greenfield versus Brownfield Extensions}
+\end{comment}
+\subsection*{グリーンフィールド拡張とブラウンフィールド拡張}
 
+\begin{comment}
 We use the term {\em greenfield extension} to describe an extension
 that begins populating a new instruction encoding space, and hence can
 only cause encoding conflicts at the prefix level.  We use the term
@@ -112,7 +178,17 @@ the same greenfield parent encoding.  For example, the base ISAs are
 greenfield encodings of a 30-bit instruction space, while the FDQ
 floating-point extensions are all brownfield extensions adding to the
 parent base ISA 30-bit encoding space.
+\end{comment}
+ここでは、新しい命令エンコーディング空間の構築を開始するため、
+プレフィックスレベルでのエンコーディングの衝突しか起こらない拡張機能を、
+{\em グリーンフィールド拡張}と呼んでいます。
+{\em ブラウンフィールド拡張} は、以前に定義された命令空間の既存のエンコーディングに適合する拡張機能を表す用語です。
+ブラウンフィールド拡張は、必ず特定のグリーンフィールド親エンコーディングに結びついており、
+同じグリーンフィールド親エンコーディングに対して複数のブラウンフィールド拡張が存在する可能性があります。
+例えば、ベースISAは30ビットの命令空間のグリーンフィールド・エンコーディングですが、
+FDQ浮動小数点拡張はすべて親ベースISAの30ビット・エンコーディング空間に追加するブラウンフィールド拡張です。
 
+\begin{comment}
 Note that we consider the standard A extension to have a greenfield
 encoding as it defines a new previously empty 25-bit encoding space in
 the leftmost bits of the full 32-bit base instruction encoding, even
@@ -121,6 +197,12 @@ of the base ISA.  Changing only its single 7-bit prefix could move the
 A extension to a different 30-bit encoding space while only worrying
 about conflicts at the prefix level, not within the encoding space
 itself.
+\end{comment}
+なお、標準A拡張は、その標準的なプレフィックスによってベースISAの30ビットエンコーディング空間内に配置されているにもかかわらず、
+32ビットベースの完全な命令エンコーディングの左端のビットに、それまで空だった25ビットのエンコーディング空間を新たに定義しているため、
+グリーンフィールド・エンコーディングであると考えています。
+7ビットのプレフィックスを変更するだけで、A拡張を別の30ビットのエンコーディング空間に移動させることができますが、
+その際に気になるのは、エンコーディング空間自体ではなくプレフィックスレベルでの競合です。
 
 \begin{table}[H]
 {
@@ -134,11 +216,15 @@ Brownfield & F(I), D(F), Q(D) & M(I) \\
 \end{tabular}
 \end{center}
 }
+\begin{comment}
 \caption{Two-dimensional characterization of standard instruction-set
   extensions.}
+\end{comment}
+\caption{標準命令セット拡張の2次元分類}
 \label{exttax}
 \end{table}
 
+\begin{comment}
 Table~\ref{exttax} shows the bases and standard extensions placed in a
 simple two-dimensional taxonomy.  One axis is whether the extension is
 greenfield or brownfield, while the other axis is whether the
@@ -149,19 +235,38 @@ brownfield) it builds upon is given in parentheses.  Additional
 user-level architectural state usually implies changes to the
 supervisor-level system or possibly to the standard calling
 convention.
+\end{comment}
+表~\ref{exttax}には、ベースと標準的な拡張がシンプルな2次元の分類法で配置されています。
+1つの軸は拡張がグリーンフィールドかブラウンフィールドか、もう1つの軸は拡張がアーキテクチャ状態を追加するかどうかを示しています。
+グリーンフィールド拡張の場合は、命令符号化空間の大きさを括弧内に示しています。
+ブラウンフィールド拡張の場合は、ベースとなった拡張の名前(グリーンフィールドまたはブラウンフィールド)を括弧内に記載しています。
+ユーザーレベルのアーキテクチャ状態の追加は、通常、スーパーバイザレベルのシステムや、標準的な呼び出し規則の変更を意味します。
 
+\begin{comment}
 Note that RV64I is not considered an extension of RV32I, but a
 different complete base encoding.
+\end{comment}
+なお、RV64IはRV32Iの拡張ではなく、別の完全なベース・エンコーディングと考えられています。
 
 \vspace{-0.2in}
+\begin{comment}
 \subsection*{Standard-Compatible Global Encodings}
+\end{comment}
+\subsection*{標準互換グローバルエンコーディング}
 
+\begin{comment}
 A complete or {\em global} encoding of an ISA for an actual RISC-V
 implementation must allocate a unique non-conflicting prefix for every
 included instruction encoding space.  The bases and every standard
 extension have each had a standard prefix allocated to ensure they can
 all coexist in a global encoding.
+\end{comment}
+実際にRISC-Vを実装する際のISAの完全な、あるいは{\em グローバル}エンコーディングは、
+含まれるすべての命令エンコーディング空間に、矛盾しないユニークなプレフィックスを割り当てる必要があります。
+ベースとすべての標準的な拡張機能には、それぞれ標準的なプレフィックスが割り当てられており、
+グローバルなエンコーディングの中でそれらが共存できるようになっています。
 
+\begin{comment}
 A {\em standard-compatible} global encoding is one where the base and
 every included standard extension have their standard prefixes.  A
 standard-compatible global encoding can include non-standard
@@ -174,16 +279,36 @@ standard-compatible global encoding, but otherwise its prefix is free
 to be reallocated.  These constraints allow a common toolchain to
 target the standard subset of any RISC-V standard-compatible global
 encoding.
+\end{comment}
+
+{\em 標準互換性}のあるグローバルエンコーディングとは、ベースと含まれるすべての標準拡張がそれぞれの標準プレフィックスを持つものです。
+標準互換のグローバルエンコーディングは、含まれる標準拡張子と衝突しない非標準拡張子を含むことができます。
+標準互換のグローバル・エンコーディングでは、標準拡張子がグローバル・エンコーディングに含まれていない場合、
+非標準拡張子に標準プレフィックスを使用することもできます。
+言い換えると、標準拡張は、標準互換のグローバルエンコーディングに含まれている場合はその標準プレフィックスを使用しなければなりませんが、
+そうでない場合はそのプレフィックスを自由に再割り当てすることができます。
+これらの制約により、共通のツールチェーンは、あらゆるRISC-V標準準拠のグローバル・エンコーディングの標準サブセットを対象とすることができます。
 
 \vspace{-0.2in}
+\begin{comment}
 \subsection*{Guaranteed Non-Standard Encoding Space}
+\end{comment}
+\subsection*{保証された非標準エンコーディング空間}
 
+\begin{comment}
 To support development of proprietary custom extensions, portions of
 the encoding space are guaranteed to never be used by standard
 extensions.
+\end{comment}
+独自のカスタム拡張機能の開発をサポートするために、エンコーディング空間の一部が、
+標準的な拡張機能では決して使用されないことが保証されています。
 
+\begin{comment}
 \section{RISC-V Extension Design Philosophy}
+\end{comment}
+\section{RISC-V拡張の設計哲学}
 
+\begin{comment}
 We intend to support a large number of independently developed
 extensions by encouraging extension developers to operate within
 instruction encoding spaces, and by providing tools to pack these into
@@ -194,10 +319,23 @@ is allocated to their parent greenfield extension.  The standard
 extension prefixes avoid spurious incompatibilities in the encoding of
 core functionality, while allowing custom packing of more esoteric
 extensions.
+\end{comment}
+私たちは、拡張機能の開発者が命令エンコーディング空間で作業することを奨励し、
+独自のプレフィックスを割り当てることで、これらを標準と互換性のあるグローバルなエンコーディングにパックするツールを提供することで、
+独立して開発された多数の拡張機能をサポートするつもりです。
+拡張機能の中には、既存の拡張機能のブラウンフィールド拡張として実装する方が自然なものもあり、
+親となるグリーンフィールド拡張に割り当てられているプレフィックスを共有することになります。
+標準的な拡張子のプレフィックスは、コアな機能のエンコーディングにおける偽の非互換性を回避する一方で、
+より難解な拡張子のカスタムパッキングを可能にします。
 
+\begin{comment}
 This capability of repacking RISC-V extensions into different
 standard-compatible global encodings can be used in a number of ways.
+\end{comment}
+RISC-V拡張機能を異なる標準互換のグローバルエンコーディングに再パックするこの機能は、
+様々な方法で使用することができます。
 
+\begin{comment}
 One use-case is developing highly specialized custom accelerators,
 designed to run kernels from important application domains.  These
 might want to drop all but the base integer ISA and add in only the
@@ -205,7 +343,15 @@ extensions that are required for the task in hand.  The base ISA has
 been designed to place minimal requirements on a hardware
 implementation, and has been encoded to use only a small fraction of a
 32-bit instruction encoding space.
+\end{comment}
+一つのケースは、重要なアプリケーション領域のカーネルを実行するように設計された、
+高度に専門化されたカスタムアクセラレータの開発です。
+このような場合には、ベースとなる整数型ISA以外のすべてを削除し、
+必要な拡張機能のみを追加することができます。
+ベースISAは、ハードウェアの実装に対する要求が最小限になるように設計されており、
+32ビット命令のエンコーディング空間のごく一部しか使用しないようにエンコードされています。
 
+\begin{comment}
 Another use-case is to build a research prototype for a new type of
 instruction-set extension.  The researchers might not want to expend
 the effort to implement a variable-length instruction-fetch unit, and
@@ -222,81 +368,170 @@ development time.  Once the instruction-set extension has been
 evaluated and refined, it could then be made available for packing
 into a larger variable-length encoding space to avoid conflicts with
 all standard extensions.
+\end{comment}
+他のユースケースとして、新しいタイプの命令セット拡張の研究用プロトタイプを作る場合です。
+研究者は、可変長の命令フェッチユニットを実装する労力をかけたくないので、
+単純な32ビット固定幅の命令エンコーディングを使用して拡張機能のプロトタイプを作成したいと考えています。
+しかし、この新しい拡張機能は、32ビット空間の標準的な拡張機能と共存するには大きすぎるかもしれません。
+研究実験に標準的な拡張機能のすべてが必要ではない場合、標準互換のグローバルエンコーディングでは、
+使用しない標準的な拡張機能を削除し、そのプレフィックス再利用して、提案された拡張機能を非標準的な場所に配置することで、
+研究プロトタイプのエンジニアリングを簡素化することができます。
+標準的なツールは、開発時間を短縮するために、ベースと、存在する標準的な拡張機能をターゲットにすることができます。
+命令セットの拡張機能が評価され、改良されたら、すべての標準的な拡張機能との競合を避けるために、
+より大きな可変長符号化空間にまとめることができます。
 
+\begin{comment}
 The following sections describe increasingly sophisticated strategies
 for developing implementations with new instruction-set extensions.
 These are mostly intended for use in highly customized, educational,
 or experimental architectures rather than for the main line of RISC-V
 ISA development.
+\end{comment}
+次のセクションでは、新しい命令セット拡張機能を備えた実装を開発するための高度な戦略について説明します。
+これらは、RISC-V ISA開発のメインラインではなく、
+高度にカスタマイズされた教育用や実験用のアーキテクチャでの使用を目的としています。
 
+\begin{comment}
 \section{Extensions within fixed-width 32-bit instruction format}
+\end{comment}
+\section{32ビット固定命令フォーマット内での拡張}
 \label{fix32b}
 
+\begin{comment}
 In this section, we discuss adding extensions to implementations that
 only support the base fixed-width 32-bit instruction format.
+\end{comment}
+このセクションでは、基本的な固定幅の32ビット命令フォーマットのみをサポートする実装に
+拡張機能を追加することについて説明します。
 
 \begin{commentary}
+\begin{comment}
 We anticipate the simplest fixed-width 32-bit encoding will be popular for
 many restricted accelerators and research prototypes.
+\end{comment}
+最もシンプルな固定幅32ビットのエンコーディングは、
+多くの制限されたアクセラレータや研究用プロトタイプに普及すると予想しています。
 \end{commentary}
 
+\begin{comment}
 \subsection*{Available 30-bit instruction encoding spaces}
+\end{comment}
+\subsection*{30ビットの命令エンコーディング空間}
 
+\begin{comment}
 In the standard encoding, three of the available 30-bit instruction
 encoding spaces (those with 2-bit prefixes 00, 01, and 10) are used to
 enable the optional compressed instruction extension.  However, if the
 compressed instruction-set extension is not required, then these three
 further 30-bit encoding spaces become available.  This quadruples the
 available encoding space within the 32-bit format.
+\end{comment}
+標準的なエンコーディングでは、30ビットの命令エンコーディング空間のうち3つ(2ビットのプレフィックス00、01、10を持つもの)が、
+オプションの圧縮命令拡張を有効にするために使用されます。
+しかし、圧縮された命令セットの拡張を必要としない場合は、さらにこの3つの30ビットのエンコーディング空間が利用可能になります。
+これにより、32ビットフォーマットで使用できるエンコーディング空間が4倍になります。
 
+\begin{comment}
 \subsection*{Available 25-bit instruction encoding spaces}
+\end{comment}
+\subsection*{25ビットの命令エンコーディング空間}
 
+\begin{comment}
 A 25-bit instruction encoding space corresponds to a major opcode in
 the base and standard extension encodings.
+\end{comment}
+25ビットの命令エンコーディング空間は、
+ベースエンコーディングと標準拡張エンコーディングのメジャーオペコードに対応しています。
 
+\begin{comment}
 There are four major opcodes expressly designated for custom extensions
 (Table~\ref{opcodemap}), each of which represents a 25-bit encoding
 space.  Two of these are reserved for eventual use in the RV128 base
 encoding (will be OP-IMM-64 and OP-64), but can be used for
 non-standard extensions for RV32 and RV64.
+\end{comment}
+カスタム拡張用に明示的に指定された4つのメジャーオペコード(表~\ref{opcodemap})があり、
+それぞれが25ビットのエンコード空間を表しています。
+このうち2つは、最終的にRV128の基本エンコーディングで使用するために予約されていますが(OP-IMM-64とOP-64になる予定)、
+RV32とRV64の非標準的な拡張に使用することができます。
 
+\begin{comment}
 The two major opcodes reserved for RV64 (OP-IMM-32 and OP-32) can also be
 used for non-standard extensions to RV32 only.
+\end{comment}
+また、RV64用に予約されている2つの主要なオペコード(OP-IMM-32とOP-32)は、
+RV32に対する非標準的な拡張にのみ使用することができます。
 
+\begin{comment}
 If an implementation does not require floating-point, then the seven
 major opcodes reserved for standard floating-point extensions
 (LOAD-FP, STORE-FP, MADD, MSUB, NMSUB, NMADD, OP-FP) can be reused for
 non-standard extensions.  Similarly, the AMO major opcode can be
 reused if the standard atomic extensions are not required.
+\end{comment}
+浮動小数点を必要としない実装の場合は、標準的な浮動小数点拡張のために予約されている7つのメジャー・オペコード
+(LOAD-FP, STORE-FP, MADD, MSUB, NMSUB, NMADD, OP-FP)を非標準的な拡張に再利用することができます。
+同様に、標準的なアトミック拡張が必要ない場合は、AMOメジャー・オペコードを再利用することができます。
 
+\begin{comment}
 If an implementation does not require instructions longer than
 32-bits, then an additional four major opcodes are available (those
 marked in gray in Table~\ref{opcodemap}).
+\end{comment}
+32ビット以上の命令を必要としない実装の場合は、
+さらに4つのメジャーオペコードが利用できます(表~\ref{opcodemap}でグレーのマークがついているもの)。
 
+\begin{comment}
 The base RV32I encoding uses only 11 major opcodes plus 3 reserved
 opcodes, leaving up to 18 available for extensions.  The base RV64I
 encoding uses only 13 major opcodes plus 3 reserved opcodes, leaving
 up to 16 available for extensions.
+\end{comment}
+基本となるRV32Iエンコーディングでは、11個のメジャーオペコードと3個の予約済みオペコードのみを使用し、
+最大18個の拡張用オペコードが利用できます。
+ベースとなるRV64Iエンコーディングでは、13個のメジャーオペコードと3個の予約済みオペコードのみを使用し、
+最大16個の拡張が可能になります。
 
+\begin{comment}
 \subsection*{Available 22-bit instruction encoding spaces}
+\end{comment}
+\subsection*{22ビットの命令エンコーディング空間}
 
+\begin{comment}
 A 22-bit encoding space corresponds to a funct3 minor opcode space in
 the base and standard extension encodings.  Several major opcodes have
 a funct3 field minor opcode that is not completely occupied, leaving
 available several 22-bit encoding spaces.
+\end{comment}
+22ビットのエンコーディング空間は、ベースおよび標準拡張エンコーディングのfunct3マイナーオペコード空間に対応します。
+いくつかのメジャーオペコードは、funct3フィールドのマイナーオペコードが完全には占有されていないため、
+いくつかの22ビットのエンコーディング空間が利用可能です。
 
+\begin{comment}
 Usually a major opcode selects the format used to encode operands in
 the remaining bits of the instruction, and ideally, an extension
 should follow the operand format of the major opcode to simplify
 hardware decoding.
+\end{comment}
+通常、メジャー・オペコードは、命令の残りのビットでオペランドをエンコードするために使用されるフォーマットを選択します。
+理想的には、ハードウェアのデコードを簡素化するために、拡張機能はメジャー・オペコードのオペランド・フォーマットに従うべきです。
 
+\begin{comment}
 \subsection*{Other spaces}
+\end{comment}
+\subsection*{他のエンコーディング空間}
 
+\begin{comment}
 Smaller spaces are available under certain major opcodes, and not all
 minor opcodes are entirely filled.
+\end{comment}
 
+\begin{comment}
 \section{Adding aligned 64-bit instruction extensions}
+\end{comment}
+\section{64ビットアライン拡張命令の追加}
 
+\begin{comment}
 The simplest approach to provide space for extensions that are too
 large for the base 32-bit fixed-width instruction format is to add
 naturally aligned 64-bit instructions.  The implementation must still
@@ -304,7 +539,14 @@ support the 32-bit base instruction format, but can require that
 64-bit instructions are aligned on 64-bit boundaries to simplify
 instruction fetch, with a 32-bit NOP instruction used as alignment
 padding where necessary.
+\end{comment}
+基本となる32ビット固定幅の命令フォーマットでは大きすぎる拡張機能のための空間を確保する最も簡単な方法は、
+自然にアラインされた64ビット命令を追加することです。
+実装は32ビットの基本命令フォーマットをサポートする必要がありますが、
+命令フェッチを簡素化するために64ビットの命令を64ビットの境界にアラインすることを要求し、
+必要に応じて32ビットのNOP命令をアラインメントのパディングとして使用することができます。
 
+\begin{comment}
 To simplify use of standard tools, the 64-bit instructions should be
 encoded as described in Figure~\ref{instlengthcode}.  However, an
 implementation might choose a non-standard instruction-length encoding
@@ -312,22 +554,44 @@ for 64-bit instructions, while retaining the standard encoding for
 32-bit instructions.  For example, if compressed instructions are not
 required, then a 64-bit instruction could be encoded using one or more
 zero bits in the first two bits of an instruction.
+\end{comment}
+標準的なツールの使用を容易にするために、64ビット命令は図のようにエンコードする必要があります。
+しかし、実装によっては、32ビット命令の標準的なエンコーディングを維持したまま、
+64ビット命令のための非標準的な命令長エンコーディングを選択する場合があります。
+例えば、圧縮された命令を必要としない場合、64ビット命令は、
+命令の最初の2ビットに1つ以上のゼロビットを使用してエンコードすることができます。
 
 \begin{commentary}
+\begin{comment}
 We anticipate processor generators that produce instruction-fetch
 units capable of automatically handling any combination of supported
 variable-length instruction encodings.
+\end{comment}
+我々は、サポートされている可変長命令エンコーディングの任意の組み合わせを自動的に処理することができる
+命令フェッチ・ユニットを生成するプロセッサ・ジェネレータを期待しています。
 \end{commentary}
 
+\begin{comment}
 \section{Supporting VLIW encodings}
+\end{comment}
+\section{VLIWエンコーディングのサポート}
 
+\begin{comment}
 Although RISC-V was not designed as a base for a pure VLIW machine,
 VLIW encodings can be added as extensions using several alternative
 approaches. In all cases, the base 32-bit encoding has to be supported
 to allow use of any standard software tools.
+\end{comment}
+RISC-Vは純粋なVLIWマシンのベースとして設計されたわけではありませんが、
+VLIWエンコーディングは、いくつかの代替アプローチを用いて拡張することができます。
+いずれの場合も、標準的なソフトウェアツールを使用するためには、ベースとなる32ビットエンコーディングをサポートする必要があります。
 
+\begin{comment}
 \subsection*{Fixed-size instruction group}
+\end{comment}
+\subsection*{固定長命令グループ}
 
+\begin{comment}
 The simplest approach is to define a single large naturally aligned
 instruction format (e.g., 128 bits) within which VLIW operations are
 encoded.  In a conventional VLIW, this approach would tend to waste
@@ -335,9 +599,18 @@ instruction memory to hold NOPs, but a RISC-V-compatible
 implementation would have to also support the base 32-bit
 instructions, confining the VLIW code size expansion to
 VLIW-accelerated functions.
+\end{comment}
+最も簡単な方法は、VLIWの演算をエンコードするための単一の大きな
+自然にアラインした命令フォーマット(例えば128ビット)を定義することです。
+従来のVLIWでは、NOPを格納するために命令メモリを浪費する傾向がありましたが、
+RISC-Vと互換性のある実装では、基本的な32ビット命令もサポートする必要があり、
+VLIWのコードサイズの拡張はVLIWで加速された機能に限定されます。
 
+\begin{comment}
 \subsection*{Encoded-Length Groups}
+\end{comment}
 
+\begin{comment}
 Another approach is to use the standard length encoding from
 Figure~\ref{instlengthcode} to encode parallel instruction groups,
 allowing NOPs to be compressed out of the VLIW instruction.  For
@@ -346,7 +619,13 @@ a 96-bit instruction could hold three 28-bit operations, and so on.
 Alternatively, a 48-bit instruction could hold one 42-bit operation,
 while a 96-bit instruction could hold two 42-bit operations, and so
 on.
+\end{comment}
+もう1つのアプローチは、図~\ref{instlengthcode}の標準の長さのエンコーディングを使用して並列命令群をエンコードすることで、
+VLIW命令からNOPを圧縮することができます。
+例えば、64ビットの命令では28ビットの演算を2つ、96ビットの命令では28ビットの演算を3つ、というようにします。
+代わりに、48ビット命令は1つの42ビット命令を持ち、一方で96ビット命令では2つの42ビット命令を持つことができる、というようにします。
 
+\begin{comment}
 This approach has the advantage of retaining the base ISA encoding for
 instructions holding a single operation, but has the disadvantage of
 requiring a new 28-bit or 42-bit encoding for operations within the
@@ -354,18 +633,37 @@ VLIW instructions, and misaligned instruction fetch for larger groups.
 One simplification is to not allow VLIW instructions to straddle
 certain microarchitecturally significant boundaries (e.g., cache lines
 or virtual memory pages).
+\end{comment}
+この方法は、単一の演算を行う命令の基本ISAエンコーディングを維持できるという利点がありますが、
+VLIW命令内の演算に新たな28ビットまたは42ビットのエンコーディングが必要となり、
+大きなグループでは命令フェッチがずれてしまうというデメリットがあります。
+また、VLIW命令がマイクロアーキテクチャ的に重要な境界(キャッシュラインや仮想メモリページなど)
+をまたぐことを許さないという単純化もあります。
 
+\begin{comment}
 \subsection*{Fixed-Size Instruction Bundles}
+\end{comment}
+\subsection*{固定サイズの命令バンドル}
 
+\begin{comment}
 Another approach, similar to Itanium, is to use a larger naturally
 aligned fixed instruction bundle size (e.g., 128 bits) across which
 parallel operation groups are encoded.  This simplifies instruction
 fetch, but shifts the complexity to the group execution engine.  To
 remain RISC-V compatible, the base 32-bit instruction would still have
 to be supported.
+\end{comment}
+もう一つの方法は、Itaniumと同様に、より大きな自然なアライメントの固定命令バンドルサイズ(例えば128ビット)を使用して、
+並列演算グループをエンコードすることです。
+これにより、命令のフェッチは簡単になりますが、複雑さはグループ実行エンジンに移行します。
+RISC-Vとの互換性を保つためには、32ビットの基本命令をサポートする必要があります。
 
+\begin{comment}
 \subsection*{End-of-Group bits in Prefix}
+\end{comment}
+\subsection*{プレフィックス内のグループ終端ビット}
 
+\begin{comment}
 None of the above approaches retains the RISC-V encoding for the
 individual operations within a VLIW instruction.  Yet another approach
 is to repurpose the two prefix bits in the fixed-width 32-bit
@@ -375,8 +673,21 @@ if clear.  Standard RISC-V 32-bit instructions generated by tools
 unaware of the VLIW extension would have both prefix bits set (11) and
 thus have the correct semantics, with each instruction at the end of a
 group and not predicated.
+\end{comment}
+上記のいずれの方法でも、VLIW命令内の個々の演算に対するRISC-Vのエンコーディングは保持されません。
+もう一つの方法は、固定幅の32ビットエンコーディングの2つのプレフィックスビットを再利用することです。
+1つのプレフィックスビットは、セットされていれば``end-of-group''のシグナルとして使用でき、
+2つ目のビットは、クリアされていればプレディケートの下での実行を示すことができます。
+VLIW拡張を知らないツールで生成された標準的なRISC-Vの32ビット命令は、
+両方のプレフィックスビットがセットされ（11）、
+その結果、各命令がグループの最後にあり、プレディケートされていないという正しいセマンティクスを持つことになります。
 
+\begin{comment}
 The main disadvantage of this approach is that the base ISA lacks the
 complex predication support usually required in an aggressive VLIW
 system, and it is difficult to add space to specify more predicate
 registers in the standard 30-bit encoding space.
+\end{comment}
+この方法の主な欠点は、ベースISAには、積極的なVLIWシステムで通常必要とされる複雑なプレディケーションのサポートがなく、
+標準的な30ビットのエンコーディング空間では、
+より多くのプレディケートレジスタを指定するための空間を追加することが困難であることです。
