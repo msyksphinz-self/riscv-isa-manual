@@ -304,52 +304,81 @@ Table~\ref{isanametable} summarizes the standardized extension names.
 \hline
 \multicolumn{3}{|c|}{Base ISA}\\
 \hline
-Integer & I & \\
-Reduced Integer & E & \\
+% Integer & I & \\
+% Reduced Integer & E & \\
+整数 & I & \\
+レジスタ縮退整数 & E & \\
 \hline
 \hline
-\multicolumn{3}{|c|}{Standard Unprivileged Extensions}\\
+% \multicolumn{3}{|c|}{Standard Unprivileged Extensions}\\
+\multicolumn{3}{|c|}{標準非特権拡張}\\
 \hline
-Integer Multiplication and Division & M & \\
-Atomics & A & \\
-Single-Precision Floating-Point & F & Zicsr \\
-Double-Precision Floating-Point & D & F \\
+% Integer Multiplication and Division & M & \\
+% Atomics & A & \\
+% Single-Precision Floating-Point & F & Zicsr \\
+% Double-Precision Floating-Point & D & F \\
+整数乗算除算 & M & \\
+アトミック & A & \\
+単精度浮動小数点 & F & Zicsr \\
+倍精度浮動小数点 & D & F \\
 \hline
-General & G & IMADZifencei \\
+% General & G & IMADZifencei \\
+一般 & G & IMADZifencei \\
 \hline
-Quad-Precision Floating-Point & Q & D\\
-Decimal Floating-Point & L & \\
-16-bit Compressed Instructions & C & \\
-Bit Manipulation & B & \\
-Dynamic Languages & J & \\
-Transactional Memory & T & \\
-Packed-SIMD Extensions & P & \\
-Vector Extensions & V & \\
-User-Level Interrupts & N & \\
-Control and Status Register Access & Zicsr & \\
-Instruction-Fetch Fence & Zifencei & \\
-Misaligned Atomics & Zam & A \\
-Total Store Ordering & Ztso & \\
+% Quad-Precision Floating-Point & Q & D\\
+% Decimal Floating-Point & L & \\
+% 16-bit Compressed Instructions & C & \\
+% Bit Manipulation & B & \\
+% Dynamic Languages & J & \\
+% Transactional Memory & T & \\
+% Packed-SIMD Extensions & P & \\
+% Vector Extensions & V & \\
+% User-Level Interrupts & N & \\
+% Control and Status Register Access & Zicsr & \\
+% Instruction-Fetch Fence & Zifencei & \\
+% Misaligned Atomics & Zam & A \\
+% Total Store Ordering & Ztso & \\
+4倍精度浮動小数点 & Q & D\\
+10進数浮動小数点 & L & \\
+16ビット圧縮命令 & C & \\
+ビット操作 & B & \\
+動的言語 & J & \\
+トランザクショナルメモリ & T & \\
+Packed SIMD拡張 & P & \\
+ベクトル拡張 & V & \\
+ユーザレベル割り込み & N & \\
+制御と状態レジスタアクセス & Zicsr & \\
+命令フェッチフェンス & Zifencei & \\
+ミスアラインアトミック & Zam & A \\
+トータルストアオーダリング & Ztso & \\
 \hline
 \hline
-\multicolumn{3}{|c|}{Standard Supervisor-Level Extensions}\\
+% \multicolumn{3}{|c|}{Standard Supervisor-Level Extensions}\\
+\multicolumn{3}{|c|}{標準スーパバイザレベル拡張}\\
 \hline
-Supervisor-level extension ``def'' & Sdef & \\
-\hline
-\hline
-\multicolumn{3}{|c|}{Standard Hypervisor-Level Extensions}\\
-\hline
-Hypervisor-level extension ``ghi'' & Hghi & \\
+% Supervisor-level extension ``def'' & Sdef & \\
+スーパバイザレベル拡張 ``def'' & Sdef & \\
 \hline
 \hline
-\multicolumn{3}{|c|}{Standard Machine-Level Extensions}\\
+% \multicolumn{3}{|c|}{Standard Hypervisor-Level Extensions}\\
+\multicolumn{3}{|c|}{標準ハイパーバイザレベル拡張}\\
 \hline
-Machine-level extension ``jkl'' & Zxmjkl & \\
+% Hypervisor-level extension ``ghi'' & Hghi & \\
+ハイパーバイザレベル拡張 ``ghi'' & Hghi & \\
 \hline
 \hline
-\multicolumn{3}{|c|}{Non-Standard Extensions}\\
+% \multicolumn{3}{|c|}{Standard Machine-Level Extensions}\\
+\multicolumn{3}{|c|}{標準マシンレベル拡張}\\
 \hline
-Non-standard extension ``mno'' & Xmno & \\
+% Machine-level extension ``jkl'' & Zxmjkl & \\
+マシンレベル拡張 ``jkl'' & Zxmjkl & \\
+\hline
+\hline
+% \multicolumn{3}{|c|}{Non-Standard Extensions}\\
+\multicolumn{3}{|c|}{非標準拡張}\\
+\hline
+% Non-standard extension ``mno'' & Xmno & \\
+非標準拡張 ``mno'' & Xmno & \\
 \hline
 \end{tabular}
 \begin{comment}
