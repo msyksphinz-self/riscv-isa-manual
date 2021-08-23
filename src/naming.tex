@@ -1,29 +1,59 @@
+\begin{comment}
 \chapter{ISA Extension Naming Conventions}
+\end{comment}
+\chapter{ISA拡張の命名規則}
 \label{naming}
 
+\begin{comment}
 This chapter describes the RISC-V ISA extension naming scheme that is
 used to concisely describe the set of instructions present in a
 hardware implementation, or the set of instructions used by an
 application binary interface (ABI).
+\end{comment}
+本章では、RISC-V ISA拡張の命名規則について説明します。
+この命名規則は、ハードウェアの実装に存在する命令群や、
+アプリケーション・バイナリ・インターフェース(ABI)で使用される命令群を簡潔に説明するために使用されます。
 
 \begin{commentary}
+\begin{comment}
 The RISC-V ISA is designed to support a wide variety of
 implementations with various experimental instruction-set extensions.
 We have found that an organized naming scheme simplifies software
 tools and documentation.
+\end{comment}
+RISC-V ISAは、様々な実験的な命令セット拡張を持つ多様な実装をサポートするように設計されています。
+整理された命名スキームにより、ソフトウェアツールやドキュメントが簡素化されることがわかりました。
 \end{commentary}
 
+\begin{comment}
 \section{Case Sensitivity}
+\end{comment}
+\section{大文字小文字の区別}
 
+\begin{comment}
 The ISA naming strings are case insensitive.
+\end{comment}
+ISAの命名文字列は、大文字と小文字を区別しません。
 
+\begin{comment}
 \section{Base Integer ISA}
+\end{comment}
+\section{ベース整数ISA}
+
+\begin{comment}
 RISC-V ISA strings begin with either RV32I, RV32E, RV64I, or RV128I
 indicating the supported address space size in bits for the base
 integer ISA.
+\end{comment}
+RISC-V ISAの文字列は、RV32I、RV32E、RV64I、RV128Iのいずれかで始まり、
+基本整数ISAでサポートされているアドレス空間のサイズをビット単位で示します。
 
+\begin{comment}
 \section{Instruction-Set Extension Names}
+\end{comment}
+\section{命令セット拡張の命名}
 
+\begin{comment}
 Standard ISA extensions are given a name consisting of a single
 letter.  For example, the first four standard
 extensions to the integer bases are:
@@ -34,21 +64,47 @@ extensions to the integer bases are:
 Any RISC-V instruction-set variant can be succinctly described by
 concatenating the base integer prefix with the names of the included
 extensions, e.g., ``RV64IMAFD''.
+\end{comment}
+ISAの標準的な拡張機能には、1文字からなる名前が付けられています。
+例えば、整数ベースの最初の4つの標準拡張は次のとおりです:
+``M''は整数の乗算と除算、
+``A''はアトミックメモリアクセス命令、
+``F''は単精度浮動小数点命令、
+``D''は倍精度浮動小数点命令です。
+RISC-Vの命令セットのバリエーションは、基本となる整数の接頭辞と、
+含まれる拡張機能の名前を連結することで簡潔に表現することができます(例：``RV64IMAFD'')。
 
+\begin{comment}
 We have also defined an abbreviation ``G'' to represent the ``IMAFDZicsr\_Zifencei''
 base and extensions, as this is intended to represent our standard
 general-purpose ISA.
+\end{comment}
+また、標準的な汎用ISAを表現するために、``IMAFDZicsr\_Zifencei''のベースと拡張機能を表す``G''という略語を定義しています。
 
+\begin{comment}
 Standard extensions to the RISC-V ISA are given other reserved
 letters, e.g., ``Q'' for quad-precision floating-point, or
 ``C'' for the 16-bit compressed instruction format.
+\end{comment}
+RISC-V ISAの標準的な拡張機能には、他の予約文字が与えられています。
+例えば、``Q''は4倍精度の浮動小数点、``C''は16ビット圧縮命令フォーマットを表しています。
 
+\begin{comment}
 Some ISA extensions depend on the presence of other extensions, e.g., ``D''
 depends on ``F'' and ``F'' depends on ``Zicsr''.  These dependences may be
 implicit in the ISA name: for example, RV32IF is equivalent to RV32IFZicsr,
 and RV32ID is equivalent to RV32IFD and RV32IFDZicsr.
+\end{comment}
+例えば、``D''は``F''に依存し、``F''は``Zicsr''に依存するなど、ISAの拡張機能の中には他の拡張機能の存在に依存するものがあります。
+これらの依存関係は、ISA名に暗黙的に含まれている場合があります。
+例えば，RV32IFはRV32IFZicsrと同等であり、RV32IDはRV32IFDおよびRV32IFDZicsrと同等です。
 
+\begin{comment}
 \section{Version Numbers}
+\end{comment}
+\section{バージョン番号}
+
+\begin{comment}
 Recognizing that instruction sets may expand or alter over time, we
 encode extension version numbers following the extension name.  Version
 numbers are divided into major and minor version numbers, separated by
@@ -59,93 +115,191 @@ version number must be backwards-compatible.  For example, the
 original 64-bit standard ISA defined in release 1.0 of this manual can
 be written in full as ``RV64I1p0M1p0A1p0F1p0D1p0'', more concisely as
 ``RV64I1M1A1F1D1''.
+\end{comment}
+命令セットは時間の経過とともに拡張されたり変更されたりする可能性があることを考慮して、
+拡張子名の後に拡張子のバージョン番号を符号化しています。
+バージョン番号は、メジャーバージョンとマイナーバージョンに分かれており、``p''で区切られています。
+マイナーバージョンが``0''の場合は、``p0''を省略することができます。
+メジャーバージョン番号の変更は後方互換性の喪失を意味しますが、
+マイナーバージョン番号のみの変更は後方互換性がなければなりません。
+例えば、本書のリリース1.0で定義されているオリジナルの64ビット標準ISAは、
+完全には ``RV64I1p0M1p0A1p0F1p0D1p0''、より簡潔には ``RV64I1M1A1F1D1''と書くことができます。
 
+\begin{comment}
 We introduced the version numbering scheme with the second release.  Hence, we
 define the default version of a standard extension to be the version present at that
 time, e.g., ``RV32I'' is equivalent to ``RV32I2''.
+\end{comment}
+第2回目のリリースからバージョン番号制を導入しました。
+例えば、``RV32I''は``RV32I2''に相当します。
 
+\begin{comment}
 \section{Underscores}
+\end{comment}
+\section{アンダースコア}
 
+\begin{comment}
 Underscores ``\_'' may be used to separate ISA extensions to
 improve readability and to provide disambiguation, e.g., ``RV32I2\_M2\_A2''.
+\end{comment}
+アンダースコア``\_''は、読みやすさと曖昧さを解消するために、
+ISA拡張機能を区切るために使用することができます(例：``RV32I2\_M2\_A2'')。
 
+\begin{comment}
 Because the ``P'' extension for Packed SIMD can be confused for the decimal
 point in a version number, it must be preceded by an underscore if it follows
 a number.  For example, ``rv32i2p2'' means version 2.2 of RV32I, whereas
 ``rv32i2\_p2'' means version 2.0 of RV32I with version 2.0 of the P extension.
+\end{comment}
+Packed SIMDの拡張子である``P''は、バージョン番号の小数点と混同される可能性があるため、
+番号の後に付ける場合はアンダースコアを付けなければなりません。
+例えば、``rv32i2p2''はRV32Iのバージョン2.2を意味し、``rv32i2\_p2''はRV32Iのバージョン2.0とP拡張のバージョン2.0を意味します。
 
+\begin{comment}
 \section{Additional Standard Extension Names}
+\end{comment}
+\section{追加の標準拡張名}
 
+\begin{comment}
 Standard extensions can also be named using a single ``Z'' followed by an
 alphabetical name and an optional version number.  For example,
 ``Zifencei'' names the instruction-fetch fence extension described in
 Chapter~\ref{chap:zifencei}; ``Zifencei2'' and ``Zifencei2p0'' name version
 2.0 of same.
+\end{comment}
+標準的な拡張機能には、``Z''の後にアルファベットの名前とバージョン番号を付けて名前を付けることもできます。
+例えば、``Zifencei''は，~\ref{chap:zifencei}章で説明されている命令フェッチフェンスの拡張機能の名前です。
+``Zifencei2''と``Zifencei2p0''は，同じ拡張機能のバージョン2.0の名前です．
 
+\begin{comment}
 The first letter following the ``Z'' conventionally indicates the most closely
 related alphabetical extension category, IMAFDQLCBJTPVN.  For the ``Zam''
 extension for misaligned atomics, for example, the letter ``a'' indicates the
 extension is related to the ``A'' standard extension.  If multiple ``Z''
 extensions are named, they should be ordered first by category, then
 alphabetically within a category---for example, ``Zicsr\_Zifencei\_Zam''.
+\end{comment}
+``Z''に続く最初の文字は、慣習的に最も近いアルファベットの拡張カテゴリーであるIMAFDQLCBJTPVNを示します。
+例えば、ミスアラインアトミックのためのZamという拡張子の場合、
+aという文字はAという標準的な拡張子に関連していることを示している。
+複数のZ拡張が命名されている場合には、まずカテゴリ順に並べ、次にカテゴリ内のアルファベット順に並べます。
 
+\begin{comment}
 Extensions with the ``Z'' prefix must be separated
 from other multi-letter extensions by an underscore, e.g.,
 ``RV32IMACZicsr\_Zifencei''.
+\end{comment}
+例えば、``RV32IMACZicsr\_Zifencei''のように、``Z''という接頭辞のついた拡張子は、
+他の複数の文字の拡張子とアンダースコアで区切らなければなりません。
 
+\begin{comment}
 \section{Supervisor-level Instruction-Set Extensions}
+\end{comment}
+\section{スーパーバイザレベル命令セットの拡張}
 
+\begin{comment}
 Standard supervisor-level instruction-set extensions are defined in Volume II,
 but are named using ``S'' as a prefix, followed by an alphabetical name and an
 optional version number.  Supervisor-level extensions must be separated from
 other multi-letter extensions by an underscore.
+\end{comment}
+標準スーパーバイザレベルの命令セット拡張は第2巻で定義されていますが、
+名前は``S''を接頭語とし、その後にアルファベット名とオプションのバージョン番号が続きます。
+スーパーバイザレベルの拡張機能は、他の複数文字の拡張機能との間にアンダースコアで区切る必要があります。
 
+\begin{comment}
 Standard supervisor-level extensions should be listed after standard
 unprivileged extensions.  If multiple supervisor-level extensions are listed,
 they should be ordered alphabetically.
+\end{comment}
+スーパバイザレベルの標準的な拡張子は、非特権の標準的な拡張子の後に記載します。
+複数のスーパバイザレベルの拡張子を記載する場合は、アルファベット順に並べる必要があります。
 
+\begin{comment}
 \section{Hypervisor-level Instruction-Set Extensions}
+\end{comment}
+\section{ハイパーバイザレベル命令セット拡張}
 
+\begin{comment}
 Standard hypervisor-level instruction-set extensions are named like
 supervisor-level extensions, but beginning with the letter ``H'' instead of
 the letter ``S''.
+\end{comment}
+ハイパーバイザーレベルの標準的な命令セット拡張は、スーパーバイザーレベルの拡張と同様に、``S''ではなく``H''で始まる名前です。
 
+\begin{comment}
 Standard hypervisor-level extensions should be listed after standard
 lesser-privileged extensions.  If multiple hypervisor-level extensions are
 listed, they should be ordered alphabetically.
+\end{comment}
+ハイパーバイザレベルの標準的な拡張機能は、より下位の特権的な標準的な拡張機能の後に記載します。
+複数のハイパーバイザレベルの拡張機能が記載されている場合は、アルファベット順に並べる必要があります。
 
+\begin{comment}
 \section{Machine-level Instruction-Set Extensions}
+\end{comment}
+\section{マシンレベル命令セットアーキテクチャ}
 
+\begin{comment}
 Standard machine-level instruction-set extensions are prefixed with the three
 letters ``Zxm''.
+\end{comment}
+標準的なマシンレベルの命令セット拡張には3つの文字 ``Zxm''が前に付きます。
 
+\begin{comment}
 Standard machine-level extensions should be listed after standard
 lesser-privileged extensions.  If multiple machine-level extensions are listed,
 they should be ordered alphabetically.
+\end{comment}
+標準的なマシンレベル拡張機能は、標準的なより低い特権を持つ拡張機能の後に記載する必要があります。
+複数のマシンレベル拡張が記載されている場合は、アルファベット順に並べる必要があります。
 
+\begin{comment}
 \section{Non-Standard Extension Names}
+\end{comment}
+\section{非標準拡張名}
 
+\begin{comment}
 Non-standard extensions are named using a single ``X'' followed by an
 alphabetical name and an optional version number.
 For example, ``Xhwacha'' names the Hwacha vector-fetch ISA extension;
 ``Xhwacha2'' and ``Xhwacha2p0'' name version 2.0 of same.
+\end{comment}
+非標準の拡張機能は、``X''の後にアルファベットの名前と任意のバージョン番号を付けて命名されます。
+例えば、``Xhwacha''はHwachaベクトルフェッチISA拡張の名前で、``Xhwacha2''と``Xhwacha2p0''は同じもののバージョン2.0の名前です。
 
+\begin{comment}
 Non-standard extensions must be listed after all standard extensions.
 They must be separated from other multi-letter extensions
 by an underscore.  For example, an ISA with non-standard extensions
 Argle and Bargle may be named ``RV64IZifencei\_Xargle\_Xbargle''.
+\end{comment}
+非標準の拡張子は標準の拡張子の後に記載しなければなりません。
+非標準の拡張子は、他の複数文字の拡張子とアンダースコアで区切られていなければなりません。
+例えば、非標準の拡張子 Argle と Bargle を持つ ISA は ``RV64IZifencei\_Xargle\_Xbargle'' という名前になります。
 
+\begin{comment}
 If multiple non-standard extensions are listed, they should be ordered
 alphabetically.
+\end{comment}
+複数の非標準拡張子が記載されている場合は、アルファベット順に並べる必要があります。
 
+\begin{comment}
 \section{Subset Naming Convention}
+\end{comment}
+\section{サブセット命名規則}
+
+\begin{comment}
 Table~\ref{isanametable} summarizes the standardized extension names.
+\end{comment}
+表~\ref{isanametable} に標準拡張名をまとめました。
 ~\\
 \begin{table}[h]
 \center
 \begin{tabular}{|l|c|c|}
 \hline
-Subset & Name & Implies \\
+% Subset & Name & Implies \\
+サブセット & 名前 & 意味 \\
 \hline
 \hline
 \multicolumn{3}{|c|}{Base ISA}\\
@@ -198,11 +352,14 @@ Machine-level extension ``jkl'' & Zxmjkl & \\
 Non-standard extension ``mno'' & Xmno & \\
 \hline
 \end{tabular}
+\begin{comment}
 \caption{Standard ISA extension names.  The table also defines the
   canonical order in which extension names must appear in the name
   string, with top-to-bottom in table indicating first-to-last in the
   name string, e.g., RV32IMACV is legal, whereas RV32IMAVC is not.}
+\end{comment}
+\caption{標準的なISA拡張子の名前。
+  また、この表では、名前の文字列に含まれる拡張子の正規の順序を定義しており、表の上から下が名前の文字列の最初から最後を意味します。
+  例えば、RV32IMACVは合法であるが、RV32IMAVCは合法ではないということである。}
 \label{isanametable}
 \end{table}
-
-
