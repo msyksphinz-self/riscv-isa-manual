@@ -9,38 +9,93 @@
   \selectfont}
 \makeatother
 
+\begin{comment}
 \chapter{RVWMO Explanatory Material, Version 0.1}
+\end{comment}
+\chapter{RVWMO説明資料, バージョン0.1}
 \label{sec:memorymodelexplanation}
+\begin{comment}
 This section provides more explanation for RVWMO (Chapter~\ref{ch:memorymodel}), using more informal language and concrete examples.
 These are intended to clarify the meaning and intent of the axioms and preserved program order rules.
 This appendix should be treated as commentary; all normative material is provided in Chapter~\ref{ch:memorymodel} and in the rest of the main body of the ISA specification.
 All currently known discrepancies are listed in Section~\ref{sec:memory:discrepancies}.
 Any other discrepancies are unintentional.
+\end{comment}
+この節では、RVWMO(~\ref{ch:memorymodel}章)について、よりインフォーマルな言葉と具体的な例を用いて説明します。
+これらは、公理と保存されたプログラムの順序規則の意味と意図を明確にすることを目的としています。
+この付録は、解説として扱われるべきであり、すべての規範的な内容は、~\ref{ch:memorymodel}章とISA仕様の残りの本体に記載されています。
+~\ref{sec:memory:discrepancies}節には、現在知られているすべての矛盾点が記載されています。
+その他の不一致は意図的なものではありません。
 
+\begin{comment}
 \section{Why RVWMO?}
+\end{comment}
+\section{なぜRVWMOか?}
 \label{sec:whyrvwmo}
 
+\begin{comment}
 Memory consistency models fall along a loose spectrum from weak to strong.
 Weak memory models allow more hardware implementation flexibility and deliver arguably better performance, performance per watt, power, scalability, and hardware verification overheads than strong models, at the expense of a more complex programming model.
 Strong models provide simpler programming models, but at the cost of imposing more restrictions on the kinds of (non-speculative) hardware optimizations that can be performed in the pipeline and in the memory system, and in turn imposing some cost in terms of power, area overhead, and verification burden.
+\end{comment}
+メモリ一貫性モデルには、弱いものから強いものまで様々な種類があります。
+弱いメモリモデルは、ハードウェア実装の柔軟性が高く、性能、ワットあたりの性能、
+消費電力、スケーラビリティ、ハードウェア検証のオーバーヘッドなどの点で、強いモデルよりも優れていますが、
+プログラミングモデルが複雑になります。
+強いモデルは、よりシンプルなプログラミングモデルを提供しますが、その代償として、
+パイプラインやメモリシステムで実行可能な(非投機的な)ハードウェア最適化に多くの制限が課せられます。
+その結果、消費電力、エリアオーバーヘッド、検証の負担などの面でコストがかかります。
 
+\begin{comment}
 RISC-V has chosen the RVWMO memory model, a variant of release consistency.
 This places it in between the two extremes of the memory model spectrum.
 The RVWMO memory model enables architects to build simple implementations, aggressive implementations, implementations embedded deeply inside a much larger system and subject to complex memory system interactions, or any number of other possibilities, all while simultaneously being strong enough to support programming language memory models at high performance.
+\end{comment}
+RISC-Vは、リリースコンシステンシの一種であるRVWMOメモリモデルを選択しました。
+これにより、RISC-Vはメモリモデルの両極端の間に位置することになります。
+RVWMOメモリモデルにより、アーキテクトは、シンプルな実装、アグレッシブな実装、
+より大規模なシステムの奥深くに組み込まれ、
+複雑なメモリシステムの相互作用にさらされる実装など、さまざまな可能性を構築することができます。
+また、RVWMOメモリモデルは、プログラミング言語のメモリモデルを高い性能でサポートするだけの強度を備えています。
 
+\begin{comment}
 To facilitate the porting of code from other architectures, some hardware implementations may choose to implement the Ztso extension, which provides stricter RVTSO ordering semantics by default.
 Code written for RVWMO is automatically and inherently compatible with RVTSO, but code written assuming RVTSO is not guaranteed to run correctly on RVWMO implementations.
 In fact, most RVWMO implementations will (and should) simply refuse to run RVTSO-only binaries.
 Each implementation must therefore choose whether to prioritize compatibility with RVTSO code (e.g., to facilitate porting from x86) or whether to instead prioritize compatibility with other RISC-V cores implementing RVWMO.
+\end{comment}
+他のアーキテクチャからのコードの移植を容易にするために、ハードウェアの実装によっては、Ztso拡張機能の実装を選択する場合があります。
+Ztso拡張機能は、デフォルトでより厳密なRVTSO順序セマンティクスを提供します。
+RVWMO用に書かれたコードは、自動的かつ本質的にRVTSOと互換性がありますが、
+RVTSOを前提として書かれたコードは、RVWMOの実装上で正しく動作することは保証されていません。
+実際、ほとんどのRVWMOの実装は、RVTSOのみのバイナリの実行を単純に拒否するでしょうし、そうすべきです。
+そのため、各実装は、RVTSOコードとの互換性を優先するか(例えば、x86からの移植を容易にするため)、
+代わりにRVWMOを実装している他のRISC-Vコアとの互換性を優先するかを選択する必要があります。
+RVWMOを実装している他のRISC-V機器との互換性を優先するかを選択します。
 
+\begin{comment}
 Some fences and/or memory ordering annotations in code written for RVWMO may become redundant under RVTSO; the cost that the default of RVWMO imposes on Ztso implementations is the incremental overhead of fetching those fences (e.g., FENCE~R,RW and FENCE~RW,W) which become no-ops on that implementation.
 However, these fences must remain present in the code if compatibility with non-Ztso implementations is desired.
+\end{comment}
+RVWMO用に書かれたコードの中には、RVTSOでは冗長になるフェンスやメモリ順序のアノテーションがあるかもしれません。
+RVWMOのデフォルトがZtsoの実装に課すコストは、その実装でnoopになるフェンス(FENCE~R.RWやFENCE~RW.Wなど)をフェッチするための増分です。
+RVWMOのデフォルトがZtsoの実装に課すコストは、その実装ではno-opとなるフェンス(例えば、FENCE~R,RWとFENCE~RW,W)をフェッチするための増分です。
+しかし、Ztso以外の実装との互換性を確保するためには、これらのフェンスをコード内に残しておく必要があります。
 
+\begin{comment}
 \section{Litmus Tests}\label{sec:litmustests}
+\end{comment}
+\section{リトマステスト}\label{sec:litmustests}
+\begin{comment}
 The explanations in this chapter make use of {\em litmus tests}, or small programs designed to test or highlight one particular aspect of a memory model.
 Figure~\ref{fig:litmus:sample} shows an example of a litmus test with two harts.
 As a convention for this figure and for all figures that follow in this chapter, we assume that {\tt s0}--{\tt s2} are pre-set to the same value in all harts and that {\tt s0} holds the address labeled {\tt x}, {\tt s1} holds {\tt y}, and {\tt s2} holds {\tt z}, where {\tt x}, {\tt y}, and {\tt z} are disjoint memory locations aligned to 8 byte boundaries.
 Each figure shows the litmus test code on the left, and a visualization of one particular valid or invalid execution on the right.
+\end{comment}
+本章では、メモリモデルのある特定の側面をテストしたり、強調したりするために設計された小さなプログラムである、{\em リトマステスト}を用いて説明します。
+図~\ref{fig:litmus:sample}は、2つのhartを使ったリトマステストの例です。
+ここでは、すべてのhartで{\tt s0}～{\tt s2}が同じ値に設定されており、{\tt s0}が{\tt x}、{\tt s1}が{\tt y}、{\tt s2}が{\tt z}と表示されたアドレスを保持しているものとします。
+左側にリトマステストのコード、右側に有効または無効な実行結果を表示しています。
 
 \begin{figure}[h!]
   \centering
@@ -65,15 +120,25 @@ Each figure shows the litmus test code on the left, and a visualization of one p
     & &
     \input{figs/litmus_sample.pdf_t}
 \end{tabular}
+\begin{comment}
     \caption{A sample litmus test and one forbidden execution ({\tt a0=1}).}
+\end{comment}
+\caption{リトマステストの例と1つの禁止された実行({\tt a0=1})}
   \label{fig:litmus:sample}
 \end{figure}
 
+\begin{comment}
 Litmus tests are used to understand the implications of the memory model in specific concrete situations.
 For example, in the litmus test of Figure~\ref{fig:litmus:sample}, the final value of {\tt a0} in the first hart can be either 2, 4, or 5, depending on the dynamic interleaving of the instruction stream from each hart at runtime.
 However, in this example, the final value of {\tt a0} in Hart 0 will never be 1 or 3; intuitively, the value 1 will no longer be visible at the time the load executes, and the value 3 will not yet be visible by the time the load executes.
 We analyze this test and many others below.
+\end{comment}
+リトマステストは、特定の具体的な状況におけるメモリモデルの意味合いを理解するために使用されます。
+例えば、図~\ref{fig:litmus:sample}のリトマステストでは、第1のhartの{\tt a0}の最終値は、実行時の各hartからの命令ストリームの動的インターリーブによって、2、4、5のいずれかになります。
+しかし、この例では、hart 0の{\tt a0}の最終的な値が1や3になることはありません。直感的には、ロードが実行される時点では1の値は見えなくなり、ロードが実行される時点では3の値はまだ見えていません。
+このテストや他の多くのテストを以下で分析します。
 
+\begin{comment}
 \begin{table}[h]
   \centering\small
   \begin{tabular}{|c|l|}
@@ -98,6 +163,37 @@ We analyze this test and many others below.
     \hline
   \end{tabular}
   \caption{A key for the litmus test diagrams drawn in this appendix}
+  \label{tab:litmus:key}
+\end{table}
+\end{comment}
+
+\begin{table}[h]
+  \centering\small
+  \begin{tabular}{|c|l|}
+    \hline
+    エッジ & フルネーム (と、説明) \\
+    \hline
+    \sf rf   & Reads From (from each store to the loads that return a value written by that store) \\
+    \hline
+    \sf co   & Coherence (a total order on the stores to each address) \\
+    \hline
+    \sf fr   & From-Reads (from each load to co-successors of the store from which the load returned a value) \\
+    \hline
+    \sf ppo  & Preserved Program Order \\
+    \hline
+    \sf fence & Orderings enforced by a FENCE instruction \\
+    \hline
+    \sf addr & Address Dependency \\
+    \hline
+    \sf ctrl & Control Dependency \\
+    \hline
+    \sf data & Data Dependency \\
+    \hline
+  \end{tabular}
+  \begin{comment}
+  \caption{A key for the litmus test diagrams drawn in this appendix}
+  \end{comment}
+  \caption{本付録で登場するリトマステストのダイアグラムのキーとなる要素}
   \label{tab:litmus:key}
 \end{table}
 
@@ -547,7 +643,7 @@ In this way, fence-enforced orderings are slightly coarser than orderings enforc
 Release orderings work exactly the same as acquire orderings, just in the opposite direction.  Release semantics require all loads and stores preceding the release operation in program order to also precede the release operation in the global memory order.
 This ensures, for example, that memory accesses in a critical section appear before the lock-releasing store in the global memory order.  Just as for acquire semantics, release semantics can be enforced using release annotations or with a FENCE~RW,W operation.  Using the same examples, the ordering between the loads and stores in the critical section and the ``Arbitrary unrelated store'' at the end of the code snippet is enforced only by the FENCE~RW,W in Figure~\ref{fig:litmus:spinlock_fences}, not by the {\em rl} in Figure~\ref{fig:litmus:spinlock_atomics}.
 
-With RCpc annotations alone, store-release-to-load-acquire ordering is not enforced.  This facilitates the porting of code written under the TSO and/or RCpc memory models.  
+With RCpc annotations alone, store-release-to-load-acquire ordering is not enforced.  This facilitates the porting of code written under the TSO and/or RCpc memory models.
 To enforce store-release-to-load-acquire ordering, the code must use store-release-RCsc and load-acquire-RCsc operations so that PPO rule \ref{ppo:rcsc} applies.
 RCpc alone is sufficient for many use cases in C/C++ but is insufficient for many other use cases in C/C++, Java, and Linux, to name just a few examples; see Section~\ref{sec:memory:porting} for details.
 
@@ -720,7 +816,7 @@ Such a dependency would only serve to ultimately set up later a dependency from 
       (b) & fence w, w  & (f) & lw a1, 0(s2)   \\
       (c) & sw t1,0(s1) &     & xor a2,a1,a1   \\
           &             &     & add s0,s0,a2   \\
-          &             & (g) & lw a3,0(s0)    \\   
+          &             & (g) & lw a3,0(s0)    \\
       \hline
       \multicolumn{4}{c}{Outcome: {\tt a0=1}, {\tt a3=0}}
     \end{tabular}
@@ -753,7 +849,7 @@ Therefore, (f) will never perform before (d) has performed.
           &             & (g) & lw a1, 0(s2)   \\
           &             &     & xor a2,a1,a1   \\
           &             &     & add s0,s0,a2   \\
-          &             & (h) & lw a3,0(s0)    \\   
+          &             & (h) & lw a3,0(s0)    \\
 
       \hline
       \multicolumn{4}{c}{Outcome: {\tt a0=1}, {\tt a3=0}}
@@ -785,7 +881,7 @@ Likewise, a store generally cannot be performed until it is known that preceding
     (c) & sw s2,0(s1) & (f) & sw t1, 0(s0)   \\
     \hline
     \multicolumn{4}{c}{Outcome: {\tt a0=1}, {\tt a1=t}}
-    \end{tabular}  
+    \end{tabular}
     & &
     \input{figs/litmus_addrpo.pdf_t}
   \end{tabular}
